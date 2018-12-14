@@ -1,6 +1,6 @@
 body {
-  background-color: #fff;
-  color: #333;
+  background-color: #FFFFFF;
+  color: #777777;
   margin: 33px;
   font-family: verdana, arial, helvetica, sans-serif;
   font-size: 13px;
@@ -11,24 +11,27 @@ p, ol, ul, td {
   font-family: verdana, arial, helvetica, sans-serif;
   font-size: 13px;
   line-height: 18px;
+  &:hover {
+    color: #F4B1A0
+  }
 }
 
 pre {
-  background-color: #eee;
+  background-color: #FFFFFF;
   padding: 10px;
   font-size: 11px;
 }
 
 a {
-  color: #000;
+  color: #9d9d9d;
 
   &:visited {
     color: #666;
   }
 
   &:hover {
-    color: #fff;
-    background-color: #000;
+    color: #F4B1A0;
+    background-color: none;
   }
 }
 
@@ -47,7 +50,7 @@ div {
 }
 
 #notice {
-  color: green;
+  color: #8D9478;
 }
 
 .field_with_errors {
