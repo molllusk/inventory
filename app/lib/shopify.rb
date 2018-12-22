@@ -52,6 +52,22 @@ class ShopifyClient
     response.body
   end
 
+  def self.set_inventory(inventory, quantity)
+    body = {
+      "location_id": inventory['location_id'],
+      "inventory_item_id": inventory['inventory_item_id'],
+      "available": quantity
+    }
+
+    response = connection.post do |req|
+      req.url '/admin/inventory_levels/adjust.json'
+      req.headers['Content-Type'] = 'application/json'
+      req.body = body
+    end
+
+    response.body
+  end
+
   def self.products_attributes(product)
     products = []
 
