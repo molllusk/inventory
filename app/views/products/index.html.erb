@@ -7,16 +7,24 @@
     <th>Product (vend name)</th>
     <th>SKU</th>
     <th>Quantity</th>
-    <th>Vend link</th>
+    <th>Vend</th>
+    <th>Shopify</th>
   </tr>
   <% @products.each do |product| %>
     <% vend = product.vend_datum %>
     <% shopify = product.shopify_datum %>
     <tr>
-      <td><%= link_to vend.name, product %>
+      <td><%= link_to vend.name, product %></td>
       <td><%= vend.sku %></td>
-      <td>Quantity</td>
+      <td>qty. place holder</td>
       <td><a href='https://mollusksurf.vendhq.com/product/<%= vend.vend_id %>' target='_blank'>Vend page</a></td>
+      <td>
+        <% if product.shopify_datum.present? %>
+          <a href='' target='_blank'>Shopify page</a>
+        <% else %>
+          n/a
+        <% end %>
+      </td>
     </tr>
   <% end %>
 </table>
