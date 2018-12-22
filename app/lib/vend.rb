@@ -59,8 +59,8 @@ class VendClient
 
   def self.update_inventory
     inventories = get_inventory
-    VendDatum.find_each do |product|
-      inventory = inventories.find { |iv| iv['product_id'] == product.vend_id }
+    VendDatum.find_each do |vd|
+      inventory = inventories.find { |iv| iv['product_id'] == vd.vend_id }
       if inventory.present?
         vd.update_attribute(:inventory, inventory['inventory_level']) unless vd.inventory == inventory['inventory_level']
       end
