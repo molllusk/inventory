@@ -1,0 +1,52 @@
+<% provide(:title, 'Product') %>
+<h1>Product: <%= @product.vend_datum.name %></h1>
+
+<hr/>
+
+<h2>Vend Data:</h2>
+<% if @product.vend_datum.present? %>
+  <table>
+    <% @product.vend_datum.attributes.each do |vd| %>
+      <% if vd.last.present? %>
+        <% next if ['variant_options', 'tag_ids', 'categories', 'description'].include?(vd.first) %>
+        <tr>
+          <td>
+            <strong><%= vd.shift.humanize %></strong>
+          </td>
+          <td>
+            <% if vd.first.is_a? Hash %>
+              <%= vd.shift['name'] %>
+            <% elsif vd.first.is_a? Array %>
+              <%= vd.shift.join(', ') %>
+            <% else %>
+              <%= vd.shift %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    <% end %>
+  </table>
+<% end %>
+
+<% if @product.shopify_datum.present? %>
+  <hr/>
+  <h2>Shopify Data:</h2>
+  <table>
+    <% @product.shopify_datum.attributes.each do |vd| %>
+      <% if vd.last.present? %>
+        <tr>
+          <td>
+            <strong><%= vd.shift.humanize %></strong>
+          </td>
+          <td>
+            <% if vd.first.is_a? Array %>
+              <%= vd.shift.join(', ') %>
+            <% else %>
+              <%= vd.shift %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    <% end %>
+  <table>
+<% end %>

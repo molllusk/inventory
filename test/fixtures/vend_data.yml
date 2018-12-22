@@ -1,0 +1,53 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  active: false
+  brand: MyString
+  brand_id: MyString
+  categories: MyText
+  vend_created_at: 2018-12-20 12:20:19
+  deleted_at: 2018-12-20 12:20:19
+  description: MyText
+  handle: MyString
+  has_inventory: false
+  has_variants: false
+  id: MyString
+  is_active: false
+  name: MyString
+  product_type_id: MyString
+  sku: MyString
+  supplier: MyString
+  supplier_id: MyString
+  supply_price: MyString
+  tag_ids: MyText
+  type: 
+  variant_count: MyString
+  variant_name: MyString
+  variant_options: MyText
+  variant_parent_id: MyString
+
+two:
+  active: false
+  brand: MyString
+  brand_id: MyString
+  categories: MyText
+  vend_created_at: 2018-12-20 12:20:19
+  deleted_at: 2018-12-20 12:20:19
+  description: MyText
+  handle: MyString
+  has_inventory: false
+  has_variants: false
+  id: MyString
+  is_active: false
+  name: MyString
+  product_type_id: MyString
+  sku: MyString
+  supplier: MyString
+  supplier_id: MyString
+  supply_price: MyString
+  tag_ids: MyText
+  type: 
+  variant_count: MyString
+  variant_name: MyString
+  variant_options: MyText
+  variant_parent_id: MyString

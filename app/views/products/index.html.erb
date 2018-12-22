@@ -1,0 +1,24 @@
+<% provide(:title, 'All products') %>
+<h1>All Products</h1>
+
+<div class="col-md-11">
+<table class="users">
+  <tr>
+    <th>Product (vend name)</th>
+    <th>SKU</th>
+    <th>Quantity</th>
+    <th>Vend link</th>
+  </tr>
+  <% @products.each do |product| %>
+    <% vend = product.vend_datum %>
+    <% shopify = product.shopify_datum %>
+    <tr>
+      <td><%= link_to vend.name, product %>
+      <td><%= vend.sku %></td>
+      <td>Quantity</td>
+      <td><a href='https://mollusksurf.vendhq.com/product/<%= vend.vend_id %>' target='_blank'>Vend page</a></td>
+    </tr>
+  <% end %>
+</table>
+
+<%= will_paginate %>

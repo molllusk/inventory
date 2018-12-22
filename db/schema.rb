@@ -10,10 +10,45 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181211230043) do
+ActiveRecord::Schema.define(version: 20181222061745) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "products", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "shopify_data", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "handle"
+    t.string "product_type"
+    t.text "tags"
+    t.string "title"
+    t.string "vendor"
+    t.string "barcode"
+    t.string "compare_at_price"
+    t.string "fulfillment_service"
+    t.integer "grams"
+    t.bigint "inventory_item_id"
+    t.string "inventory_management"
+    t.string "inventory_policy"
+    t.integer "inventory_quantity"
+    t.integer "old_inventory_quantity"
+    t.string "price"
+    t.bigint "shopify_product_id"
+    t.bigint "variant_id"
+    t.string "requires_shipping"
+    t.string "sku"
+    t.string "variant_title"
+    t.float "weight"
+    t.string "weight_unit"
+    t.datetime "variant_created_at"
+    t.datetime "shopify_created_at"
+    t.integer "product_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "name"
@@ -23,6 +58,36 @@ ActiveRecord::Schema.define(version: 20181211230043) do
     t.string "password_digest"
     t.string "remember_digest"
     t.boolean "admin", default: false
+  end
+
+  create_table "vend_data", force: :cascade do |t|
+    t.boolean "active"
+    t.string "brand"
+    t.string "brand_id"
+    t.text "categories"
+    t.datetime "vend_created_at"
+    t.datetime "vend_deleted_at"
+    t.text "description"
+    t.string "handle"
+    t.boolean "has_inventory"
+    t.boolean "has_variants"
+    t.string "vend_id"
+    t.boolean "is_active"
+    t.string "name"
+    t.string "product_type_id"
+    t.string "sku"
+    t.string "supplier"
+    t.string "supplier_id"
+    t.string "supply_price"
+    t.text "tag_ids"
+    t.text "vend_type"
+    t.string "variant_count"
+    t.string "variant_name"
+    t.text "variant_options"
+    t.string "variant_parent_id"
+    t.integer "product_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
 end
