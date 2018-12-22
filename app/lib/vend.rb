@@ -53,8 +53,18 @@ class VendClient
     all_products.select { |product| product['is_active'] }
   end
 
-  def self.inventory
+  def self.get_inventory
     paginator('inventory')
+  end
+
+  def self.update_inventory
+    inventories = get_inventory
+    VendDatum.find_each do |product|
+      inventory = inventories.find { |iv| iv['product_id'] == product.vend_id }
+      if inventory.present?
+        vd.update_attribute(:inventory, inventory['inventory_level']) unless vd.inventory == inventory['inventory_level']
+      end
+    end
   end
 
   def self.product_attributes(product)

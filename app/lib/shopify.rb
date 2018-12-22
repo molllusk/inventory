@@ -47,6 +47,11 @@ class ShopifyClient
     products
   end
 
+  def self.get_inventory(inventory_item_id)
+    response = connection.get "/admin/inventory_levels.json?inventory_item_ids=#{inventory_item_id}"
+    response.body
+  end
+
   def self.products_attributes(product)
     products = []
 

@@ -6,7 +6,7 @@
   <tr>
     <th>Product (vend name)</th>
     <th>SKU</th>
-    <th>Quantity</th>
+    <th>Vend Qty</th>
     <th>Vend</th>
     <th>Shopify</th>
   </tr>
@@ -16,7 +16,7 @@
     <tr>
       <td><%= link_to vend.name, product %></td>
       <td><%= vend.sku %></td>
-      <td>qty. place holder</td>
+      <td><%= vend.inventory %></td>
       <td><a href='https://mollusksurf.vendhq.com/product/<%= vend.vend_id %>' target='_blank'>Vend page</a></td>
       <td>
         <% if shopify.present? %>
