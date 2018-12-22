@@ -19,8 +19,8 @@
       <td>qty. place holder</td>
       <td><a href='https://mollusksurf.vendhq.com/product/<%= vend.vend_id %>' target='_blank'>Vend page</a></td>
       <td>
-        <% if product.shopify_datum.present? %>
-          <a href='' target='_blank'>Shopify page</a>
+        <% if shopify.present? %>
+          <a href='https://mollusksurf.myshopify.com/admin/products/<%= shopify.shopify_product_id %>/variants/<%= shopify.variant_id %>' target='_blank'>Shopify page</a>
         <% else %>
           n/a
         <% end %>
