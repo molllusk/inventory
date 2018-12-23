@@ -49,20 +49,20 @@ class ShopifyClient
 
   def self.get_inventory(inventory_item_id)
     response = connection.get "/admin/inventory_levels.json?inventory_item_ids=#{inventory_item_id}"
-    response.body
+    response.body["inventory_levels"].first
   end
 
-  def self.set_inventory(inventory, quantity)
+  def self.set_inventory(inventory, adjustment)
     body = {
       "location_id": inventory['location_id'],
       "inventory_item_id": inventory['inventory_item_id'],
-      "available": quantity
+      "available_adjustment": adjustment
     }
 
     response = connection.post do |req|
       req.url '/admin/inventory_levels/adjust.json'
       req.headers['Content-Type'] = 'application/json'
-      req.body = body
+      req.body = body.to_json
     end
 
     response.body
