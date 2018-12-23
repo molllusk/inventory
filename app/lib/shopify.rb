@@ -80,7 +80,7 @@ class ShopifyClient
     SAVED_PRODUCT_ATTRIBUTES.each { |saved_attribute| cleaned[saved_attribute] = product[saved_attribute.to_s] }
 
     product['variants'].each do |variant|
-      products << variant_attributes(cleaned, variant)
+      products << variant_attributes(cleaned.clone, variant)
     end
     products
   end
@@ -90,7 +90,7 @@ class ShopifyClient
     attributes[:variant_created_at] = variant['created_at']
     attributes[:variant_title] = variant['title']
 
-    SAVED_VARIANT_ATTRIBUTES.each { |saved_attribute| attributes[saved_attribute] = variant[saved_attribute.to_s]}
+    SAVED_VARIANT_ATTRIBUTES.each { |saved_attribute| attributes[saved_attribute] = variant[saved_attribute.to_s] }
     attributes
   end
 
