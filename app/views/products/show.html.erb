@@ -3,7 +3,7 @@
 
 <hr/>
 
-<h2>Vend Data:</h2>
+<h2>Vend Data (<a href='https://mollusksurf.vendhq.com/product/<%= @product.vend_datum.vend_id %>' target='_blank'>link</a>):</h2>
 <% if @product.vend_datum.present? %>
   <table>
     <% @product.vend_datum.attributes.each do |vd| %>
@@ -30,7 +30,7 @@
 
 <% if @product.shopify_datum.present? %>
   <hr/>
-  <h2>Shopify Data:</h2>
+  <h2>Shopify Data (<a href='https://mollusksurf.myshopify.com/admin/products/<%= @product.shopify_datum.shopify_product_id %>/variants/<%= @product.shopify_datum.variant_id %>' target='_blank'>link</a>):</h2>
   <table>
     <% @product.shopify_datum.attributes.each do |vd| %>
       <% if vd.last.present? %>
