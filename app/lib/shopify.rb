@@ -32,31 +32,39 @@ class ShopifyClient
     end
   end
 
-  def self.product_count
-    response = connection.get 'admin/products/count.json'
+  def self.count(resource)
+    response = connection.get "/admin/#{resource}/count.json"
     response.body['count']
   end
 
   def self.all_products
-    products = []
-    pages = (product_count / 250.0).ceil
+    all_resource('products')
+  end
+
+  def self.all_orders
+    all_resource('orders')
+  end
+
+  def self.all_resource(resource)
+    resources = []
+    pages = (count(resource) / 250.0).ceil
     pages.times do |page|
-      response = connection.get '/admin/products.json', { limit: 250, page: page + 1 }
-      products += response.body['products']
+      response = connection.get "/admin/#{resource}.json", { limit: 250, page: page + 1 }
+      resources += response.body[resource]
     end
-    products
+    resources
   end
 
   def self.get_inventory(inventory_item_id)
     response = connection.get "/admin/inventory_levels.json?inventory_item_ids=#{inventory_item_id}"
-    response.body["inventory_levels"].first
+    response.body['inventory_levels'].first
   end
 
   def self.set_inventory(inventory, adjustment)
     body = {
-      "location_id": inventory['location_id'],
-      "inventory_item_id": inventory['inventory_item_id'],
-      "available_adjustment": adjustment
+      'location_id': inventory['location_id'],
+      'inventory_item_id': inventory['inventory_item_id'],
+      'available_adjustment': adjustment
     }
 
     response = connection.post do |req|

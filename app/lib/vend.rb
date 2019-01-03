@@ -1,5 +1,7 @@
 class VendClient
-  BASE_URL = "https://mollusksurf.vendhq.com/api/2.0".freeze
+  BASE_URL = 'https://mollusksurf.vendhq.com/api/2.0'.freeze
+  SF_OUTLET_ID = '5e234f4e-8eed-11e0-8e09-4040f540b50a'.freeze
+  SILVERLAKE_OUTLET_ID = '8d27bed3-060b-11e4-a0f5-b8ca3a64f8f4'.freeze
 
   SAVED_ATTRIBUTES = %i[
     active
@@ -57,8 +59,12 @@ class VendClient
     paginator('inventory')
   end
 
+  def self.get_sf_inventory
+    get_inventory.select { |inventory| inventory['outlet_id'] == SF_OUTLET_ID }
+  end
+
   def self.update_inventory
-    inventories = get_inventory
+    inventories = get_sf_inventory
     VendDatum.find_each do |vd|
       inventory = inventories.find { |iv| iv['product_id'] == vd.vend_id }
       if inventory.present?
