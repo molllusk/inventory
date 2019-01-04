@@ -1,5 +1,6 @@
 class ShopifyClient
   BASE_URL = "https://#{ENV['SHOPIFY_USER']}:#{ENV['SHOPIFY_PASSWORD']}@mollusksurf.myshopify.com".freeze
+  SF_LOCATION = 49481991
 
   SAVED_PRODUCT_ATTRIBUTES = %i[
     handle
@@ -41,6 +42,7 @@ class ShopifyClient
     all_resource('products')
   end
 
+  # Discuss with joseph: orders.map { |o| o['line_items'].map { |aa| aa['fulfillment_status'] } }
   def self.all_orders
     all_resource('orders')
   end
@@ -55,9 +57,29 @@ class ShopifyClient
     resources
   end
 
-  def self.get_inventory(inventory_item_id)
+  def self.get_inventory_items(inventory_item_id)
     response = connection.get "/admin/inventory_levels.json?inventory_item_ids=#{inventory_item_id}"
+    response.body['inventory_levels']
+  end
+
+  def self.get_sf_inventory_item(inventory_item_id)
+    response = connection.get "/admin/inventory_levels.json?inventory_item_ids=#{inventory_item_id}&location_ids=#{SF_LOCATION}"
     response.body['inventory_levels'].first
+  end
+
+  def self.get_sf_inventory(inventory_item_id)
+    get_sf_inventory_item(inventory_item_id)['available'] if get_sf_inventory_item(inventory_item_id).present?
+  end
+
+  def self.order_quantities_by_variant
+    orders = Hash.new(0)
+    all_orders.each do |order|
+      next if %w(fulfilled restocked).include? order['fulfillment_status']
+      order['line_items'].each do |line_item|
+        orders[line_item['variant_id']] += line_item['quantity'] if line_item['fulfillment_status'].blank?
+      end
+    end
+    orders
   end
 
   def self.set_inventory(inventory, adjustment)

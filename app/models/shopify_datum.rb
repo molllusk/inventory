@@ -6,4 +6,8 @@ class ShopifyDatum < ApplicationRecord
   def full_title
     "#{title} - #{variant_title}"
   end
+
+  def sf_inventory
+    ShopifyClient.get_sf_inventory(inventory_item_id)
+  end
 end
