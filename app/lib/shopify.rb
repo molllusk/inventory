@@ -1,6 +1,7 @@
 class ShopifyClient
   BASE_URL = "https://#{ENV['SHOPIFY_USER']}:#{ENV['SHOPIFY_PASSWORD']}@mollusksurf.myshopify.com".freeze
-  SF_LOCATION = 49481991
+  SF_INVENTORY_LOCATION = 49481991
+  SF_ORIGIN_LOCATION = 280914881
 
   SAVED_PRODUCT_ATTRIBUTES = %i[
     handle
@@ -42,11 +43,6 @@ class ShopifyClient
     all_resource('products')
   end
 
-  # Discuss with joseph: orders.map { |o| o['line_items'].map { |aa| aa['fulfillment_status'] } }
-  def self.all_orders
-    all_resource('orders')
-  end
-
   def self.all_resource(resource)
     resources = []
     pages = (count(resource) / 250.0).ceil
@@ -57,13 +53,28 @@ class ShopifyClient
     resources
   end
 
+  def self.all_orders
+    all_resource('orders')
+  end
+
+  def self.order_quantities_by_variant
+    orders = Hash.new(0)
+    all_orders.each do |order|
+      next if %w(fulfilled restocked).include? order['fulfillment_status']
+      order['line_items'].each do |line_item|
+        orders[line_item['variant_id']] += line_item['quantity'] if line_item['fulfillment_status'].blank? && line_item['origin_location']['id'] == SF_ORIGIN_LOCATION
+      end
+    end
+    orders
+  end
+
   def self.get_inventory_items_all_locations(inventory_item_ids)
     response = connection.get "/admin/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}"
     response.body['inventory_levels']
   end
 
   def self.get_inventory_items_sf(inventory_item_ids)
-    response = connection.get "/admin/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}&location_ids=#{SF_LOCATION}&limit=250"
+    response = connection.get "/admin/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}&location_ids=#{SF_INVENTORY_LOCATION}&limit=250"
     response.body['inventory_levels']
   end
 
@@ -72,15 +83,17 @@ class ShopifyClient
     inventory_item.first['available'] if inventory_item.first.present?
   end
 
-  def self.order_quantities_by_variant
-    orders = Hash.new(0)
-    all_orders.each do |order|
-      next if %w(fulfilled restocked).include? order['fulfillment_status']
-      order['line_items'].each do |line_item|
-        orders[line_item['variant_id']] += line_item['quantity'] if line_item['fulfillment_status'].blank?
+  def self.update_inventories
+    inventory_item_ids = ShopifyDatum.pluck(:inventory_item_id)
+
+    while inventory_item_ids.present?
+      id_batch = inventory_item_ids.shift(50)
+      inventory_items = ShopifyClient.get_inventory_items_sf(id_batch)
+      inventory_items.each do |inventory_item|
+        sd = ShopifyDatum.find_by_inventory_item_id(inventory_item['inventory_item_id'])
+        sd.update_attribute(:inventory, inventory_item['available']) unless sd.inventory == inventory_item['available']
       end
     end
-    orders
   end
 
   def self.set_inventory(inventory, adjustment)
