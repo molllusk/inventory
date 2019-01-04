@@ -64,7 +64,6 @@ class VendClient
   end
 
   def self.update_inventory
-    orders = ShopifyClient.order_quantities_by_variant
     inventories = VendClient.get_sf_inventory
     VendDatum.find_each do |vd|
       vend_inventory = inventories.find { |inv| inv['product_id'] == vd.vend_id }
