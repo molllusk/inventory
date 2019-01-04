@@ -100,10 +100,10 @@ class ShopifyClient
     end
   end
 
-  def self.set_inventory(inventory, adjustment)
+  def self.adjust_inventory(inventory_item_id, adjustment)
     body = {
-      'location_id': inventory['location_id'],
-      'inventory_item_id': inventory['inventory_item_id'],
+      'location_id': SF_INVENTORY_LOCATION,
+      'inventory_item_id': inventory_item_id,
       'available_adjustment': adjustment
     }
 
