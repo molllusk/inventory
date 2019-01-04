@@ -28,7 +28,7 @@
       </td>
       <td>
         <% if shopify.present? %>
-          <%= shopify.tags.include?('3rdParty') %>
+          <%= shopify.tags.map { |tag| tag.strip.downcase }.include?('3rdparty') %>
         <% else %>
           n/a
         <% end %>
