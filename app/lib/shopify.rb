@@ -92,8 +92,10 @@ class ShopifyClient
       inventory_items = ShopifyClient.get_inventory_items_sf(id_batch)
       inventory_items.each do |inventory_item|
         sd = ShopifyDatum.find_by_inventory_item_id(inventory_item['inventory_item_id'])
-        current_inventory = inventory_item['available'] + orders[sd.variant_id]
-        sd.update_attribute(:inventory, current_inventory) unless sd.inventory == current_inventory
+        if inventory_item['available'].present?
+          current_inventory = inventory_item['available'] + orders[sd.variant_id]
+          sd.update_attribute(:inventory, current_inventory) unless sd.inventory == current_inventory
+        end
       end
     end
   end
