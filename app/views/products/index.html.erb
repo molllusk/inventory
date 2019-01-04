@@ -20,7 +20,7 @@
       <td><%= vend.inventory %></td>
       <td>
         <% if shopify.present? %>
-          <%= shopify.inventory %>
+          <%= shopify.inventory || 'n/a' %>
         <% else %>
           n/a
         <% end %>

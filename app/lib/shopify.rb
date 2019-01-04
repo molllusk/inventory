@@ -57,18 +57,19 @@ class ShopifyClient
     resources
   end
 
-  def self.get_inventory_items(inventory_item_id)
-    response = connection.get "/admin/inventory_levels.json?inventory_item_ids=#{inventory_item_id}"
+  def self.get_inventory_items_all_locations(inventory_item_ids)
+    response = connection.get "/admin/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}"
     response.body['inventory_levels']
   end
 
-  def self.get_sf_inventory_item(inventory_item_id)
-    response = connection.get "/admin/inventory_levels.json?inventory_item_ids=#{inventory_item_id}&location_ids=#{SF_LOCATION}"
-    response.body['inventory_levels'].first
+  def self.get_inventory_items_sf(inventory_item_ids)
+    response = connection.get "/admin/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}&location_ids=#{SF_LOCATION}&limit=250"
+    response.body['inventory_levels']
   end
 
   def self.get_sf_inventory(inventory_item_id)
-    get_sf_inventory_item(inventory_item_id)['available'] if get_sf_inventory_item(inventory_item_id).present?
+    inventory_item = get_inventory_items_sf([inventory_item_id])
+    inventory_item.first['available'] if inventory_item.first.present?
   end
 
   def self.order_quantities_by_variant
