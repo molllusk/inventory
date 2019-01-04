@@ -63,26 +63,12 @@ class VendClient
     get_inventory.select { |inventory| inventory['outlet_id'] == SF_OUTLET_ID }
   end
 
-  def self.update_inventory
+  def self.update_inventories
     inventories = VendClient.get_sf_inventory
     VendDatum.find_each do |vd|
       vend_inventory = inventories.find { |inv| inv['product_id'] == vd.vend_id }
       if vend_inventory.present?
-        product = vd.product
         vd.update_attribute(:inventory, vend_inventory['inventory_level']) unless vd.inventory == vend_inventory['inventory_level']
-        # if product.has_shopify?
-        #   shopify_inventories = ShopifyClient.get_inventories(product.shopify_datum.inventory_item_id)
-        #   if shopify_inventories.present?
-        #     # will change this line once I know how to attend to inventories
-        #     shopify_inventory = shopify_inventories.first
-        #     shopify_inventory += orders[product.shopify_datum.variant_id] if orders[product.shopify_datum.variant_id].present?
-        #     if shopify_inventory != vend_inventory['inventory_level']
-        #       puts "+{}+{}" * 30
-        #       puts "Product (ID: #{product.id}) Vend: #{vend_inventory['inventory_level']} | Shopify: #{shopify_inventory}"
-        #       puts "+{}+{}" * 30
-        #     end
-        #   end
-        # end
       end
     end
   end

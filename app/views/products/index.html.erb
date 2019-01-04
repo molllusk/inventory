@@ -17,10 +17,10 @@
     <tr>
       <td><%= link_to vend.name, product %></td>
       <td><%= vend.sku %></td>
-      <td><%= vend.inventory %></td>
+      <td><%= vend.inventory || 'missing' %></td>
       <td>
         <% if shopify.present? %>
-          <%= shopify.inventory || 'n/a' %>
+          <%= shopify.inventory || 'missing' %>
         <% else %>
           n/a
         <% end %>
