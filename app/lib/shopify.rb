@@ -57,12 +57,24 @@ class ShopifyClient
     all_resource('orders')
   end
 
+  # Final order quantity needs to account for refunded items
   def self.order_quantities_by_variant
     orders = Hash.new(0)
+    refunds = Hash.new(0)
+
     all_orders.each do |order|
       next if %w(fulfilled restocked).include? order['fulfillment_status']
+
+      order['refunds'].each do |refund|
+        refund['refund_line_items'].each do |refund_line_item|
+          refunds[refund_line_item['line_item_id']] += refund_line_item['quantity']
+        end
+      end
+
       order['line_items'].each do |line_item|
-        orders[line_item['variant_id']] += line_item['quantity'] if line_item['fulfillment_status'].blank? && line_item['origin_location']['id'] == SF_ORIGIN_LOCATION
+        if line_item['fulfillment_status'].blank? && line_item['origin_location']['id'] == SF_ORIGIN_LOCATION
+          orders[line_item['variant_id']] += line_item['quantity'] - refunds[line_item['id']]
+        end
       end
     end
     orders
