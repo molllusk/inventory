@@ -64,7 +64,7 @@ class VendClient
   end
 
   def self.update_inventories
-    inventories = VendClient.get_sf_inventory
+    inventories = get_sf_inventory
     VendDatum.find_each do |vd|
       vend_inventory = inventories.find { |inv| inv['product_id'] == vd.vend_id }
       if vend_inventory.present?
