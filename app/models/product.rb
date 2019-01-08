@@ -1,10 +1,12 @@
 class Product < ApplicationRecord
   has_one :vend_datum, dependent: :destroy
   has_one :shopify_datum, dependent: :destroy
+  has_many :inventory_updates, dependent: :destroy
 
   CSV_HEADERS = %w(
     id
     name
+    variant
     vend
     shopify
     difference
@@ -60,32 +62,56 @@ class Product < ApplicationRecord
   }
 
   def self.inventory_check
-    csv = inventory_check_csv
+    csv = inventory_csv
     ApplicationMailer.inventory_check(csv).deliver if CSV.parse(csv).count > 1
   end
 
-  def self.inventory_check_csv
+  def self.inventory_csv(make_updates = false)
     CSV.generate(headers: CSV_HEADERS, write_headers: true) do |csv|
       third_party_or_sale.find_each do |product|
-        vend_inventory = product.vend_datum.inventory.to_i
-        shopify_inventory = product.shopify_datum.inventory.to_i
-        csv << [
-          product.id,
-          "#{product.vend_datum.name} #{product.vend_datum.variant_name}".strip,
-          vend_inventory,
-          shopify_inventory,
-          vend_inventory - shopify_inventory,
-          product.shopify_datum.price,
-          !(vend_inventory < 0 && shopify_inventory.zero?),
-          product.shopify_datum.tags.detect { |tag| tag.strip.downcase == '3rdparty' }.present?,
-          product.shopify_datum.tags.detect { |tag| tag.strip.downcase == 'sale' }.present?,
-          "https://mollusk.herokuapp.com/products/#{product.id}"
-        ] if vend_inventory != shopify_inventory
+        if product.vend_inventory != product.shopify_inventory
+          csv << product.inventory_csv_row
+          if make_updates && product.update_shopify_inventory?
+            
+          end
+        end
       end
     end
   end
 
-  def has_shopify?
-    shopify_datum.present?
+  def inventory_csv_row
+    [
+      id,
+      vend_datum.name,
+      vend_datum.variant_name,
+      vend_inventory,
+      shopify_inventory,
+      vend_inventory - shopify_inventory,
+      shopify_datum.price,
+      update_shopify_inventory?,
+      third_party?,
+      sale?,
+      "https://mollusk.herokuapp.com/products/#{id}"
+    ]
+  end
+
+  def shopify_inventory
+    shopify_datum.inventory.to_i
+  end
+
+  def vend_inventory
+    vend_datum.inventory.to_i
+  end
+
+  def update_shopify_inventory?
+    (third_party? || sale?) && !(vend_inventory < 0 && shopify_inventory.zero?)
+  end
+
+  def third_party?
+    shopify_datum.tags.detect { |tag| tag.strip.downcase == '3rdparty' }.present?
+  end
+
+  def sale?
+    shopify_datum.tags.detect { |tag| tag.strip.downcase == 'sale' }.present?
   end
 end
