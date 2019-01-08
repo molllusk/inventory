@@ -14,4 +14,5 @@
 //= require bootstrap
 //= require rails-ujs
 //= require turbolinks
+//= require filterrific/filterrific-jquery
 //= require_tree .

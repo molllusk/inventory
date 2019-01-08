@@ -92,6 +92,7 @@ class VendClient
 
   def self.create_product(product)
     vd = VendDatum.new(product_attributes(product))
+    # need to test product.new vs product.create here.
     vd.product = Product.create
     if vd.save
       return vd.product

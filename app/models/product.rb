@@ -4,6 +4,42 @@ class Product < ApplicationRecord
 
   CSV_HEADERS = %w(id name vend shopify difference url)
 
+  filterrific(
+     available_filters: [
+       :search_query,
+     ]
+   )
+
+  scope :third_party, lambda {
+    where("LOWER(shopify_data.tags) like ?", "%3rdparty%").joins(:shopify_datum)
+  }
+
+  scope :search_query, lambda { |query|
+    # Matches using LIKE, automatically appends '%' to each term.
+    # LIKE is case INsensitive with MySQL, however it is case
+    # sensitive with PostGreSQL. To make it work in both worlds,
+    # we downcase everything.
+    return nil if query.blank?
+
+    terms = query.downcase.split(/\s+/)
+
+    terms = terms.map { |e|
+      ('%' + e + '%').gsub(/%+/, '%')
+    }
+
+    # configure number of OR conditions for provision
+    # of interpolation arguments. Adjust this if you
+    # change the number of OR conditions.
+    num_or_conds = 4
+
+    joins(:shopify_datum, :vend_datum).where(
+      terms.map { |term|
+        "(LOWER(shopify_data.title) LIKE ? OR LOWER(shopify_data.variant_title) LIKE ? OR LOWER(vend_data.name) LIKE ? OR LOWER(vend_data.variant_name) LIKE ?)"
+      }.join(' AND '),
+      *terms.map { |e| [e] * num_or_conds }.flatten
+    )
+  }
+
   def self.inventory_check
     csv = inventory_check_csv
     ApplicationMailer.inventory_check(csv).deliver if CSV.parse(csv).count > 1

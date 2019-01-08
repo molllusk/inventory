@@ -1,48 +1,25 @@
 <% provide(:title, 'All products') %>
-<h1>All Products</h1>
+<h1>Search Products</h1>
 
-<div class="col-md-11">
-<table class="products">
-  <tr>
-    <th>Product (vend name)</th>
-    <th>SKU</th>
-    <th>Vend SF Qty</th>
-    <th>Shopify SF Qty</th>
-    <th>3rd Party in Shopify</th>
-    <th>Vend</th>
-    <th>Shopify</th>
-  </tr>
-  <% @products.each do |product| %>
-    <% vend = product.vend_datum %>
-    <% shopify = product.shopify_datum %>
-    <tr>
-      <td><%= link_to vend.name, product %></td>
-      <td><%= vend.sku %></td>
-      <td><%= vend.inventory || 'missing' %></td>
-      <td>
-        <% if shopify.present? %>
-          <%= shopify.inventory || 'missing' %>
-        <% else %>
-          n/a
-        <% end %>
-      </td>
-      <td>
-        <% if shopify.present? %>
-          <%= shopify.tags.map { |tag| tag.strip.downcase }.include?('3rdparty') %>
-        <% else %>
-          n/a
-        <% end %>
-      </td>
-      <td><a href='https://mollusksurf.vendhq.com/product/<%= vend.vend_id %>' target='_blank'>Vend page</a></td>
-      <td>
-        <% if shopify.present? %>
-          <a href='https://mollusksurf.myshopify.com/admin/products/<%= shopify.shopify_product_id %>/variants/<%= shopify.variant_id %>' target='_blank'>Shopify page</a>
-        <% else %>
-          n/a
-        <% end %>
-      </td>
-    </tr>
-  <% end %>
-</table>
+<%= form_for_filterrific @filterrific do |f| %>
+  <div class='center' style='margin-bottom: 5px;'>
+    <%# give the search field the 'filterrific-periodically-observed' class for live updates %>
+    <%= f.text_field(
+      :search_query,
+      class: 'filterrific-periodically-observed'
+    ) %>
+  </div>
+  <div class='center' style='margin-bottom: 10px;'>
+    <%= link_to(
+      'Reset Search',
+      reset_filterrific_url,
+      class: "btn btn-primary", style: 'color: white') %>
+  </div>
+  <%# add an automated spinner to your form when the list is refreshed %>
+  <%= render_filterrific_spinner %>
+<% end %>
 
-<%= will_paginate %>
+<%= render(
+  partial: 'products/list',
+  locals: { products: @products }
+) %>
