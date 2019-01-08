@@ -2,7 +2,18 @@ class Product < ApplicationRecord
   has_one :vend_datum, dependent: :destroy
   has_one :shopify_datum, dependent: :destroy
 
-  CSV_HEADERS = %w(id name vend shopify difference price url)
+  CSV_HEADERS = %w(
+    id
+    name
+    vend
+    shopify
+    difference
+    price
+    update?
+    3rdParty
+    sale
+    url
+  )
 
   filterrific(
      available_filters: [
@@ -11,7 +22,15 @@ class Product < ApplicationRecord
    )
 
   scope :third_party, lambda {
-    where("LOWER(shopify_data.tags) like ?", "%3rdparty%").joins(:shopify_datum)
+    where('LOWER(shopify_data.tags) like ?', '%3rdparty%').joins(:shopify_datum)
+  }
+
+  scope :sale, lambda {
+    where('LOWER(shopify_data.tags) like ?', '%sale%').joins(:shopify_datum)
+  }
+
+  scope :third_party_or_sale, lambda {
+    where('LOWER(shopify_data.tags) like ? OR LOWER(shopify_data.tags) like ?', '%3rdparty%', '%sale%').joins(:shopify_datum)
   }
 
   scope :search_query, lambda { |query|
@@ -47,7 +66,7 @@ class Product < ApplicationRecord
 
   def self.inventory_check_csv
     CSV.generate(headers: CSV_HEADERS, write_headers: true) do |csv|
-      third_party.find_each do |product|
+      third_party_or_sale.find_each do |product|
         vend_inventory = product.vend_datum.inventory.to_i
         shopify_inventory = product.shopify_datum.inventory.to_i
         csv << [
@@ -57,6 +76,9 @@ class Product < ApplicationRecord
           shopify_inventory,
           vend_inventory - shopify_inventory,
           product.shopify_datum.price,
+          !(vend_inventory < 0 && shopify_inventory.zero?),
+          product.shopify_datum.tags.detect { |tag| tag.strip.downcase == '3rdparty' }.present?,
+          product.shopify_datum.tags.detect { |tag| tag.strip.downcase == 'sale' }.present?,
           "https://mollusk.herokuapp.com/products/#{product.id}"
         ] if vend_inventory != shopify_inventory
       end
