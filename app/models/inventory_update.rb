@@ -9,7 +9,7 @@ class InventoryUpdate < ApplicationRecord
 
   private
     def run_update
-      ShopifyClient.adjust_inventory(inventory_item_id)
+      ShopifyClient.adjust_inventory(inventory_item_id, adjustment)
     end
 end
 
