@@ -5,11 +5,11 @@ class Product < ApplicationRecord
   CSV_HEADERS = %w(id name vend shopify difference url)
 
   def self.inventory_check
-    csv = generate_inventory_csv
-    ApplicationMailer.inventory_check(csv).deliver
+    csv = inventory_check_csv
+    ApplicationMailer.inventory_check(csv).deliver if CSV.parse(csv).count > 1
   end
 
-  def self.generate_inventory_csv
+  def self.inventory_check_csv
     CSV.generate(headers: CSV_HEADERS, write_headers: true) do |csv|
       find_each do |product|
         vend_inventory = product.vend_datum.inventory.to_i
