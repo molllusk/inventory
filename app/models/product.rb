@@ -11,9 +11,9 @@ class Product < ApplicationRecord
 
   def self.generate_inventory_csv
     CSV.generate(headers: CSV_HEADERS, write_headers: true) do |csv|
-      Product.find_each do |product|
+      find_each do |product|
         vend_inventory = product.vend_datum.inventory.to_i
-        shopify_inventory = product.shopify_datum.invenory.to_i
+        shopify_inventory = product.shopify_datum.inventory.to_i
         csv << [
           product.id,
           "#{product.vend_datum.name} #{product.vend_datum.variant_name}".strip,
@@ -21,7 +21,7 @@ class Product < ApplicationRecord
           shopify_inventory,
           vend_inventory - shopify_inventory,
           "https://mollusk.herokuapp.com/products/#{product.id}"
-        ]
+        ] if vend_inventory != shopify_inventory
       end
     end
   end
