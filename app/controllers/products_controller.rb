@@ -4,6 +4,7 @@ class ProductsController < ApplicationController
       Product,
       params[:filterrific]
     ) or return
+
     @products = @filterrific.find.page(params[:page])
   end
 

@@ -2,7 +2,7 @@ class Product < ApplicationRecord
   has_one :vend_datum, dependent: :destroy
   has_one :shopify_datum, dependent: :destroy
 
-  CSV_HEADERS = %w(id name vend shopify difference url)
+  CSV_HEADERS = %w(id name vend shopify difference price url)
 
   filterrific(
      available_filters: [
@@ -47,7 +47,7 @@ class Product < ApplicationRecord
 
   def self.inventory_check_csv
     CSV.generate(headers: CSV_HEADERS, write_headers: true) do |csv|
-      find_each do |product|
+      third_party.find_each do |product|
         vend_inventory = product.vend_datum.inventory.to_i
         shopify_inventory = product.shopify_datum.inventory.to_i
         csv << [
@@ -56,6 +56,7 @@ class Product < ApplicationRecord
           vend_inventory,
           shopify_inventory,
           vend_inventory - shopify_inventory,
+          product.shopify_datum.price,
           "https://mollusk.herokuapp.com/products/#{product.id}"
         ] if vend_inventory != shopify_inventory
       end
