@@ -71,12 +71,14 @@ class Product < ApplicationRecord
       third_party_or_sale.find_each do |product|
         if product.vend_inventory != product.shopify_inventory
           csv << product.inventory_csv_row
-          if make_updates && product.update_shopify_inventory?
-            product.create_inventory_adjustment(vend_qty: vend_inventory, prior_qty: shopify_inventory, adjustment: inventory_adjustment)
-          end
+          product.adjust_inventory if make_updates && product.update_shopify_inventory?
         end
       end
     end
+  end
+
+  def adjust_inventory
+    create_inventory_adjustment(vend_qty: vend_inventory, prior_qty: shopify_inventory, adjustment: inventory_adjustment)
   end
 
   def inventory_csv_row
