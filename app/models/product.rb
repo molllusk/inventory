@@ -78,7 +78,7 @@ class Product < ApplicationRecord
   end
 
   def adjust_inventory
-    create_inventory_adjustment(vend_qty: vend_inventory, prior_qty: shopify_inventory, adjustment: inventory_adjustment)
+    create_inventory_update(vend_qty: vend_inventory, prior_qty: shopify_inventory, adjustment: inventory_adjustment)
   end
 
   def inventory_csv_row
