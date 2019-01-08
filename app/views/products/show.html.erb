@@ -62,20 +62,20 @@
       <th>Adjustment</th>
     </tr>
     <% @product.inventory_updates.each do |update| %>
-        <tr>
-          <td>
-            <%= update.created_at %>
-          </td>
-          <td>
-            <%= update.vend_qty %>
-          </td>
-          <td>
-            <%= update.prior_qty %>
-          </td>
-          <td>
-            <%= update.adjustment %>
-          </td>
-        </tr>
+      <tr>
+        <td>
+          <%= update.created_at %>
+        </td>
+        <td>
+          <%= update.vend_qty %>
+        </td>
+        <td>
+          <%= update.prior_qty %>
+        </td>
+        <td>
+          <%= update.adjustment %>
+        </td>
+      </tr>
     <% end %>
   <table>
 <% end %>
