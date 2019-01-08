@@ -200,3 +200,7 @@ table.products  {
     white-space: -pre-wrap;
   }
 }
+
+tr:nth-child(even) {
+  background-color: #f2f2f2
+}

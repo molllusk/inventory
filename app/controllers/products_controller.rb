@@ -1,6 +1,10 @@
 class ProductsController < ApplicationController
   def index
-    @products = Product.paginate(:page => params[:page])
+    @filterrific = initialize_filterrific(
+      Product,
+      params[:filterrific]
+    ) or return
+    @products = @filterrific.find.page(params[:page])
   end
 
   def show
