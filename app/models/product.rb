@@ -10,19 +10,19 @@ class Product < ApplicationRecord
      ]
    )
 
+  scope :third_party, lambda {
+    where("LOWER(shopify_data.tags) like ?", "%3rdparty%").joins(:shopify_datum)
+  }
+
   scope :search_query, lambda { |query|
-    # Searches the students table on the 'first_name' and 'last_name' columns.
     # Matches using LIKE, automatically appends '%' to each term.
     # LIKE is case INsensitive with MySQL, however it is case
     # sensitive with PostGreSQL. To make it work in both worlds,
     # we downcase everything.
     return nil if query.blank?
 
-    # condition query, parse into individual keywords
     terms = query.downcase.split(/\s+/)
 
-    # replace "*" with "%" for wildcard searches,
-    # append '%', remove duplicate '%'s
     terms = terms.map { |e|
       ('%' + e + '%').gsub(/%+/, '%')
     }
@@ -30,23 +30,14 @@ class Product < ApplicationRecord
     # configure number of OR conditions for provision
     # of interpolation arguments. Adjust this if you
     # change the number of OR conditions.
-    num_or_conds = 2
+    num_or_conds = 4
 
-    shopify_matches = ShopifyDatum.where(
-        terms.map { |term|
-          "(LOWER(shopify_data.title) LIKE ? OR LOWER(shopify_data.variant_title) LIKE ?)"
-        }.join(' AND '),
-        *terms.map { |e| [e] * num_or_conds }.flatten
-      ).pluck(:product_id)
-
-    vend_matches = VendDatum.where(
-        terms.map { |term|
-          "(LOWER(vend_data.name) LIKE ? OR LOWER(vend_data.variant_name) LIKE ?)"
-        }.join(' AND '),
-        *terms.map { |e| [e] * num_or_conds }.flatten
-      ).pluck(:product_id)
-
-    where(id: (shopify_matches + vend_matches).uniq)
+    joins(:shopify_datum, :vend_datum).where(
+      terms.map { |term|
+        "(LOWER(shopify_data.title) LIKE ? OR LOWER(shopify_data.variant_title) LIKE ? OR LOWER(vend_data.name) LIKE ? OR LOWER(vend_data.variant_name) LIKE ?)"
+      }.join(' AND '),
+      *terms.map { |e| [e] * num_or_conds }.flatten
+    )
   }
 
   def self.inventory_check
