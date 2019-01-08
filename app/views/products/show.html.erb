@@ -50,3 +50,32 @@
     <% end %>
   <table>
 <% end %>
+
+<% if @product.inventory_updates.present? %>
+  <hr/>
+  <h2>Updates:</h2>
+  <table>
+    <tr>
+      <th>When?</th>
+      <th>Vend Qty</th>
+      <th>Shopify Qty</th>
+      <th>Adjustment</th>
+    </tr>
+    <% @product.inventory_updates.each do |update| %>
+        <tr>
+          <td>
+            update.created_at
+          </td>
+          <td>
+            update.vend_qty
+          </td>
+          <td>
+            update.prior_qty
+          </td>
+          <td>
+            update.adjustment
+          </td>
+        </tr>
+    <% end %>
+  <table>
+<% end %>

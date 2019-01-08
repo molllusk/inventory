@@ -72,7 +72,7 @@ class Product < ApplicationRecord
         if product.vend_inventory != product.shopify_inventory
           csv << product.inventory_csv_row
           if make_updates && product.update_shopify_inventory?
-            
+            product.create_inventory_adjustment(vend_qty: vend_inventory, prior_qty: shopify_inventory, adjustment: inventory_adjustment)
           end
         end
       end
@@ -86,7 +86,7 @@ class Product < ApplicationRecord
       vend_datum.variant_name,
       vend_inventory,
       shopify_inventory,
-      vend_inventory - shopify_inventory,
+      inventory_adjustment,
       shopify_datum.price,
       update_shopify_inventory?,
       third_party?,
@@ -107,6 +107,10 @@ class Product < ApplicationRecord
     (third_party? || sale?) && !(vend_inventory < 0 && shopify_inventory.zero?)
   end
 
+  def inventory_adjustment
+    vend_inventory - shopify_inventory
+  end
+
   def third_party?
     shopify_datum.tags.detect { |tag| tag.strip.downcase == '3rdparty' }.present?
   end
@@ -115,3 +119,12 @@ class Product < ApplicationRecord
     shopify_datum.tags.detect { |tag| tag.strip.downcase == 'sale' }.present?
   end
 end
+
+# == Schema Information
+#
+# Table name: products
+#
+#  id         :bigint(8)        not null, primary key
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
