@@ -64,16 +64,16 @@
     <% @product.inventory_updates.each do |update| %>
         <tr>
           <td>
-            update.created_at
+            <%= update.created_at %>
           </td>
           <td>
-            update.vend_qty
+            <%= update.vend_qty %>
           </td>
           <td>
-            update.prior_qty
+            <%= update.prior_qty %>
           </td>
           <td>
-            update.adjustment
+            <%= update.adjustment %>
           </td>
         </tr>
     <% end %>
