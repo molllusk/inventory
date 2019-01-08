@@ -10,7 +10,8 @@
       <th>SKU</th>
       <th>Vend SF Qty</th>
       <th>Shopify SF Qty</th>
-      <th>3rd Party in Shopify</th>
+      <th>3rdParty?</th>
+      <th>Sale?</th>
       <th>Vend</th>
       <th>Shopify</th>
     </tr>
@@ -30,7 +31,14 @@
         </td>
         <td>
           <% if shopify.present? %>
-            <%= shopify.tags.map { |tag| tag.strip.downcase }.include?('3rdparty') %>
+            <%= product.third_party? %>
+          <% else %>
+            n/a
+          <% end %>
+        </td>
+        <td>
+          <% if shopify.present? %>
+            <%= product.sale? %>
           <% else %>
             n/a
           <% end %>
