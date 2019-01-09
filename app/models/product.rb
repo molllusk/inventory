@@ -80,8 +80,17 @@ class Product < ApplicationRecord
     end
   end
 
+
+
   def adjust_inventory
-    InventoryUpdate.create(vend_qty: vend_inventory, prior_qty: shopify_inventory, adjustment: inventory_adjustment, product_id: id)
+    response = ShopifyClient.adjust_inventory(shopify_datum.inventory_item_id, inventory_adjustment)
+
+    if response.present? && response['inventory_level'].present?
+      InventoryUpdate.create(vend_qty: vend_inventory, prior_qty: shopify_inventory, adjustment: inventory_adjustment, product_id: id, new_qty: response['inventory_level']['available'])
+      shopify_datum.update_attribute(:inventory, response['inventory_level']['available'])
+    else
+      Airbrake.notify("Issue updating Shopify inventory on Project: #{id} by #{inventory_adjustment}")
+    end
   end
 
   def inventory_csv_row

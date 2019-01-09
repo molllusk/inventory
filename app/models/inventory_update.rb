@@ -1,8 +1,6 @@
 class InventoryUpdate < ApplicationRecord
   belongs_to :product
 
-  after_create :run_update
-
   filterrific(
      available_filters: [
        :search_query,
@@ -36,16 +34,6 @@ class InventoryUpdate < ApplicationRecord
 
     where(product_id: product_ids)
   }
-
-  def inventory_item_id
-    product.shopify_datum.inventory_item_id
-  end
-
-  private
-    def run_update
-      response = ShopifyClient.adjust_inventory(inventory_item_id, adjustment)
-      product.shopify_datum.update_attribute(:inventory, response['inventory_level']['available'])
-    end
 end
 
 # == Schema Information
