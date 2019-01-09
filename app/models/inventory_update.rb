@@ -45,7 +45,7 @@ class InventoryUpdate < ApplicationRecord
     def run_update
       response = ShopifyClient.adjust_inventory(inventory_item_id, adjustment)
       p response
-      product.shopify_datum.update_attribute(:inventory, response['inventory_level']['available'])
+      product.shopify_datum.update_attribute(:inventory, response['inventory_levels']['available'])
     end
 end
 
