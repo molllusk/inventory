@@ -201,6 +201,11 @@ table.products  {
   }
 }
 
+table.full_width  {
+  table-layout: fixed;
+  width: 100%;
+}
+
 tr:nth-child(even) {
   background-color: #f2f2f2
 }

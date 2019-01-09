@@ -5,7 +5,7 @@
 
 <h2>Vend Data (<a href='https://mollusksurf.vendhq.com/product/<%= @product.vend_datum.vend_id %>' target='_blank'>link</a>):</h2>
 <% if @product.vend_datum.present? %>
-  <table>
+  <table class='full_width'>
     <% @product.vend_datum.attributes.each do |vd| %>
       <% if vd.last.present? %>
         <% next if ['variant_options', 'tag_ids', 'categories', 'description'].include?(vd.first) %>
@@ -31,7 +31,7 @@
 <% if @product.shopify_datum.present? %>
   <hr/>
   <h2>Shopify Data (<a href='https://mollusksurf.myshopify.com/admin/products/<%= @product.shopify_datum.shopify_product_id %>/variants/<%= @product.shopify_datum.variant_id %>' target='_blank'>link</a>):</h2>
-  <table>
+  <table class='full_width'>
     <% @product.shopify_datum.attributes.each do |vd| %>
       <% if vd.last.present? %>
         <tr>
@@ -54,7 +54,7 @@
 <% if @product.inventory_updates.present? %>
   <hr/>
   <h2>Updates:</h2>
-  <table>
+  <table class='full_width'>
     <tr>
       <th>When?</th>
       <th>Vend Qty</th>
