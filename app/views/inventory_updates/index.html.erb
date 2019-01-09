@@ -1,0 +1,26 @@
+<% provide(:title, 'Inventory Updates') %>
+<h1>Inventory Updates</h1>
+
+<table class="products">
+  <tr>
+    <th>Created at</th>
+    <th>Product Name</th>
+    <th>Variant Name</th>
+    <th>SKU</th>
+    <th>Vend SF Qty</th>
+    <th>Prior Shopify SF Qty</th>
+    <th>Adjustment</th>
+  </tr>
+  <% @updates.each do |update| %>
+    <tr>
+      <td><%= update.created_at %></td>
+      <td><%= update.product.vend_datum.name %></td>
+      <td><%= update.product.vend_datum.variant_name %></td>
+      <td><%= update.product.vend_datum.sku %></td>
+      <td><%= update.product.vend_qty %></td>
+      <td><%= update.prior_qty %></td>
+      <td><%= update.adjustment %></td>
+    </tr>
+  <% end %>
+</table>
+

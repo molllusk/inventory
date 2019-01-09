@@ -3,6 +3,12 @@ class InventoryUpdate < ApplicationRecord
 
   after_create :run_update
 
+  # filterrific(
+  #    available_filters: [
+  #      :search_query,
+  #    ]
+  #  )
+
   def inventory_item_id
     product.shopify_datum.inventory_item_id
   end
