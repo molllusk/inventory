@@ -66,14 +66,17 @@ class Product < ApplicationRecord
     ApplicationMailer.inventory_check(csv).deliver if CSV.parse(csv).count > 1
   end
 
-  def self.inventory_csv(make_updates = false)
+  def self.inventory_csv
     CSV.generate(headers: CSV_HEADERS, write_headers: true) do |csv|
       third_party_or_sale.find_each do |product|
-        if product.vend_inventory != product.shopify_inventory
-          csv << product.inventory_csv_row
-          product.adjust_inventory if make_updates && product.update_shopify_inventory?
-        end
+        csv << product.inventory_csv_row if product.vend_inventory != product.shopify_inventory
       end
+    end
+  end
+
+  def self.update_inventories
+    third_party_or_sale.find_each do |product|
+      product.adjust_inventory if product.update_shopify_inventory?
     end
   end
 
