@@ -1,28 +1,26 @@
 <% provide(:title, 'Inventory Updates') %>
 <h1>Inventory Updates</h1>
 
-<table class="products">
-  <tr>
-    <th>Created at</th>
-    <th>Product Name</th>
-    <th>Variant Name</th>
-    <th>SKU</th>
-    <th>Vend SF Qty</th>
-    <th>Prior Shopify SF Qty</th>
-    <th>Adjustment</th>
-    <th>New Shopify SF Qty</th>
-  </tr>
-  <% @updates.each do |update| %>
-    <tr>
-      <td><%= update.created_at %></td>
-      <td><%= update.product.vend_datum.name %></td>
-      <td><%= update.product.vend_datum.variant_name %></td>
-      <td><%= update.product.vend_datum.sku %></td>
-      <td><%= update.vend_qty %></td>
-      <td><%= update.prior_qty %></td>
-      <td><%= update.adjustment %></td>
-      <td><%= update.product.shopify_inventory %></td>
-    </tr>
-  <% end %>
-</table>
+<%= form_for_filterrific @filterrific do |f| %>
+  <div class='center' style='margin-bottom: 5px;'>
+    <%# give the search field the 'filterrific-periodically-observed' class for live updates %>
+    <%= f.text_field(
+      :search_query,
+      class: 'filterrific-periodically-observed'
+    ) %>
+  </div>
+  <div class='center' style='margin-bottom: 10px;'>
+    <%= link_to(
+      'Reset Search',
+      reset_filterrific_url,
+      class: "btn btn-primary", style: 'color: white') %>
+  </div>
+  <%# add an automated spinner to your form when the list is refreshed %>
+  <%= render_filterrific_spinner %>
+<% end %>
+
+<%= render(
+  partial: 'products/list',
+  locals: { products: @updates }
+) %>
 

@@ -19,8 +19,6 @@ class UsersController < ApplicationController
     @user = User.new
   end
 
-
-
   # POST /users
   # POST /users.json
   def create

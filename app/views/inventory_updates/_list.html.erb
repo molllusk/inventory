@@ -1,0 +1,35 @@
+<div id="filterrific_results">
+
+  <div class='center' style='margin-bottom: 30px;'>
+    <%= page_entries_info inventory_updates %>
+  </div>
+  
+  <table class="products">
+    <tr>
+      <th>Created at</th>
+      <th>Product Name</th>
+      <th>Variant Name</th>
+      <th>SKU</th>
+      <th>Vend SF Qty</th>
+      <th>Prior Shopify SF Qty</th>
+      <th>Adjustment</th>
+      <th>New Shopify SF Qty</th>
+    </tr>
+    <% updates.each do |update| %>
+      <tr>
+        <td><%= update.created_at %></td>
+        <td><%= update.product.vend_datum.name %></td>
+        <td><%= update.product.vend_datum.variant_name %></td>
+        <td><%= update.product.vend_datum.sku %></td>
+        <td><%= update.vend_qty %></td>
+        <td><%= update.prior_qty %></td>
+        <td><%= update.adjustment %></td>
+        <td><%= update.product.shopify_inventory %></td>
+      </tr>
+    <% end %>
+  </table>
+
+  <div class='center'>
+  <%= will_paginate %>
+  </div>
+</div>

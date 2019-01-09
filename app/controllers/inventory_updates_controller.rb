@@ -1,11 +1,10 @@
 class InventoryUpdatesController < ApplicationController
   def index
-    # @filterrific = initialize_filterrific(
-    #   InventoryUpdate,
-    #   params[:filterrific]
-    # ) or return
+    @filterrific = initialize_filterrific(
+      InventoryUpdate,
+      params[:filterrific]
+    ) or return
 
-    # @updates = @filterrific.find.page(params[:page])
-    @updates = InventoryUpdate.all
+    @updates = @filterrific.find.page(params[:page])
   end
 end
