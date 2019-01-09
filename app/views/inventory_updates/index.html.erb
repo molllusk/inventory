@@ -10,6 +10,7 @@
     <th>Vend SF Qty</th>
     <th>Prior Shopify SF Qty</th>
     <th>Adjustment</th>
+    <th>New Shopify SF Qty</th>
   </tr>
   <% @updates.each do |update| %>
     <tr>
@@ -20,6 +21,7 @@
       <td><%= update.vend_qty %></td>
       <td><%= update.prior_qty %></td>
       <td><%= update.adjustment %></td>
+      <td><%= update.product.shopify_inventory %></td>
     </tr>
   <% end %>
 </table>
