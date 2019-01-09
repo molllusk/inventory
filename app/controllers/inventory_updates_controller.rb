@@ -5,6 +5,6 @@ class InventoryUpdatesController < ApplicationController
       params[:filterrific]
     ) or return
 
-    @updates = @filterrific.find.page(params[:page])
+    @inventory_updates = @filterrific.find.page(params[:page])
   end
 end
