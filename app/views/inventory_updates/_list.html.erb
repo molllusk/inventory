@@ -18,7 +18,7 @@
     <% inventory_updates.each do |update| %>
       <tr>
         <td><%= update.created_at %></td>
-        <td><%= update.product.vend_datum.name %></td>
+        <td><%= link_to update.product.vend_datum.name, product %></td>
         <td><%= update.product.vend_datum.variant_name %></td>
         <td><%= update.product.vend_datum.sku %></td>
         <td><%= update.vend_qty %></td>
