@@ -1,6 +1,6 @@
 class SessionsController < ApplicationController
   def new
-    redirect_to users_path if logged_in?
+    redirect_to inventory_updates_path if logged_in?
   end
 
   def create
