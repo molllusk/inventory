@@ -58,23 +58,17 @@
     <tr>
       <th>When?</th>
       <th>Vend Qty</th>
-      <th>Shopify Qty</th>
+      <th>Prior Shopify Qty</th>
       <th>Adjustment</th>
+      <th>New Shopify Qty</th>
     </tr>
     <% @product.inventory_updates.each do |update| %>
       <tr>
-        <td>
-          <%= update.created_at %>
-        </td>
-        <td>
-          <%= update.vend_qty %>
-        </td>
-        <td>
-          <%= update.prior_qty %>
-        </td>
-        <td>
-          <%= update.adjustment %>
-        </td>
+        <td><%= update.created_at %></td>
+        <td><%= update.vend_qty %></td>
+        <td><%= update.prior_qty %></td>
+        <td><%= update.adjustment %></td>
+        <td><%= update.new_qty %></td>
       </tr>
     <% end %>
   <table>
