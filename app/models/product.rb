@@ -109,7 +109,7 @@ class Product < ApplicationRecord
   end
 
   def update_shopify_inventory?
-    (third_party? || sale?) && !(vend_inventory < 0 && shopify_inventory.zero?)
+    (third_party? || sale?) && shopify_inventory != vend_inventory && !(vend_inventory < 0 && shopify_inventory.zero?)
   end
 
   def inventory_adjustment
