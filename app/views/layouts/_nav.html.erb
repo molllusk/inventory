@@ -1,11 +1,11 @@
 <ul class="nav nav-tabs">
-  <li class="nav-item">
+  <li class="<%= "highlighted" if params[:controller] == "inventory_updates" %> nav-item">
     <a class="nav-link" href="/inventory_updates">Inventory Updates</a>
   </li>
-  <li class="nav-item">
+  <li class="<%= "highlighted" if params[:controller] == "products" %> nav-item">
     <a class="nav-link" href="/products">Products</a>
   </li>
-  <li class="nav-item">
+  <li class="<%= "highlighted" if params[:controller] == "users" %> nav-item">
     <a class="nav-link" href="/users">Users</a>
   </li>
 </ul>
