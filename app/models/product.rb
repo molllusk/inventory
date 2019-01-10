@@ -88,10 +88,10 @@ class Product < ApplicationRecord
         InventoryUpdate.create(vend_qty: vend_inventory, prior_qty: shopify_inventory, adjustment: inventory_adjustment, product_id: id, new_qty: response['inventory_level']['available'])
         shopify_datum.update_attribute(:inventory, response['inventory_level']['available'])
       else
-        Airbrake.notify("No shopify inventory for Product: #{id} by #{inventory_adjustment}")
+        Airbrake.notify("No shopify inventory for Product: #{id}, Adjustment: #{inventory_adjustment}")
       end
     rescue
-      Airbrake.notify("There was an error updating inventory for Product: #{id} by #{inventory_adjustment}")
+      Airbrake.notify("There was an error updating inventory for Product: #{id}, Adjustment: #{inventory_adjustment}")
     end
   end
 
