@@ -80,8 +80,6 @@ class Product < ApplicationRecord
     end
   end
 
-
-
   def adjust_inventory
     response = ShopifyClient.adjust_inventory(shopify_datum.inventory_item_id, inventory_adjustment)
 

@@ -5,6 +5,6 @@ namespace :inventories do
 
     VendClient.update_inventories
     ShopifyClient.update_inventories
-    # Product.update_inventories
+    Product.update_inventories
   end
 end

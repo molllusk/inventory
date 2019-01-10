@@ -35,7 +35,6 @@ namespace :products do
         end
       end
     end
-    # Product.update_inventories
 
     new_shopifys.each do |shopify_attrs|
       vend_attrs = new_vends.find { |vend| vend[:sku] == shopify_attrs[:sku] }
