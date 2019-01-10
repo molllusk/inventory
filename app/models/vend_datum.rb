@@ -10,7 +10,6 @@ class VendDatum < ApplicationRecord
 
   def self.create_product(product_attrs)
     vend_datum = new(product_attrs)
-    # need to test product.new vs product.create here.
     vend_datum.product = Product.new
     vend_datum.save
   end
