@@ -3,18 +3,20 @@ namespace :products do
     require File.join(Rails.root, 'app', 'lib', 'vend.rb')
     require File.join(Rails.root, 'app', 'lib', 'shopify.rb')
 
-    shopify_products = ShopifyClient.all_products;nil
-    vend_products = VendClient.active_products;nil
+    shopify_products = ShopifyClient.all_products
+    vend_products = VendClient.active_products
 
     new_vends = []
     new_shopifys = []
 
     vend_products.each do |vend_product|
       vend_attrs = VendClient.product_attributes(vend_product)
-      vend_datum = VendDatum.find_by_vend_id(vend_attrs[:vend_id])
+      vend_datum = VendDatum.find_by_sku(vend_attrs[:sku])
 
       if vend_datum.present?
-        vend_datum.update_if_changed(vend_attrs)
+        # https://stackoverflow.com/questions/21297506/update-attributes-for-user-only-if-attributes-have-changed
+        vend_datum.attributes = vend_attrs
+        vend_datum.save if vend_datum.changed?
       else
         new_vends << vend_attrs
       end
@@ -23,10 +25,11 @@ namespace :products do
     shopify_products.each do |shopify_product|
       shopify_attrs_list = ShopifyClient.products_attributes(shopify_product)
       shopify_attrs_list.each do |shopify_attrs|
-        shopify_datum = ShopifyDatum.find_by_shopify_product_id(shopify_attrs[:shopify_product_id])
-
+        shopify_datum = ShopifyDatum.find_by_sku(shopify_attrs[:sku])
         if shopify_datum.present?
-          shopify_datum.update_if_changed(shopify_attrs)
+          # https://stackoverflow.com/questions/21297506/update-attributes-for-user-only-if-attributes-have-changed
+          shopify_datum.attributes = shopify_attrs
+          shopify_datum.save if shopify_datum.changed?
         else
           new_shopifys << shopify_attrs
         end

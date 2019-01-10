@@ -17,12 +17,6 @@ class ShopifyDatum < ApplicationRecord
   def sf_inventory
     ShopifyClient.get_sf_inventory(inventory_item_id)
   end
-
-  # https://stackoverflow.com/questions/21297506/update-attributes-for-user-only-if-attributes-have-changed
-  def update_if_changed(attrs)
-    attributes = attrs
-    save if changed?
-  end
 end
 
 # == Schema Information

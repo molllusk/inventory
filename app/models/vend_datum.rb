@@ -14,12 +14,6 @@ class VendDatum < ApplicationRecord
     vend_datum.product = Product.new
     vend_datum.save
   end
-
-  # https://stackoverflow.com/questions/21297506/update-attributes-for-user-only-if-attributes-have-changed
-  def update_if_changed(attrs)
-    attributes = attrs
-    save if changed?
-  end
 end
 
 # == Schema Information
