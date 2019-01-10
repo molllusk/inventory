@@ -153,15 +153,4 @@ class ShopifyClient
     SAVED_VARIANT_ATTRIBUTES.each { |saved_attribute| attributes[saved_attribute] = variant[saved_attribute.to_s] }
     attributes
   end
-
-  def self.save_shopify_variants(shopify_product)
-    products = products_attributes(shopify_product)
-    products.each do |product_data|
-      if VendDatum.exists?(sku: product_data[:sku])
-        product = VendDatum.find_by_sku(product_data[:sku]).product
-        product_data[:product_id] = product.id
-        ShopifyDatum.create(product_data)
-      end
-    end
-  end
 end

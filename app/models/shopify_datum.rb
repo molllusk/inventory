@@ -3,12 +3,25 @@ class ShopifyDatum < ApplicationRecord
 
   belongs_to :product, optional: true
 
+  def self.save_variants(variants)
+    variants.each do |product_data|
+      product = VendDatum.find_by_sku(product_data[:sku]).try(:product)
+      product.create_shopify_datum(product_data) if product.present?
+    end
+  end
+
   def full_title
     "#{title} - #{variant_title}"
   end
 
   def sf_inventory
     ShopifyClient.get_sf_inventory(inventory_item_id)
+  end
+
+  # https://stackoverflow.com/questions/21297506/update-attributes-for-user-only-if-attributes-have-changed
+  def update_if_changed(attrs)
+    attributes = attrs
+    save if changed?
   end
 end
 

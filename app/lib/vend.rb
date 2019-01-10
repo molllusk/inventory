@@ -83,19 +83,4 @@ class VendClient
     SAVED_ATTRIBUTES.each { |saved_attribute| cleaned[saved_attribute] = product[saved_attribute.to_s] }
     cleaned
   end
-
-  # https://stackoverflow.com/questions/21297506/update-attributes-for-user-only-if-attributes-have-changed
-  def self.update_product(product, attrs)
-    product.attributes = product_attributes(attrs)
-    product.save if product.changed?
-  end
-
-  def self.create_product(product)
-    vd = VendDatum.new(product_attributes(product))
-    # need to test product.new vs product.create here.
-    vd.product = Product.create
-    if vd.save
-      return vd.product
-    end
-  end
 end

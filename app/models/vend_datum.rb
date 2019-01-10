@@ -8,6 +8,18 @@ class VendDatum < ApplicationRecord
 
   belongs_to :product
 
+  def self.create_product(product_attrs)
+    vend_datum = new(product_attrs)
+    # need to test product.new vs product.create here.
+    vend_datum.product = Product.new
+    vend_datum.save
+  end
+
+  # https://stackoverflow.com/questions/21297506/update-attributes-for-user-only-if-attributes-have-changed
+  def update_if_changed(attrs)
+    attributes = attrs
+    save if changed?
+  end
 end
 
 # == Schema Information
