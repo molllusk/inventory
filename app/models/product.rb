@@ -18,10 +18,12 @@ class Product < ApplicationRecord
   )
 
   filterrific(
-     available_filters: [
-       :search_query,
-     ]
-   )
+    default_filter_params: { sorted_by: 'created_at_desc' },
+    available_filters: [
+      :search_query,
+      :sorted_by
+    ]
+  )
 
   scope :third_party, lambda {
     where('LOWER(shopify_data.tags) like ?', '%3rdparty%').joins(:shopify_datum)
@@ -59,6 +61,18 @@ class Product < ApplicationRecord
       }.join(' AND '),
       *terms.map { |e| [e] * num_or_conds }.flatten
     )
+  }
+
+  scope :sorted_by, lambda { |sort_key|
+    # extract the sort direction from the param value.
+    direction = (sort_option =~ /desc$/) ? 'desc' : 'asc'
+
+    case sort_option.to_s
+    when /^created_at_/
+      order("products.created_at #{ direction }")
+    else
+      raise(ArgumentError, "Invalid sort option: #{ sort_option.inspect }")
+    end
   }
 
   def self.inventory_check

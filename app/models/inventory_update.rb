@@ -2,10 +2,12 @@ class InventoryUpdate < ApplicationRecord
   belongs_to :product
 
   filterrific(
-     available_filters: [
-       :search_query,
-     ]
-   )
+    default_filter_params: { sorted_by: 'created_at_desc' },
+    available_filters: [
+      :search_query,
+      :sorted_by
+    ]
+  )
 
   scope :search_query, lambda { |query|
     # Matches using LIKE, automatically appends '%' to each term.
@@ -33,6 +35,18 @@ class InventoryUpdate < ApplicationRecord
     ).pluck(:id)
 
     where(product_id: product_ids)
+  }
+
+  scope :sorted_by, lambda { |sort_key|
+    # extract the sort direction from the param value.
+    direction = (sort_option =~ /desc$/) ? 'desc' : 'asc'
+
+    case sort_option.to_s
+    when /^created_at_/
+      order("inventoy_updates.created_at #{ direction }")
+    else
+      raise(ArgumentError, "Invalid sort option: #{ sort_option.inspect }")
+    end
   }
 end
 
