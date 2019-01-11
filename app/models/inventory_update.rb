@@ -43,7 +43,7 @@ class InventoryUpdate < ApplicationRecord
 
     case sort_option.to_s
     when /^created_at_/
-      order("inventoy_updates.created_at #{ direction }")
+      order("inventory_updates.created_at #{ direction }")
     else
       raise(ArgumentError, "Invalid sort option: #{ sort_option.inspect }")
     end
