@@ -37,7 +37,7 @@ class InventoryUpdate < ApplicationRecord
     where(product_id: product_ids)
   }
 
-  scope :sorted_by, lambda { |sort_key|
+  scope :sorted_by, lambda { |sort_option|
     # extract the sort direction from the param value.
     direction = (sort_option =~ /desc$/) ? 'desc' : 'asc'
 
