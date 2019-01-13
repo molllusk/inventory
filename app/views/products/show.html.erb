@@ -1,5 +1,6 @@
 <% provide(:title, 'Product') %>
 <h1>Product: <%= @product.vend_datum.name %></h1>
+<p class='center'>Added <%= product.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></p>
 
 <hr/>
 
