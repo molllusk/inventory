@@ -4,11 +4,11 @@ Time::DATE_FORMATS[:humanized_ago]  = ->(time) do
 
   case 
   when time.between?(st + 1.day, nd + 1.day)
-    time.strftime('Tomorrow at %l:%M %p')}
+    time.strftime('Tomorrow at %l:%M %p')
   when time.between?(st, nd)
-    time.strftime('Today at %l:%M %p')}
+    time.strftime('Today at %l:%M %p')
   when time.between?(st - 1.day, nd - 1.day)
-    time.strftime('Yesterday at %l:%M %p')}
+    time.strftime('Yesterday at %l:%M %p')
   when time.between?(st - 6.day, nd - 2.day)
     time.strftime('%A at %l:%M %p')
   else 
