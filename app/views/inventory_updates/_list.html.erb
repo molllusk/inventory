@@ -17,7 +17,7 @@
     </tr>
     <% inventory_updates.each do |update| %>
       <tr>
-        <td><%= update.created_at %></td>
+        <td><%= update.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
         <td><%= link_to update.product.vend_datum.name, update.product %></td>
         <td><%= update.product.vend_datum.variant_name %></td>
         <td><%= update.product.vend_datum.sku %></td>
