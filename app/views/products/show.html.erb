@@ -1,6 +1,6 @@
 <% provide(:title, 'Product') %>
 <h1>Product: <%= @product.vend_datum.name %></h1>
-<p class='center'>Added <%= product.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></p>
+<p class='center'>Added <%= @product.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></p>
 
 <hr/>
 
@@ -63,9 +63,9 @@
       <th>Adjustment</th>
       <th>New Shopify Qty</th>
     </tr>
-    <% @product.inventory_updates.each do |update| %>
+    <% @product.inventory_updates.order('created_at desc').each do |update| %>
       <tr>
-        <td><%= update.created_at %></td>
+        <td><%= update.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
         <td><%= update.vend_qty %></td>
         <td><%= update.prior_qty %></td>
         <td><%= update.adjustment %></td>
