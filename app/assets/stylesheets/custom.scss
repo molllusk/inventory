@@ -82,7 +82,6 @@ p {
   }
 }
 
-
 #logo {
   float: left;
   margin-right: 10px;
@@ -174,23 +173,9 @@ footer {
   @include box_sizing;
 }
 
-/* Users index */
-
-.users {
-  list-style: none;
-  margin: 0;
-  li {
-    overflow: auto;
-    padding: 10px 0;
-    border-bottom: 1px solid #777777x;
-  }
-}
-
 /* tables */
 
 table.products  {
-  table-layout: fixed;
-  width: 100%;
   td {
     max-width: 200px;
     word-wrap: break-word;
