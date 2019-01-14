@@ -37,11 +37,18 @@ namespace :products do
     end
 
     new_shopifys.each do |shopify_attrs|
+      existing_vend = VendDatum.find_by_sku(shopify_attrs[:sku])
       vend_attrs = new_vends.find { |vend| vend[:sku] == shopify_attrs[:sku] }
 
-      if vend_attrs.present?
-        product = VendDatum.create_product(vend_attrs).try(:product)
-        product.create_shopify_datum(shopify_attrs) if product.present?
+      if existing_vend.present? && existing_vend.product.shopify_datum.present?
+        Airbrake.notify("Issue Importing Shopify: recognized as new, but already exists for product: #{existing_vend.product.id}")
+      else
+        if existing_vend.present?
+          existing_vend.product.create_shopify_datum(shopify_attrs)
+        elsif vend_attrs.present?
+          product = VendDatum.create_product(vend_attrs)
+          product.create_shopify_datum(shopify_attrs)
+        end
       end
     end
   end
