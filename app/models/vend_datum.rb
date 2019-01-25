@@ -8,7 +8,7 @@ class VendDatum < ApplicationRecord
 
   belongs_to :product
 
-  before_create :create_product
+  after_create :create_product
 end
 
 # == Schema Information
