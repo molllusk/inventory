@@ -25,7 +25,7 @@ namespace :products do
     shopify_products.each do |shopify_product|
       shopify_attrs_list = ShopifyClient.products_attributes(shopify_product)
       shopify_attrs_list.each do |shopify_attrs|
-        shopify_datum = ShopifyDatum.find_by_sku(shopify_attrs[:sku])
+        shopify_datum = ShopifyDatum.find_by_barcode(shopify_attrs[:barcode])
         if shopify_datum.present?
           # https://stackoverflow.com/questions/21297506/update-attributes-for-user-only-if-attributes-have-changed
           shopify_datum.attributes = shopify_attrs
@@ -37,8 +37,8 @@ namespace :products do
     end
 
     new_shopifys.each do |shopify_attrs|
-      existing_vend = VendDatum.find_by_sku(shopify_attrs[:sku])
-      vend_attrs = new_vends.find { |vend| vend[:sku] == shopify_attrs[:sku] }
+      existing_vend = VendDatum.find_by_sku(shopify_attrs[:barcode])
+      vend_attrs = new_vends.find { |vend| vend[:sku] == shopify_attrs[:barcode] }
 
       if existing_vend.present? && existing_vend.product.shopify_datum.present?
         Airbrake.notify("Issue Importing Shopify: recognized as new, but already exists for product: #{existing_vend.product.id}")
