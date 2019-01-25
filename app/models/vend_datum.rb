@@ -8,7 +8,11 @@ class VendDatum < ApplicationRecord
 
   belongs_to :product
 
-  after_create :create_product
+  before_save :add_product
+
+  def add_product
+    create_product if product.blank?
+  end
 end
 
 # == Schema Information
