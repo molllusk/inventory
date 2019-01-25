@@ -46,8 +46,8 @@ namespace :products do
         if existing_vend.present?
           existing_vend.product.create_shopify_datum(shopify_attrs)
         elsif vend_attrs.present?
-          product = VendDatum.create_product(vend_attrs)
-          product.create_shopify_datum(shopify_attrs)
+          vend_datum = VendDatum.create(vend_attrs)
+          vend_datum.product.create_shopify_datum(shopify_attrs)
         end
       end
     end

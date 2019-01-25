@@ -8,11 +8,7 @@ class VendDatum < ApplicationRecord
 
   belongs_to :product
 
-  def self.create_product(product_attrs)
-    vend_datum = new(product_attrs)
-    vend_datum.product = Product.new
-    vend_datum.save
-  end
+  before_create :create_product
 end
 
 # == Schema Information
