@@ -7,12 +7,6 @@ class VendDatum < ApplicationRecord
   serialize :categories, Array
 
   belongs_to :product
-
-  before_save :add_product
-
-  def add_product
-    create_product if product.blank?
-  end
 end
 
 # == Schema Information
