@@ -35,12 +35,6 @@ class ShopifyClient
     end
   end
 
-  def self.html_connection
-    Faraday.new(url: BASE_URL) do |faraday|
-      faraday.adapter Faraday.default_adapter
-    end
-  end
-
   def self.count(resource)
     response = connection.get "/admin/#{resource}/count.json"
     response.body['count']
