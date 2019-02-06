@@ -1,7 +1,8 @@
 class ShopifyClient
   BASE_URL = "https://#{ENV['SHOPIFY_USER']}:#{ENV['SHOPIFY_PASSWORD']}@mollusksurf.myshopify.com".freeze
   SF_INVENTORY_LOCATION = 49481991
-  SF_ORIGIN_LOCATION = 280914881
+  # this was used when we thought origin location on an order meant the store where it was to be fulfilled from.
+  # SF_ORIGIN_LOCATION = 280914881
 
   SAVED_PRODUCT_ATTRIBUTES = %i[
     handle
@@ -30,6 +31,12 @@ class ShopifyClient
   def self.connection
     Faraday.new(url: BASE_URL) do |faraday|
       faraday.response :json
+      faraday.adapter Faraday.default_adapter
+    end
+  end
+
+  def self.html_connection
+    Faraday.new(url: BASE_URL) do |faraday|
       faraday.adapter Faraday.default_adapter
     end
   end
@@ -72,7 +79,7 @@ class ShopifyClient
       end
 
       order['line_items'].each do |line_item|
-        if line_item['fulfillment_status'].blank? && line_item['origin_location']['id'] == SF_ORIGIN_LOCATION
+        if line_item['fulfillment_status'].blank?
           orders[line_item['variant_id']] += line_item['quantity'] - refunds[line_item['id']]
         end
       end
