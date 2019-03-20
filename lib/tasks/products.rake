@@ -11,7 +11,7 @@ namespace :products do
 
     vend_products.each do |vend_product|
       vend_attrs = VendClient.product_attributes(vend_product)
-      vend_datum = VendDatum.find_by_sku(vend_attrs[:sku])
+      vend_datum = VendDatum.find_by(vend_id: vend_attrs[:vend_id])
 
       if vend_datum.present?
         # https://stackoverflow.com/questions/21297506/update-attributes-for-user-only-if-attributes-have-changed
@@ -25,7 +25,7 @@ namespace :products do
     shopify_products.each do |shopify_product|
       shopify_attrs_list = ShopifyClient.products_attributes(shopify_product)
       shopify_attrs_list.each do |shopify_attrs|
-        shopify_datum = ShopifyDatum.find_by_barcode(shopify_attrs[:barcode])
+        shopify_datum = ShopifyDatum.find_by(variant_id: shopify_attrs[:variant_id])
         if shopify_datum.present?
           # https://stackoverflow.com/questions/21297506/update-attributes-for-user-only-if-attributes-have-changed
           shopify_datum.attributes = shopify_attrs
