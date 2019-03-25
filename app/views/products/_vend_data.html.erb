@@ -1,0 +1,24 @@
+<h2>Vend Data (<a href='https://mollusksurf.vendhq.com/product/<%= @product.vend_datum.vend_id %>' target='_blank'>link</a>):</h2>
+<% if @product.vend_datum.present? %>
+  <table class='full_width'>
+    <% @product.vend_datum.attributes.each do |vd| %>
+      <% if vd.last.present? %>
+        <% next if ['variant_options', 'tag_ids', 'categories', 'description'].include?(vd.first) %>
+        <tr>
+          <td>
+            <strong><%= vd.shift.humanize %></strong>
+          </td>
+          <td>
+            <% if vd.first.is_a? Hash %>
+              <%= vd.shift['name'] %>
+            <% elsif vd.first.is_a? Array %>
+              <%= vd.shift.join(', ') %>
+            <% else %>
+              <%= vd.shift %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    <% end %>
+  </table>
+<% end %>
