@@ -99,14 +99,27 @@ class Product < ApplicationRecord
       response = ShopifyClient.adjust_inventory(shopify_datum.inventory_item_id, inventory_adjustment)
 
       if response.present? && response['inventory_level'].present?
-        InventoryUpdate.create(vend_qty: vend_inventory, prior_qty: shopify_inventory, adjustment: inventory_adjustment, product_id: id, new_qty: response['inventory_level']['available'])
-        shopify_datum.update_attribute(:inventory, response['inventory_level']['available'])
+        create_inventory_update(response)
       else
-        Airbrake.notify("No shopify inventory for Product: #{id}, Adjustment: #{inventory_adjustment}")
+        # inventory location does not exist for variant, so add it and then adjust the inventory
+        ShopifyClient.connect_sf_inventory_location(shopify_datum.inventory_item_id)
+
+        response = ShopifyClient.adjust_inventory(shopify_datum.inventory_item_id, inventory_adjustment)
+
+        if response.present? && response['inventory_level'].present?
+          create_inventory_update(response)
+        else
+          Airbrake.notify("Inventory location unavailable for Product: #{id}, Adjustment: #{inventory_adjustment}")
+        end
       end
     rescue
       Airbrake.notify("There was an error updating inventory for Product: #{id}, Adjustment: #{inventory_adjustment}")
     end
+  end
+
+  def create_inventory_update(response)
+    InventoryUpdate.create(vend_qty: vend_inventory, prior_qty: shopify_inventory, adjustment: inventory_adjustment, product_id: id, new_qty: response['inventory_level']['available'])
+    shopify_datum.update_attribute(:inventory, response['inventory_level']['available'])
   end
 
   def inventory_csv_row

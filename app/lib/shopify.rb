@@ -81,6 +81,25 @@ class ShopifyClient
     orders
   end
 
+  def self.connect_inventory_location(inventory_item_id, location_id)
+    body = {
+      'location_id': location_id,
+      'inventory_item_id': inventory_item_id
+    }
+
+    response = connection.post do |req|
+      req.url '/admin/inventory_levels/connect.json'
+      req.headers['Content-Type'] = 'application/json'
+      req.body = body.to_json
+    end
+
+    response.body
+  end
+
+  def self.connect_sf_inventory_location(inventory_item_id)
+    connect_inventory_location(inventory_item_id, SF_INVENTORY_LOCATION)
+  end
+
   def self.get_inventory_items_all_locations(inventory_item_ids)
     response = connection.get "/admin/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}"
     response.body['inventory_levels']
@@ -121,7 +140,7 @@ class ShopifyClient
     }
 
     response = connection.post do |req|
-      req.url '/admin/inventory_levels/adjust.json'
+      req.url '/admin/inventory_levels/connect.json'
       req.headers['Content-Type'] = 'application/json'
       req.body = body.to_json
     end
