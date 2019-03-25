@@ -140,7 +140,7 @@ class ShopifyClient
     }
 
     response = connection.post do |req|
-      req.url '/admin/inventory_levels/connect.json'
+      req.url '/admin/inventory_levels/adjust.json'
       req.headers['Content-Type'] = 'application/json'
       req.body = body.to_json
     end
