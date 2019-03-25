@@ -148,6 +148,10 @@ class ShopifyClient
     response.body
   end
 
+  def self.inventory_item_updated?(response)
+    response.present? && response['inventory_level'].present?
+  end
+
   def self.products_attributes(product)
     products = []
 

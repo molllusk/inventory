@@ -98,15 +98,15 @@ class Product < ApplicationRecord
     begin
       response = ShopifyClient.adjust_inventory(shopify_datum.inventory_item_id, inventory_adjustment)
 
-      if response.present? && response['inventory_level'].present?
+      if ShopifyClient.inventory_item_updated?(response)
         create_inventory_update(response)
       else
         # inventory location does not exist for variant, so add it and then adjust the inventory
-        ShopifyClient.connect_sf_inventory_location(shopify_datum.inventory_item_id)
+        connect_response = ShopifyClient.connect_sf_inventory_location(shopify_datum.inventory_item_id)
 
-        response = ShopifyClient.adjust_inventory(shopify_datum.inventory_item_id, inventory_adjustment)
+        response = ShopifyClient.adjust_inventory(shopify_datum.inventory_item_id, inventory_adjustment) if ShopifyClient.inventory_item_updated?(connect_response)
 
-        if response.present? && response['inventory_level'].present?
+        if ShopifyClient.inventory_item_updated?(response)
           create_inventory_update(response)
         else
           Airbrake.notify("Inventory location unavailable for Product: #{id}, Adjustment: #{inventory_adjustment}")
