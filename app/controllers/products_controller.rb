@@ -12,5 +12,7 @@ class ProductsController < ApplicationController
 
   def show
     @product = Product.find(params[:id])
+
+    @inventory_updates = @product.inventory_updates.paginate(page: params[:page], per_page: 10)
   end
 end

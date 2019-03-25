@@ -1,0 +1,25 @@
+<% if @inventory_updates.present? %>
+  <hr/>
+  <h2>Updates:</h2>
+  <table class='full_width'>
+    <tr>
+      <th>When?</th>
+      <th>Vend Qty</th>
+      <th>Prior Shopify Qty</th>
+      <th>Adjustment</th>
+      <th>New Shopify Qty</th>
+    </tr>
+    <% @inventory_updates.order('created_at desc').each do |update| %>
+      <tr>
+        <td><%= update.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
+        <td><%= update.vend_qty %></td>
+        <td><%= update.prior_qty %></td>
+        <td><%= update.adjustment %></td>
+        <td><%= update.new_qty %></td>
+      </tr>
+    <% end %>
+  <table>
+  <div class='center'>
+    <%= will_paginate @inventory_updates %>
+  </div>
+<% end %>

@@ -1,0 +1,22 @@
+<% if @product.shopify_datum.present? %>
+  <hr/>
+  <h2>Shopify Data (<a href='https://mollusksurf.myshopify.com/admin/products/<%= @product.shopify_datum.shopify_product_id %>/variants/<%= @product.shopify_datum.variant_id %>' target='_blank'>link</a>):</h2>
+  <table class='full_width'>
+    <% @product.shopify_datum.attributes.each do |vd| %>
+      <% if vd.last.present? %>
+        <tr>
+          <td>
+            <strong><%= vd.shift.humanize %></strong>
+          </td>
+          <td>
+            <% if vd.first.is_a? Array %>
+              <%= vd.shift.join(', ') %>
+            <% else %>
+              <%= vd.shift %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    <% end %>
+  <table>
+<% end %>
