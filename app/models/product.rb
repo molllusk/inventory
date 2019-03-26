@@ -90,12 +90,7 @@ class Product < ApplicationRecord
 
   def self.update_inventories
     third_party_or_sale.find_each do |product|
-      if product.connect_shopify_inventory?
-        product.connect_inventory
-        product.adjust_inventory
-      elsif product.update_shopify_inventory?
-        product.adjust_inventory
-      end
+      product.adjust_inventory if product.update_shopify_inventory?
     end
   end
 
