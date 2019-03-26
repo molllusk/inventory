@@ -90,7 +90,12 @@ class Product < ApplicationRecord
 
   def self.update_inventories
     third_party_or_sale.find_each do |product|
-      product.adjust_inventory if product.update_shopify_inventory?
+      if product.connect_shopify_inventory?
+        product.connect_inventory
+        product.adjust_inventory
+      elsif product.update_shopify_inventory?
+        product.adjust_inventory
+      end
     end
   end
 
@@ -101,19 +106,20 @@ class Product < ApplicationRecord
       if ShopifyClient.inventory_item_updated?(response)
         create_inventory_update(response)
       else
-        # inventory location does not exist for variant, so add it and then adjust the inventory
-        connect_response = ShopifyClient.connect_sf_inventory_location(shopify_datum.inventory_item_id)
-
-        response = ShopifyClient.adjust_inventory(shopify_datum.inventory_item_id, inventory_adjustment) if ShopifyClient.inventory_item_updated?(connect_response)
-
-        if ShopifyClient.inventory_item_updated?(response)
-          create_inventory_update(response)
-        else
-          Airbrake.notify("Inventory location unavailable for Product: #{id}, Adjustment: #{inventory_adjustment}")
-        end
+        Airbrake.notify("Could not UPDATE inventory for Product: #{id}, Adjustment: #{inventory_adjustment}")
       end
     rescue
-      Airbrake.notify("There was an error updating inventory for Product: #{id}, Adjustment: #{inventory_adjustment}")
+      Airbrake.notify("There was an error UPDATING inventory for Product: #{id}, Adjustment: #{inventory_adjustment}")
+    end
+  end
+
+  def connect_inventory
+    begin
+      response = ShopifyClient.connect_sf_inventory_location(shopify_datum.inventory_item_id)
+
+      Airbrake.notify("Could not CONNECT inventory location for Product: #{id}") unless ShopifyClient.inventory_item_updated?(response)
+    rescue
+      Airbrake.notify("There was an error CONNECTING inventory for Product: #{id}")
     end
   end
 
@@ -148,6 +154,10 @@ class Product < ApplicationRecord
 
   def update_shopify_inventory?
     (third_party? || sale?) && shopify_inventory != vend_inventory && !(vend_inventory < 0 && shopify_inventory.zero?)
+  end
+
+  def connect_shopify_inventory?
+    (third_party? || sale?) && shopify_datum.inventory.nil?
   end
 
   def inventory_adjustment
