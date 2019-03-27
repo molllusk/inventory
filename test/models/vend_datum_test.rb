@@ -17,7 +17,6 @@ end
 #  categories        :text
 #  vend_created_at   :datetime
 #  vend_deleted_at   :datetime
-#  description       :text
 #  handle            :string
 #  has_inventory     :boolean
 #  has_variants      :boolean

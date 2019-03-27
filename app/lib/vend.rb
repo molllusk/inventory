@@ -6,7 +6,6 @@ class VendClient
   SAVED_ATTRIBUTES = %i[
     active
     brand_id
-    description
     handle
     has_inventory
     has_variants
