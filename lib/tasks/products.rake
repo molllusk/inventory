@@ -35,7 +35,7 @@ namespace :products do
         end
       end
     end
-    bads = []
+
     # match vend variant sku to shopify variant barcode
     new_shopifys.each do |shopify_attrs|
       existing_vend = VendDatum.find_by(sku: shopify_attrs[:barcode])
@@ -55,7 +55,5 @@ namespace :products do
         end
       end
     end
-
-    p bads
   end
 end
