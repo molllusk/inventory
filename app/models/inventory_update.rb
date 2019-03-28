@@ -55,8 +55,11 @@ end
 # Table name: inventory_updates
 #
 #  id         :bigint(8)        not null, primary key
-#  product_id :integer
 #  adjustment :integer
+#  new_qty    :integer
 #  prior_qty  :integer
 #  vend_qty   :integer
+#  created_at :datetime
+#  updated_at :datetime
+#  product_id :integer
 #
