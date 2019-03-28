@@ -1,8 +1,8 @@
 class ShopifyClient
-  BASE_URL = "https://#{ENV['SHOPIFY_USER']}:#{ENV['SHOPIFY_PASSWORD']}@mollusksurf.myshopify.com".freeze
-  SF_INVENTORY_LOCATION = 49481991
-  # this was used when we thought origin location on an order meant the store where it was to be fulfilled from.
-  # SF_ORIGIN_LOCATION = 280914881
+  RETAIL_BASE_URL = "https://#{ENV['SHOPIFY_USER']}:#{ENV['SHOPIFY_PASSWORD']}@mollusksurf.myshopify.com".freeze
+  WHOLESALE_BASE_URL = "https://#{ENV['WHOLESALE_SHOPIFY_USER']}:#{ENV['WHOLESALE_SHOPIFY_PASSWORD']}@molluskats.myshopify.com".freeze
+  SF_RETAIL_INVENTORY_LOCATION = 49481991
+  JAM_WHOLESALE_INVENTORY_LOCATION = 29887823936
 
   SAVED_PRODUCT_ATTRIBUTES = %i[
     handle
@@ -28,42 +28,42 @@ class ShopifyClient
     weight_unit
   ]
 
-  def self.connection
-    Faraday.new(url: BASE_URL) do |faraday|
+  def self.connection(store = :RETAIL)
+    Faraday.new(url: const_get("#{store.to_s.upcase}_BASE_URL")) do |faraday|
       faraday.response :json
       faraday.adapter Faraday.default_adapter
     end
   end
 
-  def self.count(resource)
-    response = connection.get "/admin/#{resource}/count.json"
+  def self.count(resource, store = :RETAIL)
+    response = connection(store).get "/admin/#{resource}/count.json"
     response.body['count']
   end
 
-  def self.all_products
-    all_resource('products')
+  def self.all_products(store = :RETAIL)
+    all_resource('products', store)
   end
 
-  def self.all_resource(resource)
+  def self.all_resource(resource, store = :RETAIL)
     resources = []
-    pages = (count(resource) / 250.0).ceil
+    pages = (count(resource, store) / 250.0).ceil
     pages.times do |page|
-      response = connection.get "/admin/#{resource}.json", { limit: 250, page: page + 1 }
+      response = connection(store).get "/admin/#{resource}.json", { limit: 250, page: page + 1 }
       resources += response.body[resource]
     end
     resources
   end
 
-  def self.all_orders
-    all_resource('orders')
+  def self.all_orders(store = :RETAIL)
+    all_resource('orders', store)
   end
 
   # Final order quantity needs to account for refunded items
-  def self.order_quantities_by_variant
+  def self.order_quantities_by_variant(store = :RETAIL)
     orders = Hash.new(0)
     refunds = Hash.new(0)
 
-    all_orders.each do |order|
+    all_orders(store).each do |order|
       next if %w(fulfilled restocked).include? order['fulfillment_status']
 
       order['refunds'].each do |refund|
@@ -81,13 +81,13 @@ class ShopifyClient
     orders
   end
 
-  def self.connect_inventory_location(inventory_item_id, location_id)
+  def self.connect_inventory_location(inventory_item_id, location_id, store = :RETAIL)
     body = {
       'location_id': location_id,
       'inventory_item_id': inventory_item_id
     }
 
-    response = connection.post do |req|
+    response = connection(store).post do |req|
       req.url '/admin/inventory_levels/connect.json'
       req.headers['Content-Type'] = 'application/json'
       req.body = body.to_json
@@ -97,31 +97,26 @@ class ShopifyClient
   end
 
   def self.connect_sf_inventory_location(inventory_item_id)
-    connect_inventory_location(inventory_item_id, SF_INVENTORY_LOCATION)
+    connect_inventory_location(inventory_item_id, SF_RETAIL_INVENTORY_LOCATION)
   end
 
-  def self.get_inventory_items_all_locations(inventory_item_ids)
-    response = connection.get "/admin/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}"
+  def self.get_inventory_items_all_locations(inventory_item_ids, store = :RETAIL)
+    response = connection(store).get "/admin/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}"
     response.body['inventory_levels']
   end
 
-  def self.get_inventory_items_sf(inventory_item_ids)
-    response = connection.get "/admin/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}&location_ids=#{SF_INVENTORY_LOCATION}&limit=250"
+  def self.get_inventory_items(inventory_item_ids, store = :RETAIL)
+    response = connection(store).get "/admin/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}&location_ids=#{inventory_location(store)}&limit=250"
     response.body['inventory_levels']
   end
 
-  def self.get_sf_inventory(inventory_item_id)
-    inventory_item = get_inventory_items_sf([inventory_item_id])
-    inventory_item.first['available'] if inventory_item.first.present?
-  end
-
-  def self.update_inventories
+  def self.update_inventories(store = :RETAIL)
     inventory_item_ids = ShopifyDatum.pluck(:inventory_item_id)
-    orders = order_quantities_by_variant
+    orders = order_quantities_by_variant(store)
 
     while inventory_item_ids.present?
       id_batch = inventory_item_ids.shift(50)
-      inventory_items = ShopifyClient.get_inventory_items_sf(id_batch)
+      inventory_items = get_inventory_items(id_batch, store)
       inventory_items.each do |inventory_item|
         sd = ShopifyDatum.find_by_inventory_item_id(inventory_item['inventory_item_id'])
         if inventory_item['available'].present?
@@ -132,14 +127,14 @@ class ShopifyClient
     end
   end
 
-  def self.adjust_inventory(inventory_item_id, adjustment)
+  def self.adjust_inventory(inventory_item_id, adjustment, store = :RETAIL)
     body = {
-      'location_id': SF_INVENTORY_LOCATION,
+      'location_id': inventory_location(store),
       'inventory_item_id': inventory_item_id,
       'available_adjustment': adjustment
     }
 
-    response = connection.post do |req|
+    response = connection(store).post do |req|
       req.url '/admin/inventory_levels/adjust.json'
       req.headers['Content-Type'] = 'application/json'
       req.body = body.to_json
@@ -176,5 +171,9 @@ class ShopifyClient
 
     SAVED_VARIANT_ATTRIBUTES.each { |saved_attribute| attributes[saved_attribute] = variant[saved_attribute.to_s] }
     attributes
+  end
+
+  def self.inventory_location(store = :RETAIL)
+    store.to_s.upcase == 'RETAIL' ? SF_RETAIL_INVENTORY_LOCATION : JAM_WHOLESALE_INVENTORY_LOCATION
   end
 end
