@@ -11,32 +11,33 @@ end
 # Table name: shopify_data
 #
 #  id                     :bigint(8)        not null, primary key
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
-#  handle                 :string
-#  product_type           :string
-#  tags                   :text
-#  title                  :string
-#  vendor                 :string
 #  barcode                :string
 #  compare_at_price       :string
 #  fulfillment_service    :string
 #  grams                  :integer
-#  inventory_item_id      :bigint(8)
+#  handle                 :string
+#  inventory              :integer
 #  inventory_management   :string
 #  inventory_policy       :string
 #  inventory_quantity     :integer
 #  old_inventory_quantity :integer
 #  price                  :string
-#  shopify_product_id     :bigint(8)
-#  variant_id             :bigint(8)
+#  product_type           :string
 #  requires_shipping      :string
+#  shopify_created_at     :datetime
 #  sku                    :string
+#  store                  :integer
+#  tags                   :text
+#  title                  :string
+#  variant_created_at     :datetime
 #  variant_title          :string
+#  vendor                 :string
 #  weight                 :float
 #  weight_unit            :string
-#  variant_created_at     :datetime
-#  shopify_created_at     :datetime
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  inventory_item_id      :bigint(8)
 #  product_id             :integer
-#  inventory              :integer
+#  shopify_product_id     :bigint(8)
+#  variant_id             :bigint(8)
 #
