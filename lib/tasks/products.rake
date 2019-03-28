@@ -42,7 +42,6 @@ namespace :products do
       vend_attrs = new_vends.find { |vend| vend[:sku] == shopify_attrs[:barcode] }
 
       if existing_vend.present? && existing_vend.product.shopify_datum.present?
-        bads << existing_vend.product.shopify_datum.id
         Airbrake.notify("Issue Importing Shopify: recognized as new, but already exists for product: #{existing_vend.product.id}")
       else
         if existing_vend.present?
