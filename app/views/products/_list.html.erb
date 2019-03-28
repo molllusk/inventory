@@ -6,51 +6,49 @@
   
   <table class="products full_width">
     <tr>
-      <th>Added (Pacific Time)</th>
       <th>Product (vend name)</th>
+      <th>Added (Pacific Time)</th>
       <th>SKU</th>
       <th>Vend SF Qty</th>
       <th>Shopify SF Qty</th>
       <th>3rdParty?</th>
       <th>Sale?</th>
-      <th>Vend</th>
-      <th>Shopify</th>
+      <th>Links</th>
     </tr>
     <% products.each do |product| %>
       <% vend = product.vend_datum %>
-      <% shopify = product.shopify_datum %>
+      <% retail_shopify = product.shopify_data.retail %>
       <tr>
         <td><%= product.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
         <td><%= link_to vend.name, product %></td>
         <td><%= vend.sku %></td>
         <td><%= vend.inventory || 'missing' %></td>
         <td>
-          <% if shopify.present? %>
-            <%= shopify.inventory || 'missing' %>
+          <% if retail_shopify.present? %>
+            <%= retail_shopify.inventory || 'missing' %>
           <% else %>
             n/a
           <% end %>
         </td>
         <td>
-          <% if shopify.present? %>
+          <% if retail_shopify.present? %>
             <%= product.third_party? %>
           <% else %>
             n/a
           <% end %>
         </td>
         <td>
-          <% if shopify.present? %>
+          <% if retail_shopify.present? %>
             <%= product.sale? %>
           <% else %>
             n/a
           <% end %>
         </td>
-        <td><a href='https://mollusksurf.vendhq.com/product/<%= vend.vend_id %>' target='_blank'>Vend page</a></td>
         <td>
-          <% if shopify.present? %>
+          <a href='https://mollusksurf.vendhq.com/product/<%= vend.vend_id %>' target='_blank'>Vend page</a>
+          <br />
+          <% if retail_shopify.present? %>
             <a href='https://mollusksurf.myshopify.com/admin/products/<%= shopify.shopify_product_id %>/variants/<%= shopify.variant_id %>' target='_blank'>Shopify page</a>
-          <% else %>
-            n/a
           <% end %>
         </td>
       </tr>

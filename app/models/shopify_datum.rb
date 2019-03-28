@@ -8,8 +8,17 @@ class ShopifyDatum < ApplicationRecord
     wholesale: 1
   }
 
-  def self.save_variants(variants)
+  scope :retail, lambda {
+    where(store: :retail)
+  }
+
+  scope :wholesale, lambda {
+    where(store: :wholesale)
+  }
+
+  def self.save_variants(variants, store)
     variants.each do |product_data|
+      product_data[:store] = store
       product = VendDatum.find_by_sku(product_data[:sku]).try(:product)
       product.create_shopify_datum(product_data) if product.present?
     end

@@ -1,6 +1,6 @@
 class Product < ApplicationRecord
   has_one :vend_datum, dependent: :destroy
-  has_one :shopify_datum, dependent: :destroy
+  has_many :shopify_data, dependent: :destroy
   has_many :inventory_updates, dependent: :destroy
 
   CSV_HEADERS = %w(
@@ -26,15 +26,18 @@ class Product < ApplicationRecord
   )
 
   scope :third_party, lambda {
-    where('LOWER(shopify_data.tags) like ?', '%3rdparty%').joins(:shopify_datum)
+    where('shopify_data.store = ? AND LOWER(shopify_data.tags) like ?', ShopifyDatum.stores[:retail], '%3rdparty%')
+      .joins(:shopify_data)
   }
 
   scope :sale, lambda {
-    where('LOWER(shopify_data.tags) like ?', '%sale%').joins(:shopify_datum)
+    where('shopify_data.store = ? AND LOWER(shopify_data.tags) like ?', ShopifyDatum.stores[:retail], '%sale%')
+      .joins(:shopify_data)
   }
 
   scope :third_party_or_sale, lambda {
-    where('LOWER(shopify_data.tags) like ? OR LOWER(shopify_data.tags) like ?', '%3rdparty%', '%sale%').joins(:shopify_datum)
+    where('shopify_data.store = ? AND (LOWER(shopify_data.tags) like ? OR LOWER(shopify_data.tags) like ?)', ShopifyDatum.stores[:retail], '%3rdparty%', '%sale%')
+      .joins(:shopify_data)
   }
 
   scope :search_query, lambda { |query|
@@ -55,7 +58,7 @@ class Product < ApplicationRecord
     # change the number of OR conditions.
     num_or_conds = 4
 
-    joins(:shopify_datum, :vend_datum).where(
+    joins(:shopify_data, :vend_datum).where(
       terms.map { |term|
         "(LOWER(shopify_data.title) LIKE ? OR LOWER(shopify_data.variant_title) LIKE ? OR LOWER(vend_data.name) LIKE ? OR LOWER(vend_data.variant_name) LIKE ?)"
       }.join(' AND '),
@@ -83,7 +86,7 @@ class Product < ApplicationRecord
   def self.inventory_csv
     CSV.generate(headers: CSV_HEADERS, write_headers: true) do |csv|
       third_party_or_sale.find_each do |product|
-        csv << product.inventory_csv_row if product.vend_inventory != product.shopify_inventory
+        csv << product.inventory_csv_row if product.vend_inventory != product.shopify_inventory(:retail)
       end
     end
   end
@@ -132,42 +135,42 @@ class Product < ApplicationRecord
       vend_datum.name,
       vend_datum.variant_name,
       vend_inventory,
-      shopify_inventory,
+      shopify_inventory(:retail),
       inventory_adjustment,
       shopify_datum.price,
-      update_shopify_inventory?,
+      update_retail_shopify_inventory?,
       third_party?,
       sale?,
       "https://mollusk.herokuapp.com/products/#{id}"
     ]
   end
 
-  def shopify_inventory
-    shopify_datum.inventory.to_i
+  def shopify_inventory(scope)
+    shopify_datum.send(scope).inventory.to_i
   end
 
   def vend_inventory
     vend_datum.inventory.to_i
   end
 
-  def update_shopify_inventory?
-    (third_party? || sale?) && shopify_inventory != vend_inventory && !(vend_inventory < 0 && shopify_inventory.zero?)
+  def update_retail_shopify_inventory?
+    (third_party? || sale?) && shopify_inventory(:retail) != vend_inventory && !(vend_inventory < 0 && shopify_inventory.zero?)
   end
 
-  def connect_shopify_inventory?
-    (third_party? || sale?) && shopify_datum.inventory.nil?
+  def connect_retail_shopify_inventory?
+    (third_party? || sale?) && shopify_datum.retail.inventory.nil?
   end
 
-  def inventory_adjustment
-    vend_inventory - shopify_inventory
+  def retail_inventory_adjustment
+    vend_inventory - shopify_inventory(:retail)
   end
 
   def third_party?
-    shopify_datum.tags.detect { |tag| tag.strip.downcase == '3rdparty' }.present?
+    shopify_datum.retail.tags.detect { |tag| tag.strip.downcase == '3rdparty' }.present?
   end
 
   def sale?
-    shopify_datum.tags.detect { |tag| tag.strip.downcase == 'sale' }.present?
+    shopify_datum.retail.tags.detect { |tag| tag.strip.downcase == 'sale' }.present?
   end
 end
 
