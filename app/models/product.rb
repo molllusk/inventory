@@ -81,7 +81,7 @@ class Product < ApplicationRecord
 
   def adjust_sf_inventory
     begin
-      response = ShopifyClient.adjust_inventory(inventory_item_id, retail_inventory_adjustment)
+      response = ShopifyClient.adjust_inventory(retail_shopify.inventory_item_id, retail_inventory_adjustment)
 
       if ShopifyClient.inventory_item_updated?(response)
         update_retail_inventory(response)
