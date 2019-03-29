@@ -3,20 +3,6 @@ class Product < ApplicationRecord
   has_many :shopify_data, dependent: :destroy
   has_many :inventory_updates, dependent: :destroy
 
-  CSV_HEADERS = %w(
-    id
-    name
-    variant
-    vend
-    shopify
-    difference
-    price
-    update?
-    3rdParty
-    sale
-    url
-  )
-
   filterrific(
     default_filter_params: { sorted_by: 'created_at_desc' },
     available_filters: [
@@ -78,99 +64,68 @@ class Product < ApplicationRecord
     end
   }
 
-  def self.inventory_check
-    csv = inventory_csv
-    ApplicationMailer.inventory_check(csv).deliver if CSV.parse(csv).count > 1
+  # WHOLESALE specific
+  def wholesale_shopify
+    shopify_data.find_by(store: :wholesale)
   end
 
-  def self.inventory_csv
-    CSV.generate(headers: CSV_HEADERS, write_headers: true) do |csv|
-      third_party_or_sale.find_each do |product|
-        csv << product.inventory_csv_row if product.vend_inventory != product.shopify_inventory(:retail)
-      end
-    end
-  end
-
-  def self.update_inventories
+  # RETAIL specific
+  def self.update_retail_inventories_sf
     third_party_or_sale.find_each do |product|
-      if product.update_shopify_inventory?
-        product.connect_inventory if connect_shopify_inventory?
-        product.adjust_inventory
+      if product.update_sf_shopify_inventory?
+        product.connect_sf_inventory_location if missing_retail_inventory_location?
+        product.adjust_sf_inventory
       end
     end
   end
 
-  def adjust_inventory
+  def adjust_sf_inventory
     begin
-      response = ShopifyClient.adjust_inventory(shopify_datum.inventory_item_id, inventory_adjustment)
+      response = ShopifyClient.adjust_inventory(inventory_item_id, adjustment)
 
       if ShopifyClient.inventory_item_updated?(response)
-        create_inventory_update(response)
+        update_retail_inventory(response)
       else
-        Airbrake.notify("Could not UPDATE inventory for Product: #{id}, Adjustment: #{inventory_adjustment}")
+        Airbrake.notify("Could not UPDATE SF inventory for Product: #{id}, Adjustment: #{adjustment}")
       end
     rescue
-      Airbrake.notify("There was an error UPDATING inventory for Product: #{id}, Adjustment: #{inventory_adjustment}")
+      Airbrake.notify("There was an error UPDATING SF inventory for Product: #{id}, Adjustment: #{adjustment}")
     end
   end
 
-  def connect_inventory
+  def update_retail_inventory(response)
+    InventoryUpdate.create(vend_qty: vend_datum.sf_inventory, prior_qty: shopify_inventory_sf, adjustment: retail_inventory_adjustment, product_id: id, new_qty: response['inventory_level']['available'])
+    retail_shopify.update_attribute(:inventory, response['inventory_level']['available'])
+  end
+
+  def connect_sf_inventory_location
     begin
-      response = ShopifyClient.connect_sf_inventory_location(shopify_datum.inventory_item_id)
+      response = ShopifyClient.connect_sf_inventory_location(retail_shopify.inventory_item_id)
 
-      Airbrake.notify("Could not CONNECT inventory location for Product: #{id}") unless ShopifyClient.inventory_item_updated?(response)
+      Airbrake.notify("Could not CONNECT SF inventory location for Product: #{id}") unless ShopifyClient.inventory_item_updated?(response)
     rescue
-      Airbrake.notify("There was an error CONNECTING inventory for Product: #{id}")
+      Airbrake.notify("There was an error CONNECTING SF inventory for Product: #{id}")
     end
   end
 
-  def create_inventory_update(response)
-    InventoryUpdate.create(vend_qty: vend_inventory, prior_qty: shopify_inventory, adjustment: inventory_adjustment, product_id: id, new_qty: response['inventory_level']['available'])
-    shopify_datum.update_attribute(:inventory, response['inventory_level']['available'])
+  def retail_shopify
+    shopify_data.find_by(store: :retail)
   end
 
-  def inventory_csv_row
-    [
-      id,
-      vend_datum.name,
-      vend_datum.variant_name,
-      vend_inventory,
-      shopify_inventory(:retail),
-      inventory_adjustment,
-      shopify_datum.price,
-      update_retail_shopify_inventory?,
-      third_party?,
-      sale?,
-      "https://mollusk.herokuapp.com/products/#{id}"
-    ]
+  def shopify_inventory_sf
+    retail_shopify.inventory.to_i
   end
 
-  def shopify_inventory(scope)
-    shopify_datum.send(scope).inventory.to_i
-  end
-
-  def vend_inventory
-    vend_datum.inventory.to_i
-  end
-
-  def update_retail_shopify_inventory?
-    (third_party? || sale?) && shopify_inventory(:retail) != vend_inventory && !(vend_inventory < 0 && shopify_inventory.zero?)
-  end
-
-  def connect_retail_shopify_inventory?
-    (third_party? || sale?) && shopify_datum.retail.inventory.nil?
+  def update_sf_shopify_inventory?
+    retail_shopify.third_party_or_sale? && shopify_inventory_sf != vend_datum.sf_inventory && !(vend_datum.sf_inventory < 0 && shopify_inventory_sf.zero?)
   end
 
   def retail_inventory_adjustment
-    vend_inventory - shopify_inventory(:retail)
+    vend_datum.sf_inventory - shopify_inventory_sf
   end
 
-  def third_party?
-    shopify_datum.retail.tags.detect { |tag| tag.strip.downcase == '3rdparty' }.present?
-  end
-
-  def sale?
-    shopify_datum.retail.tags.detect { |tag| tag.strip.downcase == 'sale' }.present?
+  def missing_retail_inventory_location?
+    retail_shopify.third_party_or_sale? && retail_shopify.inventory.nil?
   end
 end
 

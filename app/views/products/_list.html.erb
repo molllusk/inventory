@@ -11,16 +11,18 @@
       <th>SKU</th>
       <th>Vend SF Qty</th>
       <th>Shopify SF Qty</th>
+      <th>Shopify Wholesale Qty</th>
       <th>3rdParty?</th>
       <th>Sale?</th>
       <th>Links</th>
     </tr>
     <% products.each do |product| %>
       <% vend = product.vend_datum %>
-      <% retail_shopify = product.shopify_data.retail %>
+      <% retail_shopify = product.retail_shopify %>
+      <% wholesale_shopify = product.wholesale_shopify %>
       <tr>
-        <td><%= product.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
         <td><%= link_to vend.name, product %></td>
+        <td><%= product.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
         <td><%= vend.sku %></td>
         <td><%= vend.inventory || 'missing' %></td>
         <td>
@@ -31,24 +33,35 @@
           <% end %>
         </td>
         <td>
-          <% if retail_shopify.present? %>
-            <%= product.third_party? %>
+          <% if wholesale_shopify.present? %>
+            <%= wholesale_shopify.inventory || 'missing' %>
           <% else %>
             n/a
           <% end %>
         </td>
         <td>
           <% if retail_shopify.present? %>
-            <%= product.sale? %>
+            <%= retail_shopify.third_party? %>
           <% else %>
             n/a
           <% end %>
         </td>
         <td>
-          <a href='https://mollusksurf.vendhq.com/product/<%= vend.vend_id %>' target='_blank'>Vend page</a>
-          <br />
           <% if retail_shopify.present? %>
-            <a href='https://mollusksurf.myshopify.com/admin/products/<%= shopify.shopify_product_id %>/variants/<%= shopify.variant_id %>' target='_blank'>Shopify page</a>
+            <%= retail_shopify.sale? %>
+          <% else %>
+            n/a
+          <% end %>
+        </td>
+        <td>
+          <a href='https://mollusksurf.vendhq.com/product/<%= vend.vend_id %>' target='_blank'>Vend</a>
+          <% if retail_shopify.present? %>
+            <br />
+            <a href='https://mollusksurf.myshopify.com/admin/products/<%= retail_shopify.shopify_product_id %>/variants/<%= retail_shopify.variant_id %>' target='_blank'>Retail Shopify</a>
+          <% end %>
+          <% if wholesale_shopify.present? %>
+            <br />
+            <a href='https://molluskats.myshopify.com/admin/products/<%= wholesale_shopify.shopify_product_id %>/variants/<%= wholesale_shopify.variant_id %>' target='_blank'>Wholesale Shopify</a>
           <% end %>
         </td>
       </tr>

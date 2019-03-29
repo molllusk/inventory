@@ -1,18 +1,19 @@
-<% if @product.shopify_datum.present? %>
+<% if shopify_datum.present? %>
   <hr/>
-  <h2>Shopify Data (<a href='https://mollusksurf.myshopify.com/admin/products/<%= @product.shopify_datum.shopify_product_id %>/variants/<%= @product.shopify_datum.variant_id %>' target='_blank'>link</a>):</h2>
+  <h2><%= shopify_datum.store.upcase %> Shopify Data (<a href='https://mollusk<%= shopify_datum.store == 'retail' ? 'surf' : 'ats' %>.myshopify.com/admin/products/<%= shopify_datum.shopify_product_id %>/variants/<%= shopify_datum.variant_id %>' target='_blank'>link</a>):</h2>
   <table class='full_width'>
-    <% @product.shopify_datum.attributes.each do |vd| %>
-      <% if vd.last.present? %>
+    <% shopify_datum.attributes.each do |sd| %>
+      <% next if %w[product_id].include?(sd.first) %>
+      <% if sd.last.present? %>
         <tr>
           <td>
-            <strong><%= vd.shift.humanize %></strong>
+            <strong><%= sd.shift.humanize %></strong>
           </td>
           <td>
-            <% if vd.first.is_a? Array %>
-              <%= vd.shift.join(', ') %>
+            <% if sd.first.is_a? Array %>
+              <%= sd.shift.join(', ') %>
             <% else %>
-              <%= vd.shift %>
+              <%= sd.shift %>
             <% end %>
           </td>
         </tr>

@@ -16,16 +16,20 @@ class ShopifyDatum < ApplicationRecord
     where(store: :wholesale)
   }
 
-  def self.save_variants(variants, store)
-    variants.each do |product_data|
-      product_data[:store] = store
-      product = VendDatum.find_by_sku(product_data[:sku]).try(:product)
-      product.create_shopify_datum(product_data) if product.present?
-    end
-  end
-
   def full_title
     "#{title} - #{variant_title}"
+  end
+
+  def third_party?
+    tags.detect { |tag| tag.strip.downcase == '3rdparty' }.present?
+  end
+
+  def sale?
+    tags.detect { |tag| tag.strip.downcase == 'sale' }.present?
+  end
+
+  def third_party_or_sale?
+    tags.detect { |tag| %w[3rdparty sale].include?(tag.strip.downcase) }.present?
   end
 end
 

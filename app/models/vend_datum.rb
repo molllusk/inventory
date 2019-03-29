@@ -7,6 +7,10 @@ class VendDatum < ApplicationRecord
   serialize :categories, Array
 
   belongs_to :product
+
+  def sf_inventory
+    inventory.to_i
+  end
 end
 
 # == Schema Information

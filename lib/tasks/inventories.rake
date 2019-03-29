@@ -5,6 +5,7 @@ namespace :inventories do
 
     VendClient.update_inventories
     ShopifyClient.update_inventories
-    Product.update_inventories
+    ShopifyClient.update_inventories(:WHOLESALE)
+    Product.update_retail_inventories_sf
   end
 end
