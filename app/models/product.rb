@@ -86,11 +86,9 @@ class Product < ApplicationRecord
       if ShopifyClient.inventory_item_updated?(response)
         update_retail_inventory(response)
       else
-        puts "Could not UPDATE SF inventory for Product: #{id}, Adjustment: #{retail_inventory_adjustment}"
         Airbrake.notify("Could not UPDATE SF inventory for Product: #{id}, Adjustment: #{retail_inventory_adjustment}")
       end
     rescue
-      puts "There was an error UPDATING SF inventory for Product: #{id}, Adjustment: #{retail_inventory_adjustment}"
       Airbrake.notify("There was an error UPDATING SF inventory for Product: #{id}, Adjustment: #{retail_inventory_adjustment}")
     end
   end
@@ -103,12 +101,9 @@ class Product < ApplicationRecord
   def connect_sf_inventory_location
     begin
       response = ShopifyClient.connect_sf_inventory_location(retail_shopify.inventory_item_id)
-      if !ShopifyClient.inventory_item_updated?(response)
-      puts "Could not CONNECT SF inventory location for Product: #{id}"
+
       Airbrake.notify("Could not CONNECT SF inventory location for Product: #{id}") unless ShopifyClient.inventory_item_updated?(response)
-      end
     rescue
-      puts "There was an error CONNECTING SF inventory for Product: #{id}"
       Airbrake.notify("There was an error CONNECTING SF inventory for Product: #{id}")
     end
   end
