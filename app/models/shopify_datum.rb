@@ -8,15 +8,28 @@ class ShopifyDatum < ApplicationRecord
     wholesale: 1
   }
 
-  def self.save_variants(variants)
-    variants.each do |product_data|
-      product = VendDatum.find_by_sku(product_data[:sku]).try(:product)
-      product.create_shopify_datum(product_data) if product.present?
-    end
-  end
+  scope :retail, lambda {
+    where(store: :retail)
+  }
+
+  scope :wholesale, lambda {
+    where(store: :wholesale)
+  }
 
   def full_title
     "#{title} - #{variant_title}"
+  end
+
+  def third_party?
+    tags.detect { |tag| tag.strip.downcase == '3rdparty' }.present?
+  end
+
+  def sale?
+    tags.detect { |tag| tag.strip.downcase == 'sale' }.present?
+  end
+
+  def third_party_or_sale?
+    tags.detect { |tag| %w[3rdparty sale].include?(tag.strip.downcase) }.present?
   end
 end
 
