@@ -73,7 +73,7 @@ class Product < ApplicationRecord
   def self.update_retail_inventories_sf
     third_party_or_sale.find_each do |product|
       if product.update_sf_shopify_inventory?
-        product.connect_sf_inventory_location if missing_retail_inventory_location?
+        product.connect_sf_inventory_location if product.missing_retail_inventory_location?
         product.adjust_sf_inventory
       end
     end
