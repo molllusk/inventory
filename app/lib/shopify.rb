@@ -107,7 +107,7 @@ class ShopifyClient
 
   def self.get_inventory_items(inventory_item_ids, store = :RETAIL)
     response = connection(store).get "/admin/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}&location_ids=#{inventory_location(store)}&limit=250"
-    response.body['inventory_levels']
+    response.body['inventory_levels'] || []
   end
 
   def self.update_inventories(store = :RETAIL)
