@@ -104,7 +104,7 @@ class Product < ApplicationRecord
     begin
       response = ShopifyClient.connect_sf_inventory_location(retail_shopify.inventory_item_id)
       if !ShopifyClient.inventory_item_updated?(response)
-      puts "There was an error UPDATING SF inventory for Product: #{id}, Adjustment: #{retail_inventory_adjustment}"
+      puts "Could not CONNECT SF inventory location for Product: #{id}"
       Airbrake.notify("Could not CONNECT SF inventory location for Product: #{id}") unless ShopifyClient.inventory_item_updated?(response)
       end
     rescue
