@@ -81,15 +81,15 @@ class Product < ApplicationRecord
 
   def adjust_sf_inventory
     begin
-      response = ShopifyClient.adjust_inventory(inventory_item_id, adjustment)
+      response = ShopifyClient.adjust_inventory(inventory_item_id, retail_inventory_adjustment)
 
       if ShopifyClient.inventory_item_updated?(response)
         update_retail_inventory(response)
       else
-        Airbrake.notify("Could not UPDATE SF inventory for Product: #{id}, Adjustment: #{adjustment}")
+        Airbrake.notify("Could not UPDATE SF inventory for Product: #{id}, Adjustment: #{retail_inventory_adjustment}")
       end
     rescue
-      Airbrake.notify("There was an error UPDATING SF inventory for Product: #{id}, Adjustment: #{adjustment}")
+      Airbrake.notify("There was an error UPDATING SF inventory for Product: #{id}, Adjustment: #{retail_inventory_adjustment}")
     end
   end
 
