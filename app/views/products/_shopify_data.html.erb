@@ -1,23 +1,41 @@
-<% if shopify_datum.present? %>
+<% if retail_shopify.present? || wholesale_shopify.present? %>
+  <% headers = ['store'] + ((retail_shopify || wholesale_shopify).attributes.keys - ['store'])  %>
   <hr/>
-  <h2><%= shopify_datum.store.upcase %> Shopify Data (<a href='https://mollusk<%= shopify_datum.store == 'retail' ? 'surf' : 'ats' %>.myshopify.com/admin/products/<%= shopify_datum.shopify_product_id %>/variants/<%= shopify_datum.variant_id %>' target='_blank'>link</a>):</h2>
+  <h2>Shopify Data:</h2>
   <table class='full_width'>
-    <% shopify_datum.attributes.each do |sd| %>
-      <% next if %w[product_id].include?(sd.first) %>
-      <% if sd.last.present? %>
-        <tr>
+    <% headers.each do |header| %>
+      <% next if %w[product_id].include?(header) %>
+      <tr>
+        <td>
+          <strong><%= header.humanize %></strong>
+        </td>
+        <% if retail_shopify.present? %>
           <td>
-            <strong><%= sd.shift.humanize %></strong>
-          </td>
-          <td>
-            <% if sd.first.is_a? Array %>
-              <%= sd.shift.join(', ') %>
+            <% if header == 'store' %>
+              <a href='https://mollusksurf.myshopify.com/admin/products/<%= retail_shopify.shopify_product_id %>/variants/<%= retail_shopify.variant_id %>' target='_blank'>RETAIL Link</a>
+            <% elsif retail_shopify.send(header).is_a? Array %>
+              <%= retail_shopify.send(header).join(', ') %>
+            <% elsif retail_shopify.send(header).is_a? String %>
+              <%= retail_shopify.send(header).humanize %>
             <% else %>
-              <%= sd.shift %>
+              <%= retail_shopify.send(header) %>
             <% end %>
           </td>
-        </tr>
-      <% end %>
+        <% end %>
+        <% if wholesale_shopify.present? %>
+          <td>
+            <% if header == 'store' %>
+              <a href='https://molluskats.myshopify.com/admin/products/<%= wholesale_shopify.shopify_product_id %>/variants/<%= wholesale_shopify.variant_id %>' target='_blank'>WHOLESALE Link</a>
+            <% elsif wholesale_shopify.send(header).is_a? Array %>
+              <%= wholesale_shopify.send(header).join(', ') %>
+            <% elsif wholesale_shopify.send(header).is_a? String %>
+              <%= wholesale_shopify.send(header).humanize %>
+            <% else %>
+              <%= wholesale_shopify.send(header) %>
+            <% end %>
+          </td>
+        <% end %>
+      </tr>
     <% end %>
   <table>
 <% end %>
