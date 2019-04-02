@@ -21,7 +21,7 @@
       <% retail_shopify = product.retail_shopify %>
       <% wholesale_shopify = product.wholesale_shopify %>
       <tr>
-        <td><%= link_to vend.name, product %></td>
+        <td><%= link_to product do %><%= vend.name %> <i class='fa fa-external-link-alt'></i><% end %></td>
         <td><%= product.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
         <td><%= vend.sku %></td>
         <td><%= vend.inventory || 'missing' %></td>
@@ -54,12 +54,12 @@
           <% end %>
         </td>
         <td>
-          <p class='mb-0'><a href='https://mollusksurf.vendhq.com/product/<%= vend.vend_id %>' target='_blank'>Vend</a></p>
+          <p class='mb-0'><a href='https://mollusksurf.vendhq.com/product/<%= vend.vend_id %>' target='_blank'>Vend <i class='fa fa-external-link-alt'></i></a></p>
           <% if retail_shopify.present? %>
-            <p class='mt-2 mb-0'><a href='https://mollusksurf.myshopify.com/admin/products/<%= retail_shopify.shopify_product_id %>/variants/<%= retail_shopify.variant_id %>' target='_blank'>Retail Shopify</a></p>
+            <p class='mt-2 mb-0'><a href='https://mollusksurf.myshopify.com/admin/products/<%= retail_shopify.shopify_product_id %>/variants/<%= retail_shopify.variant_id %>' target='_blank'>Retail Shopify <i class='fa fa-external-link-alt'></i></a></p>
           <% end %>
           <% if wholesale_shopify.present? %>
-            <p class='mt-2 mb-0'><a href='https://molluskats.myshopify.com/admin/products/<%= wholesale_shopify.shopify_product_id %>/variants/<%= wholesale_shopify.variant_id %>' target='_blank'>Wholesale Shopify</a></p>
+            <p class='mt-2 mb-0'><a href='https://molluskats.myshopify.com/admin/products/<%= wholesale_shopify.shopify_product_id %>/variants/<%= wholesale_shopify.variant_id %>' target='_blank'>Wholesale Shopify <i class='fa fa-external-link-alt'></i></a></p>
           <% end %>
         </td>
       </tr>
