@@ -46,7 +46,7 @@ class ShopifyClient
 
   def self.all_resource(resource, store = :RETAIL)
     resources = []
-    pages = (count(resource, store) / 250.0).ceil
+    pages = (count(resource, store).to_i / 250.0).ceil
     pages.times do |page|
       response = connection(store).get "/admin/#{resource}.json", { limit: 250, page: page + 1 }
       resources += response.body[resource]
