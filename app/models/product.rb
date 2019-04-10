@@ -115,7 +115,7 @@ class Product < ApplicationRecord
       puts
       Airbrake.notify("Could not CONNECT SF inventory location for Product: #{id}") unless ShopifyClient.inventory_item_updated?(response)
     rescue
-            puts
+      puts
       puts
       puts "There was an error CONNECTING SF inventory location for Product: #{id}"
       puts
