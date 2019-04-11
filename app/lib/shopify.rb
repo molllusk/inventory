@@ -112,7 +112,6 @@ class ShopifyClient
 
   def self.update_inventories(store = :RETAIL)
     inventory_item_ids = ShopifyDatum.pluck(:inventory_item_id)
-    orders = order_quantities_by_variant(store)
 
     while inventory_item_ids.present?
       id_batch = inventory_item_ids.shift(50)
@@ -120,7 +119,7 @@ class ShopifyClient
       inventory_items.each do |inventory_item|
         sd = ShopifyDatum.find_by_inventory_item_id(inventory_item['inventory_item_id'])
         if inventory_item['available'].present?
-          current_inventory = inventory_item['available'] + orders[sd.variant_id]
+          current_inventory = inventory_item['available']
           sd.update_attribute(:inventory, current_inventory) unless sd.inventory == current_inventory
         end
       end
