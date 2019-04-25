@@ -11,7 +11,9 @@
       <th>SKU</th>
       <th>Vend SF Qty</th>
       <th>Shopify SF Qty</th>
+      <th>Shopify All Retail Qty</th>
       <th>Shopify Wholesale Qty</th>
+      <th>Shopify All Wholesale Qty</th>
       <th>3rdParty?</th>
       <th>Sale?</th>
       <th>Links</th>
@@ -33,10 +35,32 @@
           <% end %>
         </td>
         <td>
+          <% if retail_shopify.present? %>
+            <% if retail_shopify.shopify_inventories.present? %>
+              <% retail_shopify.shopify_inventories.each do |inventory| %>
+                <strong><%= inventory.location %></strong>: <%= inventory.inventory %><br />
+              <% end %>
+            <% else %>
+              'missing'
+            <% end %>
+          <% end %>
+        </td>
+        <td>
           <% if wholesale_shopify.present? %>
             <%= wholesale_shopify.inventory || 'missing' %>
           <% else %>
             n/a
+          <% end %>
+        </td>
+        <td>
+          <% if wholesale_shopify.present? %>
+            <% if wholesale_shopify.shopify_inventories.present? %>
+              <% wholesale_shopify.shopify_inventories.each do |inventory| %>
+                <strong><%= inventory.location %></strong>: <%= inventory.inventory %><br />
+              <% end %>
+            <% else %>
+              'missing'
+            <% end %>
           <% end %>
         </td>
         <td>
