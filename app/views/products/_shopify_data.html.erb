@@ -4,7 +4,7 @@
   <h2>Shopify Data:</h2>
   <table class='full_width'>
     <% headers.each do |header| %>
-      <% next if %w[product_id].include?(header) %>
+      <% next if %w[product_id inventory].include?(header) %>
       <tr>
         <td>
           <strong><%= header.humanize %></strong>
