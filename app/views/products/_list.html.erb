@@ -29,7 +29,7 @@
           <% if retail_shopify.present? %>
             <% if retail_shopify.shopify_inventories.present? %>
               <% retail_shopify.shopify_inventories.each do |inventory| %>
-                <strong><%= inventory.location.gsub(' retail', '') %></strong>: <%= inventory.inventory %><br />
+                <strong><%= inventory.location.gsub(' Retail', '') %></strong>: <%= inventory.inventory %><br />
               <% end %>
             <% else %>
               none
@@ -42,7 +42,7 @@
           <% if wholesale_shopify.present? %>
             <% if wholesale_shopify.shopify_inventories.present? %>
               <% wholesale_shopify.shopify_inventories.each do |inventory| %>
-                <strong><%= inventory.location.gsub(' wholesale', '') %></strong>: <%= inventory.inventory %><br />
+                <strong><%= inventory.location.gsub(' Wholesale', '') %></strong>: <%= inventory.inventory %><br />
               <% end %>
             <% else %>
               none
