@@ -1,0 +1,7 @@
+<% provide(:title, 'Fluid Inventory Thresholds') %>
+<h1>Fluid Inventory Thresholds</h1>
+
+<%= render(
+  partial: 'fluid_inventory_thresholds/list',
+  locals: { inventory_thresholds: @inventory_thresholds }
+) %>

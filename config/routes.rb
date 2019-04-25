@@ -6,4 +6,5 @@ Rails.application.routes.draw do
   resources :inventory_updates
   resources :products
   resources :users
+  resources :fluid_inventory_thresholds
 end
