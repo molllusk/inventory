@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_28_031500) do
+ActiveRecord::Schema.define(version: 2019_04_24_225359) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -60,6 +60,14 @@ ActiveRecord::Schema.define(version: 2019_03_28_031500) do
     t.integer "product_id"
     t.integer "inventory"
     t.integer "store"
+  end
+
+  create_table "shopify_inventories", force: :cascade do |t|
+    t.integer "inventory_location"
+    t.integer "inventory"
+    t.integer "shopify_datum_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "users", force: :cascade do |t|
