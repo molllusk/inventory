@@ -4,19 +4,6 @@ class ShopifyClient
   SF_RETAIL_INVENTORY_LOCATION = 49481991.freeze
   JAM_WHOLESALE_INVENTORY_LOCATION = 29887823936.freeze
 
-  INVENTORY_LOCATIONS = {
-      retail: {
-        san_francisco: 49481991,
-        jam: nil,
-        silverlake: nil,
-        venice: nil
-      },
-      wholesale: {
-        jam: 29887823936,
-        other: nil,
-      }
-    }.freeze
-
   SAVED_PRODUCT_ATTRIBUTES = %i[
     handle
     product_type

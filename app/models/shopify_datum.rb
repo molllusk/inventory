@@ -17,9 +17,8 @@ class ShopifyDatum < ApplicationRecord
     where(store: :wholesale)
   }
 
-  def location_inventory(location = :san_francisco)
-    inventory_location = ShopifyClient::INVENTORY_LOCATIONS[:retail][location]
-    shopify_inventories.find_by(inventory_location: inventory_location)&.inventory
+  def inventory_at_location(location = 'Mollusk SF')
+    shopify_inventories.find_by(location: location)&.inventory
   end
 
   def full_title

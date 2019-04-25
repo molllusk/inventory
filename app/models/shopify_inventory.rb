@@ -2,14 +2,14 @@ class ShopifyInventory < ApplicationRecord
   belongs_to :shopify_datum
 
   enum location: {
-    "4500 Irving St" => 1939009,
-    "EasyPost" => 7662829621,
-    "Jam Warehouse Retail" => 7700054069,
-    "Mollusk SF" => 49481991,
-    "Mollusk SL" => 7702609973,
-    "Mollusk VB" => 7702577205,
-    "1283 42nd Ave Wholesale" => 29394010176,
-    "Jam Warehouse Wholesale" => 29887823936
+    '4500 Irving St' => 1939009,
+    'EasyPost' => 7662829621,
+    'Jam Warehouse Retail' => 7700054069,
+    'Mollusk SF' => 49481991,
+    'Mollusk SL' => 7702609973,
+    'Mollusk VB' => 7702577205,
+    '1283 42nd Ave Wholesale' => 29394010176,
+    'Jam Warehouse Wholesale' => 29887823936
   }
 end
 
