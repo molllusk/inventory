@@ -63,7 +63,7 @@ ActiveRecord::Schema.define(version: 2019_04_24_225359) do
   end
 
   create_table "shopify_inventories", force: :cascade do |t|
-    t.integer "inventory_location"
+    t.bigint "location"
     t.integer "inventory"
     t.integer "shopify_datum_id"
     t.datetime "created_at", null: false

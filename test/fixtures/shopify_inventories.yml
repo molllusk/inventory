@@ -2,12 +2,12 @@
 #
 # Table name: shopify_inventories
 #
-#  id                 :bigint(8)        not null, primary key
-#  inventory          :integer
-#  inventory_location :integer
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  shopify_datum_id   :integer
+#  id               :bigint(8)        not null, primary key
+#  inventory        :integer
+#  location         :bigint(8)
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  shopify_datum_id :integer
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

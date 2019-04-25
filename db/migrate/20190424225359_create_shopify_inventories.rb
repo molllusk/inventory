@@ -1,7 +1,7 @@
 class CreateShopifyInventories < ActiveRecord::Migration[5.2]
   def change
     create_table :shopify_inventories do |t|
-      t.integer :inventory_location
+      t.integer :location, limit: 8
       t.integer :inventory
       t.integer :shopify_datum_id
 

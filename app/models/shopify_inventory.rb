@@ -1,7 +1,7 @@
 class ShopifyInventory < ApplicationRecord
   belongs_to :shopify_datum
 
-  enum inventory_location: {
+  enum location: {
     "4500 Irving St" => 1939009,
     "EasyPost" => 7662829621,
     "Jam Warehouse Retail" => 7700054069,
@@ -17,10 +17,10 @@ end
 #
 # Table name: shopify_inventories
 #
-#  id                 :bigint(8)        not null, primary key
-#  inventory          :integer
-#  inventory_location :integer
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  shopify_datum_id   :integer
+#  id               :bigint(8)        not null, primary key
+#  inventory        :integer
+#  location         :bigint(8)
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  shopify_datum_id :integer
 #
