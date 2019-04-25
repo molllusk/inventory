@@ -10,10 +10,8 @@
       <th>Added (Pacific Time)</th>
       <th>SKU</th>
       <th>Vend SF Qty</th>
-      <th>Shopify SF Qty</th>
-      <th>Shopify All Retail Qty</th>
-      <th>Shopify Wholesale Qty</th>
-      <th>Shopify All Wholesale Qty</th>
+      <th>Shopify Retail Inventories</th>
+      <th>Shopify Wholesale Inventories</th>
       <th>3rdParty?</th>
       <th>Sale?</th>
       <th>Links</th>
@@ -29,13 +27,6 @@
         <td><%= vend.inventory || 'missing' %></td>
         <td>
           <% if retail_shopify.present? %>
-            <%= retail_shopify.inventory || 'missing' %>
-          <% else %>
-            n/a
-          <% end %>
-        </td>
-        <td>
-          <% if retail_shopify.present? %>
             <% if retail_shopify.shopify_inventories.present? %>
               <% retail_shopify.shopify_inventories.each do |inventory| %>
                 <strong><%= inventory.location %></strong>: <%= inventory.inventory %><br />
@@ -43,13 +34,6 @@
             <% else %>
               'missing'
             <% end %>
-          <% else %>
-            n/a
-          <% end %>
-        </td>
-        <td>
-          <% if wholesale_shopify.present? %>
-            <%= wholesale_shopify.inventory || 'missing' %>
           <% else %>
             n/a
           <% end %>
