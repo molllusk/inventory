@@ -71,8 +71,11 @@ class Product < ApplicationRecord
 
   # RETAIL specific
   def self.update_retail_inventories_sf
+    orders = ShopifyClient.order_quantities_by_variant
+
     third_party_or_sale.find_each do |product|
-      if product.update_sf_shopify_inventory?
+      # do not update inventory if any order exists for that variant in any location
+      if product.update_sf_shopify_inventory? && orders[product.retail_shopify.variant_id] === 0
         product.connect_sf_inventory_location if product.missing_retail_inventory_location?
         product.adjust_sf_inventory
       end
