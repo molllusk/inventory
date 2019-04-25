@@ -1,8 +1,8 @@
 class ShopifyClient
   RETAIL_BASE_URL = "https://#{ENV['SHOPIFY_USER']}:#{ENV['SHOPIFY_PASSWORD']}@mollusksurf.myshopify.com".freeze
   WHOLESALE_BASE_URL = "https://#{ENV['WHOLESALE_SHOPIFY_USER']}:#{ENV['WHOLESALE_SHOPIFY_PASSWORD']}@molluskats.myshopify.com".freeze
-  SF_RETAIL_INVENTORY_LOCATION = 49481991
-  JAM_WHOLESALE_INVENTORY_LOCATION = 29887823936
+  SF_RETAIL_INVENTORY_LOCATION = 49481991.freeze
+  JAM_WHOLESALE_INVENTORY_LOCATION = 29887823936.freeze
 
   SAVED_PRODUCT_ATTRIBUTES = %i[
     handle
@@ -33,6 +33,11 @@ class ShopifyClient
       faraday.response :json
       faraday.adapter Faraday.default_adapter
     end
+  end
+
+  def self.all_inventory_locations(store = :RETAIL)
+     response = connection(store).get "/admin/api/2019-04/locations.json"
+     response.body['locations']
   end
 
   def self.count(resource, store = :RETAIL)
@@ -115,12 +120,27 @@ class ShopifyClient
 
     while inventory_item_ids.present?
       id_batch = inventory_item_ids.shift(50)
+      
+      all_inventory_items = get_inventory_items_all_locations(id_batch, store)
       inventory_items = get_inventory_items(id_batch, store)
+
       inventory_items.each do |inventory_item|
         sd = ShopifyDatum.find_by_inventory_item_id(inventory_item['inventory_item_id'])
         if inventory_item['available'].present?
           current_inventory = inventory_item['available']
           sd.update_attribute(:inventory, current_inventory) unless sd.inventory == current_inventory
+        end
+      end
+
+      all_inventory_items.each do |inventory_item|
+        sd = ShopifyDatum.find_by_inventory_item_id(inventory_item['inventory_item_id'])
+        existing_inventory_item = sd.shopify_inventories.find_by(location: inventory_item['location_id'])
+        if inventory_item['available'].present?
+          if existing_inventory_item.present?
+            existing_inventory_item.update_attribute(:inventory, inventory_item['available']) if existing_inventory_item.inventory != inventory_item['available'] 
+          else
+            sd.shopify_inventories << ShopifyInventory.create(location: inventory_item['location_id'], inventory: inventory_item['available'])
+          end
         end
       end
     end

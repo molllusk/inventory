@@ -37,5 +37,28 @@
         <% end %>
       </tr>
     <% end %>
+    <tr>
+      <td>
+        <strong>All Inventories</strong>
+      </td>
+      <% if retail_shopify.present? %>
+        <td>
+          <% if retail_shopify.shopify_inventories.present? %>
+            <% retail_shopify.shopify_inventories.each do |inventory| %>
+              <strong><%= inventory.location %></strong>: <%= inventory.inventory %><br />
+            <% end %>
+          <% end %>
+        </td>
+      <% end %>
+      <% if wholesale_shopify.present? %>
+        <td>
+          <% if wholesale_shopify.shopify_inventories.present? %>
+            <% wholesale_shopify.shopify_inventories.each do |inventory| %>
+              <strong><%= inventory.location %></strong>: <%= inventory.inventory %><br />
+            <% end %>
+          <% end %>
+        </td>
+      <% end %>
+    </tr>
   <table>
 <% end %>

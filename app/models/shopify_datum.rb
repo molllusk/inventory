@@ -2,6 +2,7 @@ class ShopifyDatum < ApplicationRecord
   serialize :tags, Array
 
   belongs_to :product, optional: true
+  has_many :shopify_inventories
 
   enum store: {
     retail: 0,
@@ -15,6 +16,10 @@ class ShopifyDatum < ApplicationRecord
   scope :wholesale, lambda {
     where(store: :wholesale)
   }
+
+  def inventory_at_location(location = 'Mollusk SF')
+    shopify_inventories.find_by(location: location)&.inventory
+  end
 
   def full_title
     "#{title} - #{variant_title}"
