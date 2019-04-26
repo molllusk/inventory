@@ -3,7 +3,7 @@
   <table class='full_width'>
     <% @product.vend_datum.attributes.each do |vd| %>
       <% if vd.last.present? %>
-        <% next if %w[variant_options tag_ids categories product_id].include?(vd.first) %>
+        <% next if %w[variant_options tag_ids categories product_id brand_id is_active product_type_id supplier_id].include?(vd.first) %>
         <tr>
           <td>
             <strong><%= vd.shift.humanize %></strong>
