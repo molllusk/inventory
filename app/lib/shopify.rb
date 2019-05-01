@@ -106,21 +106,20 @@ class ShopifyClient
   end
 
   def self.get_inventory_items_all_locations(inventory_item_ids, store = :RETAIL)
-    response = connection(store).get "/admin/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}"
+    response = connection(store).get "/admin/api/2019-04/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}&limit=250"
     response.body['inventory_levels'] || []
   end
 
   def self.get_inventory_items(inventory_item_ids, store = :RETAIL)
-    response = connection(store).get "/admin/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}&location_ids=#{inventory_location(store)}&limit=250"
+    response = connection(store).get "/admin/api/2019-04/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}&location_ids=#{inventory_location(store)}&limit=250"
     response.body['inventory_levels'] || []
   end
 
   def self.update_inventories(store = :RETAIL)
-    inventory_item_ids = ShopifyDatum.pluck(:inventory_item_id)
+    inventory_item_ids = ShopifyDatum.where(store: store.to_s.downcase).pluck(:inventory_item_id)
 
     while inventory_item_ids.present?
       id_batch = inventory_item_ids.shift(50)
-      
       all_inventory_items = get_inventory_items_all_locations(id_batch, store)
       inventory_items = get_inventory_items(id_batch, store)
 
@@ -133,7 +132,7 @@ class ShopifyClient
       end
 
       all_inventory_items.each do |inventory_item|
-        sd = ShopifyDatum.find_by_inventory_item_id(inventory_item['inventory_item_id'])
+        sd = ShopifyDatum.find_by(inventory_item_id: inventory_item['inventory_item_id'])
         existing_inventory_item = sd.shopify_inventories.find_by(location: inventory_item['location_id'])
         if inventory_item['available'].present?
           if existing_inventory_item.present?
