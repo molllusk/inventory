@@ -2,7 +2,7 @@ class ShopifyDatum < ApplicationRecord
   serialize :tags, Array
 
   belongs_to :product, optional: true
-  has_many :shopify_inventories
+  has_many :shopify_inventories, dependent: :destroy
 
   enum store: {
     retail: 0,
