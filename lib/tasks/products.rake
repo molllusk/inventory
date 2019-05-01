@@ -52,6 +52,8 @@ namespace :products do
       end
     end
 
+    dupes_retail = []
+
     # match vend variant sku to shopify variant barcode
     new_retail_shopifys.each do |shopify_attrs|
       shopify_attrs[:store] = :retail
@@ -59,6 +61,7 @@ namespace :products do
       vend_attrs = new_vends.find { |vend| vend[:sku] == shopify_attrs[:barcode] }
 
       if existing_vend.present? && existing_vend.product.retail_shopify.present?
+        dupes_retail << existing_vend.product
         Airbrake.notify("Issue Importing RETAIL Shopify: recognized as new, but already exists for product: #{existing_vend.product.id}")
       else
         if existing_vend.present?
@@ -72,12 +75,15 @@ namespace :products do
       end
     end
 
+    dupes_wholesale = []
+
     new_wholesale_shopifys.each do |shopify_attrs|
       shopify_attrs[:store] = :wholesale
       existing_vend = VendDatum.find_by(sku: shopify_attrs[:barcode])
       vend_attrs = new_vends.find { |vend| vend[:sku] == shopify_attrs[:barcode] }
 
       if existing_vend.present? && existing_vend.product.wholesale_shopify.present?
+        dupes_wholesale << existing_vend.product
         Airbrake.notify("Issue Importing WHOLESALE Shopify: recognized as new, but already exists for product: #{existing_vend.product.id}")
       else
         if existing_vend.present?
