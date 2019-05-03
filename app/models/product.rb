@@ -71,7 +71,7 @@ class Product < ApplicationRecord
   def self.run_inventory_updates
     orders = ShopifyClient.order_quantities_by_variant
     update_retail_inventories_sf(orders)
-    update_fluid_inventories(orders)
+    # update_fluid_inventories(orders)
   end
 
   def self.update_retail_inventories_sf(orders)
