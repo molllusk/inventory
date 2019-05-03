@@ -64,7 +64,6 @@ class Product < ApplicationRecord
     end
   }
 
-  # WHOLESALE specific
   def wholesale_shopify
     shopify_data.find_by(store: :wholesale)
   end
@@ -75,7 +74,6 @@ class Product < ApplicationRecord
     update_fluid_inventories(orders)
   end
 
-  # RETAIL specific
   def self.update_retail_inventories_sf(orders)
     third_party_or_sale.find_each do |product|
       # do not update inventory if any order exists for that variant in any location
@@ -88,46 +86,56 @@ class Product < ApplicationRecord
 
   def self.update_fluid_inventories(orders)
     Product.find_each do |product|
+      # do not update inventory if any order exists for that variant in any location
       product.fluid_inventory unless orders[product.retail_shopify.variant_id].positive?
     end
   end
 
   def adjust_sf_retail_inventory
-    adjust_inventory_vend('Mollusk SF', retail_inventory_adjustment) #retail_inventory_adjustment
+    adjust_inventory_vend('Mollusk SF', retail_inventory_adjustment)
   end
 
   def adjust_inventory_vend(location_name, quantity)
     location_id = ShopifyInventory.locations[location_name]
     begin
-      response = ShopifyClient.adjust_inventory(send("#{store.to_s.downcase}_shopify")&.inventory_item_id, location_id, quantity, :RETAIL)
+      response = ShopifyClient.adjust_inventory(retail_shopify.inventory_item_id, location_id, quantity, :RETAIL)
 
       if ShopifyClient.inventory_item_updated?(response)
-        update_retail_inventory(response, quantity)
+        save_inventory_adjustment_vend(response, quantity)
       else
-        Airbrake.notify("Could not UPDATE SF inventory for Product: #{id}, Adjustment: #{retail_inventory_adjustment}")
+        Airbrake.notify("Could not UPDATE SF inventory for Product: #{id}, Adjustment: #{quantity}")
       end
     rescue
-      Airbrake.notify("There was an error UPDATING SF inventory for Product: #{id}, Adjustment: #{retail_inventory_adjustment}")
+      Airbrake.notify("There was an error UPDATING SF inventory for Product: #{id}, Adjustment: #{quantity}")
     end
   end
 
   def adjust_inventory_fluid(quantity)
     retail_response = nil
-    location_id = store.to_s.downcase == 'retail' ? ShopifyInventory.locations['Jam Warehouse Retail'] : ShopifyInventory.locations['Jam Warehouse Wholesale']
-
     begin
-      retail_response = ShopifyClient.adjust_inventory(retail_shopify.inventory_item_id, location_id, quantity, :RETAIL)
+      retail_response = ShopifyClient.adjust_inventory(
+        retail_shopify.inventory_item_id,
+        ShopifyInventory.locations['Jam Warehouse Retail'],
+        quantity,
+        :RETAIL
+      )
+      
       if ShopifyClient.inventory_item_updated?(retail_response)
         begin
-          wholesale_response = ShopifyClient.adjust_inventory(wholesale_shopify.inventory_item_id, location_id, -quantity, :WHOLESALE)
+          wholesale_response = ShopifyClient.adjust_inventory(
+            wholesale_shopify.inventory_item_id,
+            ShopifyInventory.locations['Jam Warehouse Wholesale'],
+            -quantity,
+            :WHOLESALE
+          )
 
           if ShopifyClient.inventory_item_updated?(wholesale_response)
             save_inventory_adjustment_fluid(quantity, wholesale_response['inventory_level']['available'], retail_response['inventory_level']['available'])
           else
-            Airbrake.notify("Could not UPDATE Wholesale Jam Warehouse inventory for Product: #{id}, Adjustment: #{retail_inventory_adjustment}")
+            Airbrake.notify("Could not UPDATE Wholesale Jam Warehouse inventory after already adjusting Retail inventory for Product: #{id}, Adjustment: #{-quantity}")
           end
         rescue
-          Airbrake.notify("There was an error UPDATING Wholesale Jam Warehouse inventory for Product: #{id}, Adjustment: #{retail_inventory_adjustment}")
+          Airbrake.notify("There was an error UPDATING Wholesale Jam Warehouse inventory after already adjusting Retail inventory for Product: #{id}, Adjustment: #{-quantity}")
         end
       else
         Airbrake.notify("Could not UPDATE Retail Jam Warehouse inventory for Product: #{id}, Adjustment: #{quantity}")

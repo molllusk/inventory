@@ -118,6 +118,11 @@ class ShopifyClient
     response.body['inventory_levels'] || []
   end
 
+  # might be able to get rid of and replace this and the inventory location constants
+  def self.inventory_location(store = :RETAIL)
+    store.to_s.upcase == 'RETAIL' ? SF_RETAIL_INVENTORY_LOCATION : JAM_WHOLESALE_INVENTORY_LOCATION
+  end
+
   def self.update_inventories(store = :RETAIL)
     inventory_item_ids = ShopifyDatum.where(store: store.to_s.downcase).pluck(:inventory_item_id)
 
@@ -193,10 +198,5 @@ class ShopifyClient
 
     SAVED_VARIANT_ATTRIBUTES.each { |saved_attribute| attributes[saved_attribute] = variant[saved_attribute.to_s] }
     attributes
-  end
-
-  # might be able to get rid of and replace this and the inventory location constants
-  def self.inventory_location(store = :RETAIL)
-    store.to_s.upcase == 'RETAIL' ? SF_RETAIL_INVENTORY_LOCATION : JAM_WHOLESALE_INVENTORY_LOCATION
   end
 end
