@@ -195,13 +195,13 @@ class Product < ApplicationRecord
               adjust_inventory_fluid(adjustment)
             end
           else
-            #notify missing threshold for project type on project id if threshold.blank?
+            Airbrake.notify("Missing fluid inventory threshold for Product Type: #{retail_shopify.product_type} Product: #{id}")
           end
         else
-          #notify missing Jam Inventory for project id if wholesale_inventory.blank?
+          Airbrake.notify("Missing WHOLESALE Jam Inventory for Product: #{id}")
         end
       else
-        #notify missing Jam Inventory for project id if retail_inventory.blank?
+        Airbrake.notify("Missing RETAIL Jam Inventory for Product: #{id}")
       end
     end
   end
