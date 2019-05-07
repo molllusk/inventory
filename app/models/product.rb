@@ -231,7 +231,7 @@ class Product < ApplicationRecord
   end
 
   def missing_retail_inventory_location?
-    retail_shopify.third_party_or_sale? && retail_shopify.inventory.nil?
+    retail_shopify.third_party_or_sale? && retail_shopify.shopify_inventories.find_by(location: 'Mollusk SF').blank?
   end
 end
 
