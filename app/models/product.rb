@@ -77,7 +77,7 @@ class Product < ApplicationRecord
   def self.update_retail_inventories_sf(orders)
     third_party_or_sale.find_each do |product|
       # do not update inventory if any order exists for that variant in any location
-      if product.update_sf_shopify_inventory? && orders[product.retail_shopify.variant_id] === 0
+      if product.update_sf_shopify_inventory? && orders[product.retail_shopify.variant_id].zero?
         product.connect_sf_inventory_location if product.missing_retail_inventory_location?
         product.adjust_sf_retail_inventory
       end
@@ -98,7 +98,7 @@ class Product < ApplicationRecord
   def adjust_inventory_vend(location_name, quantity)
     location_id = ShopifyInventory.locations[location_name]
     begin
-      response = ShopifyClient.adjust_inventory(retail_shopify.inventory_item_id, location_id, quantity, :RETAIL)
+      response = ShopifyClient.adjust_inventory(retail_shopify.inventory_item_id, location_id, quantity)
 
       if ShopifyClient.inventory_item_updated?(response)
         save_inventory_adjustment_vend(response, quantity)
@@ -116,8 +116,7 @@ class Product < ApplicationRecord
       retail_response = ShopifyClient.adjust_inventory(
         retail_shopify.inventory_item_id,
         ShopifyInventory.locations['Jam Warehouse Retail'],
-        quantity,
-        :RETAIL
+        quantity
       )
       
       if ShopifyClient.inventory_item_updated?(retail_response)
@@ -130,7 +129,7 @@ class Product < ApplicationRecord
           )
 
           if ShopifyClient.inventory_item_updated?(wholesale_response)
-            save_inventory_adjustment_fluid(quantity, wholesale_response['inventory_level']['available'], retail_response['inventory_level']['available'])
+            save_inventory_adjustment_fluid(quantity, retail_response['inventory_level']['available'], wholesale_response['inventory_level']['available'])
           else
             Airbrake.notify("Could not UPDATE Wholesale Jam Warehouse inventory after already adjusting Retail inventory for Product: #{id}, Adjustment: #{-quantity}")
           end
@@ -162,7 +161,7 @@ class Product < ApplicationRecord
     shopify_inventory.update_attribute(:inventory, new_quantity)
   end
 
-  def save_inventory_adjustment_fluid(quantity, wholesale_available, retail_available)
+  def save_inventory_adjustment_fluid(quantity, retail_available, wholesale_available)
     retail_inventory = retail_shopify.shopify_inventories.find_by(location: 'Jam Warehouse Retail')
     wholesale_inventory = wholesale_shopify.shopify_inventories.find_by(location: 'Jam Warehouse Wholesale')
 
@@ -231,7 +230,7 @@ class Product < ApplicationRecord
   end
 
   def missing_retail_inventory_location?
-    retail_shopify.third_party_or_sale? && retail_shopify.shopify_inventories.find_by(location: 'Mollusk SF').blank?
+    retail_shopify.third_party_or_sale? && retail_shopify.shopify_inventories.find_by(location: 'Mollusk SF').nil?
   end
 end
 

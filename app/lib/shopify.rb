@@ -153,7 +153,6 @@ class ShopifyClient
     end
   end
 
-  # need to generalize this to accept a location id
   def self.adjust_inventory(inventory_item_id, location_id, adjustment, store = :RETAIL)
     body = {
       'location_id': location_id,
