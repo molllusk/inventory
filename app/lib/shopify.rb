@@ -3,6 +3,7 @@ class ShopifyClient
   WHOLESALE_BASE_URL = "https://#{ENV['WHOLESALE_SHOPIFY_USER']}:#{ENV['WHOLESALE_SHOPIFY_PASSWORD']}@molluskats.myshopify.com".freeze
   SF_RETAIL_INVENTORY_LOCATION = 49481991.freeze
   JAM_WHOLESALE_INVENTORY_LOCATION = 29887823936.freeze
+  API_VERSION = '/admin/api/2019-04'.freeze
 
   SAVED_PRODUCT_ATTRIBUTES = %i[
     handle
@@ -36,12 +37,12 @@ class ShopifyClient
   end
 
   def self.all_inventory_locations(store = :RETAIL)
-     response = connection(store).get "/admin/api/2019-04/locations.json"
+     response = connection(store).get "#{API_VERSION}/locations.json"
      response.body['locations']
   end
 
   def self.count(resource, store = :RETAIL)
-    response = connection(store).get "/admin/#{resource}/count.json"
+    response = connection(store).get "#{API_VERSION}/#{resource}/count.json"
     response.body['count']
   end
 
@@ -53,7 +54,7 @@ class ShopifyClient
     resources = []
     pages = (count(resource, store).to_i / 250.0).ceil
     pages.times do |page|
-      response = connection(store).get "/admin/#{resource}.json", { limit: 250, page: page + 1 }
+      response = connection(store).get "#{API_VERSION}/#{resource}.json", { limit: 250, page: page + 1 }
       resources += response.body[resource]
     end
     resources
@@ -93,7 +94,7 @@ class ShopifyClient
     }
 
     response = connection(store).post do |req|
-      req.url '/admin/inventory_levels/connect.json'
+      req.url "#{API_VERSION}/inventory_levels/connect.json"
       req.headers['Content-Type'] = 'application/json'
       req.body = body.to_json
     end
@@ -101,18 +102,25 @@ class ShopifyClient
     response.body
   end
 
+  # replace use of this with connect_inventory_location to connect an inventory location by location id
   def self.connect_sf_inventory_location(inventory_item_id)
     connect_inventory_location(inventory_item_id, SF_RETAIL_INVENTORY_LOCATION)
   end
 
   def self.get_inventory_items_all_locations(inventory_item_ids, store = :RETAIL)
-    response = connection(store).get "/admin/api/2019-04/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}&limit=250"
+    response = connection(store).get "#{API_VERSION}/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}&limit=250"
     response.body['inventory_levels'] || []
   end
 
+  # Might be able to get rid of or replace this
   def self.get_inventory_items(inventory_item_ids, store = :RETAIL)
-    response = connection(store).get "/admin/api/2019-04/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}&location_ids=#{inventory_location(store)}&limit=250"
+    response = connection(store).get "#{API_VERSION}/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}&location_ids=#{inventory_location(store)}&limit=250"
     response.body['inventory_levels'] || []
+  end
+
+  # might be able to get rid of and replace this and the inventory location constants
+  def self.inventory_location(store = :RETAIL)
+    store.to_s.upcase == 'RETAIL' ? SF_RETAIL_INVENTORY_LOCATION : JAM_WHOLESALE_INVENTORY_LOCATION
   end
 
   def self.update_inventories(store = :RETAIL)
@@ -145,15 +153,15 @@ class ShopifyClient
     end
   end
 
-  def self.adjust_inventory(inventory_item_id, adjustment, store = :RETAIL)
+  def self.adjust_inventory(inventory_item_id, location_id, adjustment, store = :RETAIL)
     body = {
-      'location_id': inventory_location(store),
+      'location_id': location_id,
       'inventory_item_id': inventory_item_id,
       'available_adjustment': adjustment
     }
 
     response = connection(store).post do |req|
-      req.url '/admin/inventory_levels/adjust.json'
+      req.url "#{API_VERSION}/inventory_levels/adjust.json"
       req.headers['Content-Type'] = 'application/json'
       req.body = body.to_json
     end
@@ -189,9 +197,5 @@ class ShopifyClient
 
     SAVED_VARIANT_ATTRIBUTES.each { |saved_attribute| attributes[saved_attribute] = variant[saved_attribute.to_s] }
     attributes
-  end
-
-  def self.inventory_location(store = :RETAIL)
-    store.to_s.upcase == 'RETAIL' ? SF_RETAIL_INVENTORY_LOCATION : JAM_WHOLESALE_INVENTORY_LOCATION
   end
 end

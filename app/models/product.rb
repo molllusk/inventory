@@ -64,41 +64,117 @@ class Product < ApplicationRecord
     end
   }
 
-  # WHOLESALE specific
   def wholesale_shopify
     shopify_data.find_by(store: :wholesale)
   end
 
-  # RETAIL specific
-  def self.update_retail_inventories_sf
+  def self.run_inventory_updates
     orders = ShopifyClient.order_quantities_by_variant
+    update_retail_inventories_sf(orders)
+    # update_fluid_inventories(orders)
+  end
 
+  def self.update_retail_inventories_sf(orders)
     third_party_or_sale.find_each do |product|
       # do not update inventory if any order exists for that variant in any location
-      if product.update_sf_shopify_inventory? && orders[product.retail_shopify.variant_id] === 0
+      if product.update_sf_shopify_inventory? && orders[product.retail_shopify.variant_id].zero?
         product.connect_sf_inventory_location if product.missing_retail_inventory_location?
-        product.adjust_sf_inventory
+        product.adjust_sf_retail_inventory
       end
     end
   end
 
-  def adjust_sf_inventory
+  def self.update_fluid_inventories(orders)
+    Product.find_each do |product|
+      # do not update inventory if any order exists for that variant in any location
+      product.fluid_inventory unless orders[product.retail_shopify.variant_id].positive?
+    end
+  end
+
+  def adjust_sf_retail_inventory
+    adjust_inventory_vend('Mollusk SF', retail_inventory_adjustment)
+  end
+
+  def adjust_inventory_vend(location_name, quantity)
+    location_id = ShopifyInventory.locations[location_name]
     begin
-      response = ShopifyClient.adjust_inventory(retail_shopify.inventory_item_id, retail_inventory_adjustment)
+      response = ShopifyClient.adjust_inventory(retail_shopify.inventory_item_id, location_id, quantity)
 
       if ShopifyClient.inventory_item_updated?(response)
-        update_retail_inventory(response)
+        save_inventory_adjustment_vend(response, quantity)
       else
-        Airbrake.notify("Could not UPDATE SF inventory for Product: #{id}, Adjustment: #{retail_inventory_adjustment}")
+        Airbrake.notify("Could not UPDATE SF inventory for Product: #{id}, Adjustment: #{quantity}")
       end
     rescue
-      Airbrake.notify("There was an error UPDATING SF inventory for Product: #{id}, Adjustment: #{retail_inventory_adjustment}")
+      Airbrake.notify("There was an error UPDATING SF inventory for Product: #{id}, Adjustment: #{quantity}")
     end
   end
 
-  def update_retail_inventory(response)
-    InventoryUpdate.create(vend_qty: vend_datum.sf_inventory, prior_qty: shopify_inventory_sf, adjustment: retail_inventory_adjustment, product_id: id, new_qty: response['inventory_level']['available'])
-    retail_shopify.update_attribute(:inventory, response['inventory_level']['available'])
+  def adjust_inventory_fluid(quantity)
+    begin
+      retail_response = ShopifyClient.adjust_inventory(
+        retail_shopify.inventory_item_id,
+        ShopifyInventory.locations['Jam Warehouse Retail'],
+        quantity
+      )
+      
+      if ShopifyClient.inventory_item_updated?(retail_response)
+        begin
+          wholesale_response = ShopifyClient.adjust_inventory(
+            wholesale_shopify.inventory_item_id,
+            ShopifyInventory.locations['Jam Warehouse Wholesale'],
+            -quantity,
+            :WHOLESALE
+          )
+
+          if ShopifyClient.inventory_item_updated?(wholesale_response)
+            save_inventory_adjustment_fluid(quantity, retail_response['inventory_level']['available'], wholesale_response['inventory_level']['available'])
+          else
+            Airbrake.notify("Could not UPDATE Wholesale Jam Warehouse inventory after already adjusting Retail inventory for Product: #{id}, Adjustment: #{-quantity}")
+          end
+        rescue
+          Airbrake.notify("There was an error UPDATING Wholesale Jam Warehouse inventory after already adjusting Retail inventory for Product: #{id}, Adjustment: #{-quantity}")
+        end
+      else
+        Airbrake.notify("Could not UPDATE Retail Jam Warehouse inventory for Product: #{id}, Adjustment: #{quantity}")
+      end
+    rescue
+      Airbrake.notify("There was an error UPDATING Retail Jam Warehouse inventory for Product: #{id}, Adjustment: #{quantity}")
+    end
+  end
+
+  # need to change this
+  def save_inventory_adjustment_vend(response, quantity)
+    location_id = response['inventory_level']['location_id']
+    shopify_inventory = retail_shopify.shopify_inventories.find_by(location: location_id)
+    new_inventory = response['inventory_level']['available']
+
+    InventoryUpdate.create(
+      vend_qty: vend_datum.sf_inventory,
+      prior_qty: shopify_inventory.inventory,
+      adjustment: quantity,
+      product_id: id,
+      new_qty: new_inventory
+    )
+
+    shopify_inventory.update_attribute(:inventory, new_inventory)
+  end
+
+  def save_inventory_adjustment_fluid(quantity, retail_available, wholesale_available)
+    retail_inventory = retail_shopify.shopify_inventories.find_by(location: 'Jam Warehouse Retail')
+    wholesale_inventory = wholesale_shopify.shopify_inventories.find_by(location: 'Jam Warehouse Wholesale')
+
+    FluidInventoryUpdate.create(
+      prior_wholesale_qty: wholesale_inventory.inventory,
+      prior_retail_qty: retail_inventory.inventory,
+      adjustment: quantity,
+      product_id: id,
+      new_wholesale_qty: wholesale_available,
+      new_retail_qty: retail_available
+    )
+
+    retail_inventory.update_attribute(:inventory, retail_available)
+    wholesale_inventory.update_attribute(:inventory, wholesale_available)
   end
 
   def connect_sf_inventory_location
@@ -110,12 +186,38 @@ class Product < ApplicationRecord
     end
   end
 
+  def fluid_inventory
+    if retail_shopify.present? && wholesale_shopify.present?
+      retail_inventory = retail_shopify.shopify_inventories.find_by(location: 'Jam Warehouse Retail')&.inventory
+      wholesale_inventory = wholesale_shopify.shopify_inventories.find_by(location: 'Jam Warehouse Wholesale')&.inventory
+      threshold = FluidInventoryThreshold.find_by(product_type: retail_shopify.product_type)&.threshold
+
+      if retail_inventory.present?
+        if wholesale_inventory.present?
+          if threshold.present?
+            if retail_inventory < threshold
+              sufficient_wholesale = (threshold - retail_inventory) <= wholesale_inventory
+              adjustment = sufficient_wholesale ? threshold - retail_inventory : wholesale_inventory
+              adjust_inventory_fluid(adjustment)
+            end
+          else
+            Airbrake.notify("Missing fluid inventory threshold for Product Type: #{retail_shopify.product_type} Product: #{id}")
+          end
+        else
+          Airbrake.notify("Missing WHOLESALE Jam Inventory for Product: #{id}")
+        end
+      else
+        Airbrake.notify("Missing RETAIL Jam Inventory for Product: #{id}")
+      end
+    end
+  end
+
   def retail_shopify
     shopify_data.find_by(store: :retail)
   end
 
   def shopify_inventory_sf
-    retail_shopify.inventory.to_i
+    retail_shopify.shopify_inventories.find_by(location: 'Mollusk SF')&.inventory.to_i
   end
 
   def update_sf_shopify_inventory?
@@ -127,7 +229,7 @@ class Product < ApplicationRecord
   end
 
   def missing_retail_inventory_location?
-    retail_shopify.third_party_or_sale? && retail_shopify.inventory.nil?
+    retail_shopify.third_party_or_sale? && retail_shopify.shopify_inventories.find_by(location: 'Mollusk SF').nil?
   end
 end
 
