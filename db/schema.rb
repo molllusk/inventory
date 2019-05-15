@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_25_033334) do
+ActiveRecord::Schema.define(version: 2019_05_15_194344) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -18,6 +18,17 @@ ActiveRecord::Schema.define(version: 2019_04_25_033334) do
   create_table "fluid_inventory_thresholds", force: :cascade do |t|
     t.integer "threshold"
     t.bigint "product_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "fluid_inventory_updates", force: :cascade do |t|
+    t.integer "prior_wholesale_qty"
+    t.integer "prior_retail_qty"
+    t.integer "adjustment"
+    t.integer "product_id"
+    t.integer "new_wholesale_qty"
+    t.integer "new_retail_qty"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
