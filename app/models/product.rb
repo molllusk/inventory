@@ -34,7 +34,7 @@ class Product < ApplicationRecord
     # we downcase everything.
     return nil if query.blank?
 
-    terms = query.downcase.split(/\s+/)
+    terms = query.to_s.downcase.split(/\s+/)
 
     terms = terms.map { |e|
       ('%' + e + '%').gsub(/%+/, '%')
@@ -180,7 +180,10 @@ class Product < ApplicationRecord
 
   def connect_sf_inventory_location
     begin
-      response = ShopifyClient.connect_sf_inventory_location(retail_shopify.inventory_item_id)
+      sf_location = ShopifyInventory.locations['Mollusk sf']
+
+      response = ShopifyClient.connect_inventory_location(retail_shopify.inventory_item_id, sf_location)
+
       Airbrake.notify("Could not CONNECT SF inventory location for Product: #{id}") unless ShopifyClient.inventory_item_updated?(response)
     rescue
       Airbrake.notify("There was an error CONNECTING SF inventory for Product: #{id}")

@@ -102,11 +102,6 @@ class ShopifyClient
     response.body
   end
 
-  # replace use of this with connect_inventory_location to connect an inventory location by location id
-  def self.connect_sf_inventory_location(inventory_item_id)
-    connect_inventory_location(inventory_item_id, SF_RETAIL_INVENTORY_LOCATION)
-  end
-
   def self.get_inventory_items_all_locations(inventory_item_ids, store = :RETAIL)
     response = connection(store).get "#{API_VERSION}/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}&limit=250"
     response.body['inventory_levels'] || []

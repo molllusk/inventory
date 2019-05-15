@@ -16,7 +16,7 @@ class InventoryUpdate < ApplicationRecord
     # we downcase everything.
     return nil if query.blank?
 
-    terms = query.downcase.split(/\s+/)
+    terms = query.to_s.downcase.split(/\s+/)
 
     terms = terms.map { |e|
       ('%' + e + '%').gsub(/%+/, '%')
