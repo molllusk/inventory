@@ -111,7 +111,6 @@ class Product < ApplicationRecord
   end
 
   def adjust_inventory_fluid(quantity)
-    retail_response = nil
     begin
       retail_response = ShopifyClient.adjust_inventory(
         retail_shopify.inventory_item_id,
@@ -148,17 +147,17 @@ class Product < ApplicationRecord
   def save_inventory_adjustment_vend(response, quantity)
     location_id = response['inventory_level']['location_id']
     shopify_inventory = retail_shopify.shopify_inventories.find_by(location: location_id)
-    new_quantity = response['inventory_level']['available']
+    new_inventory = response['inventory_level']['available']
 
     InventoryUpdate.create(
       vend_qty: vend_datum.sf_inventory,
       prior_qty: shopify_inventory.inventory,
       adjustment: quantity,
       product_id: id,
-      new_qty: new_quantity
+      new_qty: new_inventory
     )
 
-    shopify_inventory.update_attribute(:inventory, new_quantity)
+    shopify_inventory.update_attribute(:inventory, new_inventory)
   end
 
   def save_inventory_adjustment_fluid(quantity, retail_available, wholesale_available)
