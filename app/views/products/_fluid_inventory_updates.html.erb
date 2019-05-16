@@ -1,6 +1,7 @@
 <% if @fluid_inventory_updates.present? %>
   <hr/>
-  <h2>Fluid Inventory Updates:<br />(<%= @product.retail_shopify.product_type %> threshold: <%= @product.fluid_inventory_threshold %>)</h2>
+  <h2>Fluid Inventory Updates:</h2>
+  <div class='center'>(<%= @product.retail_shopify.product_type %> threshold: <%= @product.fluid_inventory_threshold %>)</div>
   <table class='full_width'>
     <tr>
       <th>When? (Pacific Time)</th>
