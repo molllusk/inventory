@@ -71,7 +71,7 @@ class Product < ApplicationRecord
 
   def self.run_inventory_updates
     update_retail_inventories_sf
-    update_fluid_inventories
+    # update_fluid_inventories
   end
 
   def self.update_retail_inventories_sf
