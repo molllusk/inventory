@@ -14,5 +14,6 @@ class ProductsController < ApplicationController
     @product = Product.find(params[:id])
 
     @inventory_updates = @product.inventory_updates.paginate(page: params[:page], per_page: 10)
+    @fluid_inventory_updates = @product.fluid_inventory_updates.paginate(page: params[:page], per_page: 10)
   end
 end

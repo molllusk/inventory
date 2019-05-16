@@ -1,0 +1,33 @@
+<% if @fluid_inventory_updates.present? %>
+  <hr/>
+  <h2>Fluid Inventory Updates:</h2>
+  <table class='full_width'>
+    <tr>
+      <th>When? (Pacific Time)</th>
+      <th>Product Name</th>
+      <th>Variant Name</th>
+      <th>SKU</th>
+      <th>Prior Jam RETAIL Qty</th>
+      <th>Prior Jam WHOLESALE Qty</th>
+      <th>Adjustment</th>
+      <th>New Jam RETAIL Qty</th>
+      <th>New Jam WHOLESALE Qty</th>
+    </tr>
+    <% @fluid_inventory_updates.each do |update| %>
+      <tr>
+        <td><%= update.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
+        <td><%= link_to update.product do %><%= update.product.vend_datum.name %> <i class='fa fa-external-link-alt'></i><% end %></td>
+        <td><%= update.product.vend_datum.variant_name %></td>
+        <td><%= update.product.vend_datum.sku %></td>
+        <td><%= update.prior_retail_qty %></td>
+        <td><%= update.prior_wholesale_qty %></td>
+        <td><%= update.adjustment %></td>
+        <td><%= update.new_retail_qty %></td>
+        <td><%= update.new_wholesale_qty %></td>
+      </tr>
+    <% end %>
+  <table>
+  <div class='center'>
+    <%= will_paginate @fluid_inventory_updates %>
+  </div>
+<% end %>
