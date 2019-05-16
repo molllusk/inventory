@@ -1,13 +1,9 @@
 <% if @fluid_inventory_updates.present? %>
   <hr/>
-  <h2>Fluid Inventory Updates:</h2>
+  <h2>Fluid Inventory Updates:<br />(<%= @product.retail_shopify.product_type %> threshold: <%= update.product.fluid_inventory_threshold %>)</h2>
   <table class='full_width'>
     <tr>
       <th>When? (Pacific Time)</th>
-      <th>Product Name</th>
-      <th>Variant Name</th>
-      <th>SKU</th>
-      <th>Threshold</th>
       <th>Prior Jam RETAIL Qty</th>
       <th>Prior Jam WHOLESALE Qty</th>
       <th>Adjustment</th>
@@ -17,10 +13,6 @@
     <% @fluid_inventory_updates.each do |update| %>
       <tr>
         <td><%= update.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
-        <td><%= link_to update.product do %><%= update.product.vend_datum.name %> <i class='fa fa-external-link-alt'></i><% end %></td>
-        <td><%= update.product.vend_datum.variant_name %></td>
-        <td><%= update.product.vend_datum.sku %></td>
-        <td><%= update.product.fluid_inventory_threshold %></td>
         <td><%= update.prior_retail_qty %></td>
         <td><%= update.prior_wholesale_qty %></td>
         <td><%= update.adjustment %></td>
