@@ -190,18 +190,21 @@ class Product < ApplicationRecord
     end
   end
 
+  def fluid_inventory_threshold
+    @fluid_inventory_threshold ||= FluidInventoryThreshold.find_by(product_type: retail_shopify.product_type)&.threshold
+  end
+
   def fluid_inventory
     if retail_shopify.present? && wholesale_shopify.present?
       retail_inventory = retail_shopify.shopify_inventories.find_by(location: 'Jam Warehouse Retail')&.inventory
       wholesale_inventory = wholesale_shopify.shopify_inventories.find_by(location: 'Jam Warehouse Wholesale')&.inventory
-      threshold = FluidInventoryThreshold.find_by(product_type: retail_shopify.product_type)&.threshold
 
       if retail_inventory.present?
         if wholesale_inventory.present?
-          if threshold.present?
-            if retail_inventory < threshold
-              sufficient_wholesale = (threshold - retail_inventory) <= wholesale_inventory
-              adjustment = sufficient_wholesale ? threshold - retail_inventory : wholesale_inventory
+          if fluid_inventory_threshold.present?
+            if retail_inventory < fluid_inventory_threshold
+              sufficient_wholesale = (fluid_inventory_threshold - retail_inventory) <= wholesale_inventory
+              adjustment = sufficient_wholesale ? fluid_inventory_threshold - retail_inventory : wholesale_inventory
               adjust_inventory_fluid(adjustment)
             end
           else

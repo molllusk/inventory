@@ -7,6 +7,7 @@
       <th>Product Name</th>
       <th>Variant Name</th>
       <th>SKU</th>
+      <th>Threshold</th>
       <th>Prior Jam RETAIL Qty</th>
       <th>Prior Jam WHOLESALE Qty</th>
       <th>Adjustment</th>
@@ -19,6 +20,7 @@
         <td><%= link_to update.product do %><%= update.product.vend_datum.name %> <i class='fa fa-external-link-alt'></i><% end %></td>
         <td><%= update.product.vend_datum.variant_name %></td>
         <td><%= update.product.vend_datum.sku %></td>
+        <td><%= update.product.fluid_inventory_threshold %></td>
         <td><%= update.prior_retail_qty %></td>
         <td><%= update.prior_wholesale_qty %></td>
         <td><%= update.adjustment %></td>
