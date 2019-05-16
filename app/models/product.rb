@@ -71,7 +71,7 @@ class Product < ApplicationRecord
 
   def self.run_inventory_updates
     update_retail_inventories_sf
-    # update_fluid_inventories
+    update_fluid_inventories
   end
 
   def self.update_retail_inventories_sf
@@ -88,7 +88,7 @@ class Product < ApplicationRecord
     Product.find_each do |product|
       if product.has_retail_and_wholesale_shopify?
         # do not update inventory if any order exists for that variant in any location
-        product.fluid_inventory unless product.retail_orders_present? || product.wholesale_orders_present?
+        product.fluid_inventory unless product.retail_orders_present?
       end
     end
   end
