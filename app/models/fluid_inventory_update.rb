@@ -60,7 +60,9 @@ end
 #  new_wholesale_qty   :integer
 #  prior_retail_qty    :integer
 #  prior_wholesale_qty :integer
+#  threshold           :integer
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
 #  product_id          :integer
 #
+

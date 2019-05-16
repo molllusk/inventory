@@ -183,6 +183,7 @@ class Product < ApplicationRecord
     FluidInventoryUpdate.create(
       prior_wholesale_qty: wholesale_inventory.inventory,
       prior_retail_qty: retail_inventory.inventory,
+      threshold: fluid_inventory_threshold,
       adjustment: quantity,
       product_id: id,
       new_wholesale_qty: wholesale_available,
