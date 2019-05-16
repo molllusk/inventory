@@ -70,26 +70,41 @@ class Product < ApplicationRecord
   end
 
   def self.run_inventory_updates
-    orders = ShopifyClient.order_quantities_by_variant
-    update_retail_inventories_sf(orders)
-    # update_fluid_inventories(orders)
+    update_retail_inventories_sf
+    # update_fluid_inventories
   end
 
-  def self.update_retail_inventories_sf(orders)
+  def self.update_retail_inventories_sf
     third_party_or_sale.find_each do |product|
       # do not update inventory if any order exists for that variant in any location
-      if product.update_sf_shopify_inventory? && orders[product.retail_shopify.variant_id].zero?
+      if product.update_sf_shopify_inventory?
         product.connect_sf_inventory_location if product.missing_retail_inventory_location?
-        product.adjust_sf_retail_inventory
+        product.adjust_sf_retail_inventory unless product.retail_orders_present?
       end
     end
   end
 
-  def self.update_fluid_inventories(orders)
+  def self.update_fluid_inventories
     Product.find_each do |product|
-      # do not update inventory if any order exists for that variant in any location
-      product.fluid_inventory unless orders[product.retail_shopify.variant_id].positive?
+      if product.has_retail_and_wholesale_shopify?
+        # do not update inventory if any order exists for that variant in any location
+        product.fluid_inventory unless product.retail_orders_present? || product.wholesale_orders_present?
+      end
     end
+  end
+
+  def has_retail_and_wholesale_shopify?
+    retail_shopify.present? && wholesale_shopify.present?
+  end
+
+  def retail_orders_present?
+    retail_orders = ShopifyClient.order_quantities_by_variant
+    retail_orders[retail_shopify&.variant_id].positive?
+  end
+
+  def wholesale_orders_present?
+    wholesale_orders = ShopifyClient.order_quantities_by_variant(:WHOLESALE)
+    wholesale_orders[wholesale_shopify&.variant_id].positive?
   end
 
   def adjust_sf_retail_inventory
@@ -195,7 +210,7 @@ class Product < ApplicationRecord
   end
 
   def fluid_inventory
-    if retail_shopify.present? && wholesale_shopify.present?
+    if has_retail_and_wholesale_shopify?
       retail_inventory = retail_shopify.shopify_inventories.find_by(location: 'Jam Warehouse Retail')&.inventory
       wholesale_inventory = wholesale_shopify.shopify_inventories.find_by(location: 'Jam Warehouse Wholesale')&.inventory
 
