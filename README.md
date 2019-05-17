@@ -9,7 +9,7 @@ Thrash the inventory wave...
 1. **Run `$ bundle install` and resolve any errors**  
 
 2. **Configure your DB:**
-  * Create a new ROLE in postgres for 'grits'
+  * Create a new ROLE in postgres for 'mollusk'
     * `$ psql -h localhost`
     * `$ CREATE ROLE mollusk WITH CREATEDB LOGIN PASSWORD 'inventory';`
 
