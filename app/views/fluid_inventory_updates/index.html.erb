@@ -1,12 +1,12 @@
 <% provide(:title, 'Fluid Inventory Updates') %>
-<h1>Fluid Inventory Updates</h1>
+<!-- <h1>Fluid Inventory Updates</h1> -->
 
 <%= form_for_filterrific @filterrific do |f| %>
-  <div class='center' style='margin-bottom: 5px;'>
+  <div class='search_bar' style='margin-bottom: 5px;'>
     <%# give the search field the 'filterrific-periodically-observed' class for live updates %>
     <%= f.text_field(
       :search_query,
-      class: 'filterrific-periodically-observed',
+      class: 'search_field',
       placeholder: ' Search'
     ) %>
   </div>
@@ -14,7 +14,7 @@
     <%= link_to(
       'Reset Search',
       reset_filterrific_url,
-      class: "btn btn-sm btn-primary", style: 'color: white') %>
+      class: "reset_search", style: 'color: #337ab7; font-weight: 450;') %>
   </div>
   <%# add an automated spinner to your form when the list is refreshed %>
   <%= render_filterrific_spinner %>

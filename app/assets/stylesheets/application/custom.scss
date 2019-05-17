@@ -197,7 +197,19 @@ tr:hover {
 }
 
 #filterrific_filter {
-  width: 50%;
-  margin-left: auto;
-  margin-right: auto;
+  width: 500px;
+  margin-top: 15px;
+
+  // margin-left: auto;
+  // margin-right: auto;
+}
+
+.reset_button {
+  margin-top: -40px;
+  margin-left: 400px;
+
+}
+
+.search_field {
+  border-radius: 5px;
 }
