@@ -17,10 +17,10 @@ Thrash the inventory wave...
   * `$ bundle exec rake db:create`
 
 4. **Import the latest postgres backup from Heroku (You'll need access to Heroku):**
-  * `$ heroku pg:backups:capture`
-    `$ heroku pg:backups:download`
-    `$ pg_restore --verbose --clean --no-acl --no-owner -h localhost -U mollusk -d inventory_app-dev latest.dump`
-    `$ rm latest.dump`
+   * `$ heroku pg:backups:capture`
+     `$ heroku pg:backups:download`
+     `$ pg_restore --verbose --clean --no-acl --no-owner -h localhost -U mollusk -d inventory_app-dev latest.dump`
+     `$ rm latest.dump`
     
 5. **Migrate your databases:**
   * `$ bundle exec rake db:migrate`
