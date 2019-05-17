@@ -7,7 +7,7 @@ git_source(:github) do |repo_name|
 end
 
 
-gem 'airbrake', '~> 7.4'
+gem 'airbrake', '~> 9.2'
 gem 'annotate'
 gem 'bcrypt',         '3.1.12'
 gem 'bootstrap-sass', '3.4.1'
