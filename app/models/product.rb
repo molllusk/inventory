@@ -97,13 +97,19 @@ class Product < ApplicationRecord
     retail_shopify.present? && wholesale_shopify.present?
   end
 
+  def retail_orders
+    @retail_orders ||= ShopifyClient.order_quantities_by_variant
+  end
+
+  def wholesale_orders
+    @wholesale_orders ||= ShopifyClient.order_quantities_by_variant(:WHOLESALE)
+  end
+
   def retail_orders_present?
-    retail_orders = ShopifyClient.order_quantities_by_variant
     retail_orders[retail_shopify&.variant_id].positive?
   end
 
   def wholesale_orders_present?
-    wholesale_orders = ShopifyClient.order_quantities_by_variant(:WHOLESALE)
     wholesale_orders[wholesale_shopify&.variant_id].positive?
   end
 
