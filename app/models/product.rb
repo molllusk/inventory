@@ -65,30 +65,27 @@ class Product < ApplicationRecord
     end
   }
 
-  def wholesale_shopify
-    shopify_data.find_by(store: :wholesale)
-  end
-
   def self.run_inventory_updates
-    update_retail_inventories_sf
-    update_fluid_inventories
+    retail_orders = ShopifyClient.order_quantities_by_variant
+    update_retail_inventories_sf(retail_orders)
+    update_fluid_inventories(retail_orders)
   end
 
-  def self.update_retail_inventories_sf
+  def self.update_retail_inventories_sf(retail_orders)
     third_party_or_sale.find_each do |product|
       # do not update inventory if any order exists for that variant in any location
       if product.update_sf_shopify_inventory?
         product.connect_sf_inventory_location if product.missing_retail_inventory_location?
-        product.adjust_sf_retail_inventory unless product.retail_orders_present?
+        product.adjust_sf_retail_inventory unless product.retail_orders_present?(retail_orders)
       end
     end
   end
 
-  def self.update_fluid_inventories
+  def self.update_fluid_inventories(retail_orders)
     Product.find_each do |product|
       if product.has_retail_and_wholesale_shopify?
         # do not update inventory if any order exists for that variant in any location
-        product.fluid_inventory unless product.retail_orders_present?
+        product.fluid_inventory unless product.retail_orders_present?(retail_orders)
       end
     end
   end
@@ -97,19 +94,11 @@ class Product < ApplicationRecord
     retail_shopify.present? && wholesale_shopify.present?
   end
 
-  def retail_orders
-    @retail_orders ||= ShopifyClient.order_quantities_by_variant
-  end
-
-  def wholesale_orders
-    @wholesale_orders ||= ShopifyClient.order_quantities_by_variant(:WHOLESALE)
-  end
-
-  def retail_orders_present?
+  def retail_orders_present?(retail_orders)
     retail_orders[retail_shopify&.variant_id].positive?
   end
 
-  def wholesale_orders_present?
+  def wholesale_orders_present?(wholesale_orders)
     wholesale_orders[wholesale_shopify&.variant_id].positive?
   end
 
@@ -243,6 +232,10 @@ class Product < ApplicationRecord
 
   def retail_shopify
     shopify_data.find_by(store: :retail)
+  end
+
+  def wholesale_shopify
+    shopify_data.find_by(store: :wholesale)
   end
 
   def shopify_inventory_sf
