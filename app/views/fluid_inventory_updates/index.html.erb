@@ -1,7 +1,7 @@
 <% provide(:title, 'Fluid Inventory Updates') %>
 
 <%= form_for_filterrific @filterrific do |f| %>
-  <div class='search_bar' style='margin-bottom: 5px;'>
+  <div class='search_bar'>
     <%# give the search field the 'filterrific-periodically-observed' class for live updates %>
     <%= f.text_field(
       :search_query,
