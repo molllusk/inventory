@@ -6,7 +6,6 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
-
 gem 'airbrake', '~> 9.2'
 gem 'annotate'
 gem 'bcrypt',         '3.1.12'

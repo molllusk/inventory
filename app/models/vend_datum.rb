@@ -9,7 +9,7 @@ class VendDatum < ApplicationRecord
   belongs_to :product
 
   def sf_inventory
-    inventory.to_i
+    inventory.to_i < 0 ? 0 : inventory.to_i
   end
 end
 

@@ -216,7 +216,8 @@ class Product < ApplicationRecord
             if retail_inventory < fluid_inventory_threshold
               sufficient_wholesale = (fluid_inventory_threshold - retail_inventory) <= wholesale_inventory
               adjustment = sufficient_wholesale ? fluid_inventory_threshold - retail_inventory : wholesale_inventory
-              adjust_inventory_fluid(adjustment) unless adjustment.zero?
+              # bails on zero adjustments and negative wholesale inventories
+              adjust_inventory_fluid(adjustment) unless adjustment < 1
             end
           else
             Airbrake.notify("Missing fluid inventory threshold for Product Type: #{retail_shopify.product_type} Product: #{id}")
@@ -243,7 +244,7 @@ class Product < ApplicationRecord
   end
 
   def update_sf_shopify_inventory?
-    retail_shopify.third_party_or_sale? && shopify_inventory_sf != vend_datum.sf_inventory && !(vend_datum.sf_inventory < 0 && shopify_inventory_sf.zero?)
+    retail_shopify.third_party_or_sale? && shopify_inventory_sf != vend_datum.sf_inventory
   end
 
   def retail_inventory_adjustment
