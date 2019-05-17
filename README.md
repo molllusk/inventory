@@ -1,26 +1,9 @@
-# README
+Dump db from heroku to your local dev environment:
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+1. heroku pg:backups:capture
+2. heroku pg:backups:download
+3. bundle exec rake db:create
+4. pg_restore --verbose --clean --no-acl --no-owner -h localhost -U mollusk -d inventory_app-dev latest.dump
+5. bundle exec rake db:migrate
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
-
-* Arvel is pretty cool!
+Make sure to `bundle exec rake db:drop` if you have a previously existing db.
