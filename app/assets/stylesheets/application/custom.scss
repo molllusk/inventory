@@ -199,17 +199,23 @@ tr:hover {
 #filterrific_filter {
   width: 500px;
   margin-top: 15px;
+}
 
-  // margin-left: auto;
-  // margin-right: auto;
+.search_bar {
+  margin-bottom: 5px;
 }
 
 .reset_button {
   margin-top: -40px;
   margin-left: 400px;
-
+  margin-bottom: 10px
 }
 
 .search_field {
   border-radius: 5px;
+}
+
+.addauser {
+  margin-top: 10px;
+  float: left;
 }
