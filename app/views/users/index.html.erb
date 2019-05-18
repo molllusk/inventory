@@ -1,8 +1,5 @@
 <% provide(:title, 'All users') %>
-<h1>All users</h1>
-<div class='row'>
-<a href="/users/new" style='float:right' role="button"><button class="btn btn-primary">Add User</button></a>
-</div>
+
 <table class="full_width">
   <tr>
     <th>Name</th>
@@ -13,5 +10,9 @@
   </tr>
   <%= render @users %>
 </table>
+
+<a href="/users/new" role="button">
+  <button class="btn btn-primary btn-sm mt-4"><i class='fa fa-user-plus'></i> Add User</button>
+</a>
 
 <%= will_paginate %>

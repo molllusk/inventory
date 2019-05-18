@@ -1,4 +1,4 @@
-<h2>Vend Data <a href='https://mollusksurf.vendhq.com/product/<%= @product.vend_datum.vend_id %>' target='_blank'><i class='fa fa-external-link-alt'></i></a>:</h2>
+<h2 class='center'>Vend Data <a href='https://mollusksurf.vendhq.com/product/<%= @product.vend_datum.vend_id %>' target='_blank'><i class='fa fa-external-link-alt'></i></a>:</h2>
 <% if @product.vend_datum.present? %>
   <table class='full_width'>
     <% @product.vend_datum.attributes.each do |vd| %>
