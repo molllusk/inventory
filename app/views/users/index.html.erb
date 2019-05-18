@@ -10,10 +10,9 @@
   </tr>
   <%= render @users %>
 </table>
-<div class='row addauser'>
-  <a href="/users/new" style='float:right' role="button">
-    <button class="btn btn-primary">Add User</button>
-  </a>
-</div>
+
+<a href="/users/new" role="button">
+  <button class="btn btn-primary btn-sm mt-4"><i class='fa fa-user-plus'></i> Add User</button>
+</a>
 
 <%= will_paginate %>

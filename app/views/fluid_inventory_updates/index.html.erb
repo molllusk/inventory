@@ -1,15 +1,15 @@
 <% provide(:title, 'Fluid Inventory Updates') %>
 
 <%= form_for_filterrific @filterrific do |f| %>
-  <div class='search_bar'>
+  <div class='mb-2'>
     <%# give the search field the 'filterrific-periodically-observed' class for live updates %>
     <%= f.text_field(
       :search_query,
-      class: 'search_field',
-      placeholder: ' Search'
+      class: 'filterrific-periodically-observed search_field pl-3',
+      placeholder: 'Search'
     ) %>
   </div>
-  <div class='center reset_button'>
+  <div class='reset_button'>
     <%= link_to(
       'Reset Search',
       reset_filterrific_url,

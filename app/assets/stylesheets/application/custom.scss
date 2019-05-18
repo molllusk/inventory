@@ -10,10 +10,6 @@ $gray-medium-light: #eaeaea;
 
 /* universal */
 
-body {
-  padding-top: 60px;
-}
-
 section {
   overflow: auto;
 }
@@ -24,9 +20,6 @@ textarea {
 
 .center {
   text-align: center;
-  h1 {
-    margin-bottom: 10px;
-  }
 }
 
 /* typography */
@@ -39,14 +32,12 @@ h1 {
   font-size: 3em;
   letter-spacing: -2px;
   margin-bottom: 30px;
-  text-align: center;
 }
 
 h2 {
-  font-size: 1.2em;
+  font-size: 1.4em;
   letter-spacing: -1px;
   margin-bottom: 30px;
-  text-align: center;
   font-weight: normal;
   color: #777777;
 }
@@ -137,8 +128,6 @@ input {
 /* footer */
 
 footer {
-  margin-top: 45px;
-  padding-top: 5px;
   border-top: 1px solid $gray-medium-light;
   color: #777777;
   a {
@@ -198,11 +187,6 @@ tr:hover {
 
 #filterrific_filter {
   width: 500px;
-  margin-top: 15px;
-}
-
-.search_bar {
-  margin-bottom: 5px;
 }
 
 .reset_button {
@@ -218,13 +202,4 @@ tr:hover {
 .reset_search {
   color: #337ab7;
   font-weight: 450;
-}
-
-.addauser {
-  margin-top: 10px;
-  float: left;
-}
-
-.thresholds_container {
-  margin-top: 20px;
 }
