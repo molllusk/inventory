@@ -1,11 +1,11 @@
 <% provide(:title, 'All products') %>
 
 <%= form_for_filterrific @filterrific do |f| %>
-  <div class='mb-2'>
+  <div>
     <%# give the search field the 'filterrific-periodically-observed' class for live updates %>
     <%= f.text_field(
       :search_query,
-      class: 'filterrific-periodically-observed search_field pl-3',
+      class: 'filterrific-periodically-observed search_field pl-3 py-2',
       placeholder: 'Search'
     ) %>
   </div>
