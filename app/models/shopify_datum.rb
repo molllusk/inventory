@@ -48,7 +48,6 @@ end
 #  fulfillment_service    :string
 #  grams                  :integer
 #  handle                 :string
-#  inventory              :integer
 #  inventory_management   :string
 #  inventory_policy       :string
 #  inventory_quantity     :integer
