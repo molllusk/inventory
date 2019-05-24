@@ -4,7 +4,7 @@
   <h2 class='center'>Shopify Data:</h2>
   <table class='full_width'>
     <% headers.each do |header| %>
-      <% next if %w[product_id inventory vendor compare_at_price fulfillment_service grams inventory_management inventory_policy requires_shipping weight weight_unit shopify_created_at inventory_quantity old_inventory_quantity].include?(header) %>
+      <% next if %w[product_id vendor compare_at_price fulfillment_service grams inventory_management inventory_policy requires_shipping weight weight_unit shopify_created_at inventory_quantity old_inventory_quantity].include?(header) %>
       <tr>
         <td>
           <strong><%= header.humanize %></strong>
