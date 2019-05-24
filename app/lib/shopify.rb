@@ -124,15 +124,6 @@ class ShopifyClient
     while inventory_item_ids.present?
       id_batch = inventory_item_ids.shift(50)
       all_inventory_items = get_inventory_items_all_locations(id_batch, store)
-      inventory_items = get_inventory_items(id_batch, store)
-
-      inventory_items.each do |inventory_item|
-        sd = ShopifyDatum.find_by_inventory_item_id(inventory_item['inventory_item_id'])
-        if inventory_item['available'].present?
-          current_inventory = inventory_item['available']
-          sd.update_attribute(:inventory, current_inventory) unless sd.inventory == current_inventory
-        end
-      end
 
       all_inventory_items.each do |inventory_item|
         sd = ShopifyDatum.find_by(inventory_item_id: inventory_item['inventory_item_id'])
