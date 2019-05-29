@@ -13,7 +13,7 @@ class ProductsController < ApplicationController
   def show
     @product = Product.find(params[:id])
 
-    @inventory_updates = @product.inventory_updates.order('created_at ASC').paginate(page: params[:page], per_page: 8)
-    @fluid_inventory_updates = @product.fluid_inventory_updates.order('created_at ASC').paginate(page: params[:page], per_page: 8)
+    @inventory_updates = @product.inventory_updates.order('created_at DESC').paginate(page: params[:page], per_page: 8)
+    @fluid_inventory_updates = @product.fluid_inventory_updates.order('created_at DESC').paginate(page: params[:page], per_page: 8)
   end
 end
