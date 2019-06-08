@@ -1,0 +1,37 @@
+<div id="filterrific_results">
+
+  <div class='mb-5'>
+    <%= page_entries_info shopify_sales_receipts %>
+  </div>
+
+  <table class="products full_width">
+    <tr>
+      <th>Day</th>
+      <th>Product Sales</th>
+      <th>Gift Card Sales</th>
+      <th>Discounts</th>
+      <th>Sales Tax</th>
+      <th>Shipping</th>
+      <th>Shopify Payments</th>
+      <th>Paypal Payments</th>
+      <th>Gift Card Payments</th>
+    </tr>
+    <% shopify_sales_receipts.each do |receipt| %>
+      <tr>
+        <td><%= receipt.date.in_time_zone('Pacific Time (US & Canada)').to_s(:humanized_ago) %></td>
+        <td><%= number_to_currency(receipt.product_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+        <td><%= number_to_currency(receipt.gift_card_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+        <td><%= number_to_currency(receipt.discount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+        <td><%= number_to_currency(receipt.sales_tax, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+        <td><%= number_to_currency(receipt.shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+        <td><%= number_to_currency(receipt.shopify_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+        <td><%= number_to_currency(receipt.paypal_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+        <td><%= number_to_currency(receipt.gift_card_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+      </tr>
+    <% end %>
+  </table>
+
+  <div class='center'>
+  <%= will_paginate %>
+  </div>
+</div>

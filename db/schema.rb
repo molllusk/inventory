@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_24_000510) do
+ActiveRecord::Schema.define(version: 2019_06_08_075816) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -84,6 +84,20 @@ ActiveRecord::Schema.define(version: 2019_05_24_000510) do
     t.bigint "location"
     t.integer "inventory"
     t.integer "shopify_datum_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "shopify_sales_receipts", force: :cascade do |t|
+    t.float "product_sales", default: 0.0
+    t.float "discount", default: 0.0
+    t.float "shipping", default: 0.0
+    t.float "sales_tax", default: 0.0
+    t.float "gift_card_sales", default: 0.0
+    t.float "shopify_payments", default: 0.0
+    t.float "gift_card_payments", default: 0.0
+    t.float "paypal_payments", default: 0.0
+    t.datetime "date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

@@ -1,0 +1,6 @@
+<% provide(:title, 'Fluid Inventory Updates') %>
+
+<%= render(
+  partial: 'list',
+  locals: { shopify_sales_receipts: @shopify_sales_receipts }
+) %>

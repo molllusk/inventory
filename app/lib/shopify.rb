@@ -184,4 +184,69 @@ class ShopifyClient
     SAVED_VARIANT_ATTRIBUTES.each { |saved_attribute| attributes[saved_attribute] = variant[saved_attribute.to_s] }
     attributes
   end
+
+  def self.yesterdays_closed_order_count(store = :RETAIL)
+    day = 8.days.ago
+
+    min_date = day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
+    min_date -= min_date.utc_offset
+
+    count_params = {
+      status: 'closed',
+      created_at_min: min_date,
+    }
+
+    count_response = connection(store).get "#{API_VERSION}/orders/count.json", count_params
+    count_response.body['count'].to_i
+  end
+
+  def self.yesterdays_closed_orders(store = :RETAIL)
+    orders = []
+
+    pages = (yesterdays_closed_order_count / 250.0).ceil
+
+    day = 8.days.ago
+
+    min_date =  day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
+    min_date -= min_date.utc_offset
+
+    max_date = day.to_time.in_time_zone('Pacific Time (US & Canada)').end_of_day
+    max_date -= max_date.utc_offset
+
+    pages.times do |page|
+      params = {
+        limit: 250,
+        page: page + 1,
+        status: 'closed',
+        updated_at_min: min_date
+      }
+
+      response = connection(store).get "#{API_VERSION}/orders.json", params
+      orders += response.body['orders']
+    end
+    orders
+  end
+
+  def self.orders_closed_yesterday(store = :RETAIL)
+    orders = yesterdays_closed_orders(store)
+
+    day = 8.days.ago
+    min_date =  day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day #Date.yesterday.beginning_of_day.to_time.in_time_zone('Pacific Time (US & Canada)')
+    min_date -= min_date.utc_offset
+
+    max_date = day.to_time.in_time_zone('Pacific Time (US & Canada)').end_of_day #Date.yesterday.end_of_day.to_time.in_time_zone('Pacific Time (US & Canada)')
+    max_date -= max_date.utc_offset
+
+    orders.select { |order| min_date <= Time.parse(order['closed_at']) && Time.parse(order['closed_at']) <= max_date }
+  end
+
+  def self.transactions(order_id, store = :RETAIL)
+    response = connection(store).get "#{API_VERSION}/orders/#{order_id}/transactions.json"
+    response.body['transactions']
+  end
+
+  def self.fulfillments(order_id, store = :RETAIL)
+    response = connection(store).get "#{API_VERSION}/orders/#{order_id}/fulfillments.json"
+    response.body['fulfillments']
+  end
 end

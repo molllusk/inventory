@@ -7,5 +7,6 @@ Rails.application.routes.draw do
   resources :fluid_inventory_thresholds
   resources :fluid_inventory_updates
   resources :products
+  resources :shopify_sales_receipts
   resources :users
 end
