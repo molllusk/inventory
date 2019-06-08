@@ -18,7 +18,7 @@
     </tr>
     <% shopify_sales_receipts.each do |receipt| %>
       <tr>
-        <td><%= receipt.date.in_time_zone('Pacific Time (US & Canada)').to_s(:humanized_ago) %></td>
+        <td><%= receipt.date.strftime("%m/%d/%Y")  %></td>
         <td><%= number_to_currency(receipt.product_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
         <td><%= number_to_currency(receipt.gift_card_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
         <td><%= number_to_currency(receipt.discount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
