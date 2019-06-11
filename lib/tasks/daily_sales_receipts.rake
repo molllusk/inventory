@@ -43,7 +43,7 @@ namespace :daily_sales_receipts do
 
       if %w(refunded partially_refunded).include?(order['financial_status'])
         order_refunds = ShopifyClient.refunds(order['id'])
-        refunds << oder_refunds unless oder_refunds.blank?
+        refunds << order_refunds unless order_refunds.blank?
       end
 
       ShopifyClient.transactions(order['id']).each do |transaction|
