@@ -32,6 +32,8 @@ namespace :daily_sales_receipts do
       order['line_items'].each do |line_item|
         variant_ids << line_item['variant_id']
 
+        p line_item['gift_card']
+
         if line_item['gift_card'] || line_item['product_id'] == 1045344714837 # mollusk money
           gift_card_sales += line_item['price'].to_f
         else
@@ -85,13 +87,13 @@ namespace :daily_sales_receipts do
       next if refund_date < min_date || refund_date > max_date
 
       refund['refund_line_items'].each do |line_item|
-        refunded_amounts[line_item['location_id']][:sub_total] += line_item['subtotal']
-        refunded_amounts[line_item['location_id']][:tax] += line_item['total_tax'] # or do we want tax lines total
-        refunded_amounts[line_item['location_id']][:discount] += line_item['total_discount'] # or do we want some allocated/set amount
+        refunded_amounts[line_item['location_id']][:sub_total] += line_item['subtotal'].to_f
+        refunded_amounts[line_item['location_id']][:tax] += line_item['total_tax'].to_f # or do we want tax lines total
+        refunded_amounts[line_item['location_id']][:discount] += line_item['total_discount'].to_f # or do we want some allocated/set amount
 
-        refunded_amounts[:total][:sub_total] += line_item['subtotal']
-        refunded_amounts[:total][:tax] += line_item['total_tax']
-        refunded_amounts[:total][:discount] += line_item['total_tax']
+        refunded_amounts[:total][:sub_total] += line_item['subtotal'].to_f
+        refunded_amounts[:total][:tax] += line_item['total_tax'].to_f
+        refunded_amounts[:total][:discount] += line_item['total_tax'].to_f
       end
 
       refund['transactions'].each do |transaction|
