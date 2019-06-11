@@ -102,15 +102,32 @@ class ShopifyClient
     response.body
   end
 
-  def self.get_inventory_items_all_locations(inventory_item_ids, store = :RETAIL)
+  def self.get_inventory_levels_all_locations(inventory_item_ids, store = :RETAIL)
     response = connection(store).get "#{API_VERSION}/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}&limit=250"
     response.body['inventory_levels'] || []
   end
 
   # Might be able to get rid of or replace this
-  def self.get_inventory_items(inventory_item_ids, store = :RETAIL)
+  def self.get_inventory_levels(inventory_item_ids, store = :RETAIL)
     response = connection(store).get "#{API_VERSION}/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}&location_ids=#{inventory_location(store)}&limit=250"
     response.body['inventory_levels'] || []
+  end
+
+  def self.get_inventory_items(inventory_item_ids, store = :RETAIL)
+    inventory_items = []
+
+    while inventory_item_ids.present?
+      id_batch = inventory_item_ids.shift(50)
+      response = connection(store).get "#{API_VERSION}/inventory_items.json?ids=#{id_batch.join(',')}&limit=250"
+      inventory_items << response.body['inventory_items'] unless response.body['inventory_items'].blank?
+    end
+
+    inventory_items.flatten
+  end
+
+  def self.get_variant(variant_id, store = :RETAIL)
+    response = connection(store).get "#{API_VERSION}/variants/#{variant_id}.json"
+    response.body['variant']
   end
 
   # might be able to get rid of and replace this and the inventory location constants
@@ -123,16 +140,16 @@ class ShopifyClient
 
     while inventory_item_ids.present?
       id_batch = inventory_item_ids.shift(50)
-      all_inventory_items = get_inventory_items_all_locations(id_batch, store)
+      all_inventory_levels = get_inventory_levels_all_locations(id_batch, store)
 
-      all_inventory_items.each do |inventory_item|
-        sd = ShopifyDatum.find_by(inventory_item_id: inventory_item['inventory_item_id'])
-        existing_inventory_item = sd.shopify_inventories.find_by(location: inventory_item['location_id'])
-        if inventory_item['available'].present?
+      all_inventory_levels.each do |inventory_level|
+        sd = ShopifyDatum.find_by(inventory_item_id: inventory_level['inventory_item_id'])
+        existing_inventory_item = sd.shopify_inventories.find_by(location: inventory_level['location_id'])
+        if inventory_level['available'].present?
           if existing_inventory_item.present?
-            existing_inventory_item.update_attribute(:inventory, inventory_item['available']) if existing_inventory_item.inventory != inventory_item['available'] 
+            existing_inventory_item.update_attribute(:inventory, inventory_level['available']) if existing_inventory_item.inventory != inventory_level['available']
           else
-            sd.shopify_inventories << ShopifyInventory.create(location: inventory_item['location_id'], inventory: inventory_item['available'])
+            sd.shopify_inventories << ShopifyInventory.create(location: inventory_level['location_id'], inventory: inventory_level['available'])
           end
         end
       end
@@ -186,7 +203,7 @@ class ShopifyClient
   end
 
   def self.yesterdays_closed_order_count(store = :RETAIL)
-    day = 1.day.ago
+    day = 1.days.ago
 
     min_date = day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
     min_date -= min_date.utc_offset
@@ -205,7 +222,7 @@ class ShopifyClient
 
     pages = (yesterdays_closed_order_count / 250.0).ceil
 
-    day = 1.day.ago
+    day = 1.days.ago
 
     min_date =  day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
     min_date -= min_date.utc_offset
@@ -230,7 +247,7 @@ class ShopifyClient
   def self.orders_closed_yesterday(store = :RETAIL)
     orders = yesterdays_closed_orders(store)
 
-    day = 1.day.ago
+    day = 1.days.ago
     min_date =  day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day #Date.yesterday.beginning_of_day.to_time.in_time_zone('Pacific Time (US & Canada)')
     min_date -= min_date.utc_offset
 
@@ -248,5 +265,10 @@ class ShopifyClient
   def self.fulfillments(order_id, store = :RETAIL)
     response = connection(store).get "#{API_VERSION}/orders/#{order_id}/fulfillments.json"
     response.body['fulfillments']
+  end
+
+  def self.refunds(order_id, store = :RETAIL)
+    response = connection(store).get "#{API_VERSION}/orders/#{order_id}/refunds.json"
+    response.body['refunds']
   end
 end
