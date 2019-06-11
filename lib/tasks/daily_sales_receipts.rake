@@ -78,14 +78,13 @@ namespace :daily_sales_receipts do
 
     p sum_costs
 
-    refunded_amounts = { total: { sub_total: 0, tax: 0, shipping: 0, shopify_payments: 0, paypal_payments: 0, gift_card_payments: 0, total_payments: 0 } }
+    refunded_amounts = Hash.new { |hash, key| hash[key] = { sub_total: 0, tax: 0, shipping: 0, discount: 0, shopify_payments: 0, paypal_payments: 0, gift_card_payments: 0, total_payments: 0 } }
 
     refunds.each do |refund|
       refund_date = Time.parse(refund['created_at'])
       next if refund_date < min_date || refund_date > max_date
 
       refund['refund_line_items'].each do |line_item|
-        refunded_amounts[line_item['location_id']] ||= { sub_total: 0, tax: 0, shipping: 0, shopify_payments: 0, paypal_payments: 0, gift_card_payments: 0, total_payments: 0 }
         refunded_amounts[line_item['location_id']][:sub_total] += line_item['subtotal'].to_f
         refunded_amounts[line_item['location_id']][:tax] += line_item['total_tax'].to_f # or do we want tax lines total
         refunded_amounts[line_item['location_id']][:discount] += line_item['total_discount'].to_f # or do we want some allocated/set amount
