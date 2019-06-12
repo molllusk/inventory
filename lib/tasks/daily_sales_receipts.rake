@@ -5,7 +5,6 @@ namespace :daily_sales_receipts do
 
     orders = ShopifyClient.orders_closed_yesterday
 
-
     day = 1.days.ago
     min_date =  day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day #Date.yesterday.beginning_of_day.to_time.in_time_zone('Pacific Time (US & Canada)')
     min_date -= min_date.utc_offset
@@ -24,19 +23,20 @@ namespace :daily_sales_receipts do
 
     refunds = []
     variant_ids = []
-
     orders.each do |order|
       discount += order['total_discounts'].to_f
       sales_tax += order['tax_lines'].reduce(0) { |sum, tax_line| sum + tax_line['price'].to_f }
-
+      # p order['line_items'].map { |o| { order: order['id'], amount: o['price'].to_f }}
       order['line_items'].each do |line_item|
         variant_ids << line_item['variant_id']
-
+        # p line_item.as_json
         if line_item['gift_card'] || line_item['product_id'] == 1045344714837 # mollusk money
           gift_card_sales += line_item['price'].to_f
         else
           product_sales += line_item['price'].to_f
         end
+
+        # discount += line_item['total_discount'].to_f
       end
 
       shipping += order['shipping_lines'].reduce(0) { |sum, shipping_line| sum + shipping_line['price'].to_f }
@@ -47,7 +47,8 @@ namespace :daily_sales_receipts do
       end
 
       ShopifyClient.transactions(order['id']).each do |transaction|
-        next unless transaction['kind'] == 'capture'
+        # p transaction['kind']
+        next unless %w(capture sale).include?(transaction['kind'])
 
         case transaction['gateway']
         when 'gift_card'
@@ -56,6 +57,16 @@ namespace :daily_sales_receipts do
           paypal_payments += transaction['amount'].to_f
         when 'shopify_payments'
           shopify_payments += transaction['amount'].to_f
+        else
+          puts
+          puts
+          puts
+          "*******" * 100
+          puts transaction['gateway']
+          "*******" * 100
+          puts
+          puts
+          puts
         end
       end
     end
@@ -95,7 +106,7 @@ namespace :daily_sales_receipts do
       end
 
       refund['transactions'].each do |transaction|
-        next unless transaction['kind'] == 'refund' # transaction['status'] == 'success'
+        next unless transaction['kind'] == 'refund' # transaction['status'] == 'success' / what about void?
 
         transaction_location_id = transaction['location_id']
 
@@ -115,6 +126,16 @@ namespace :daily_sales_receipts do
           refunded_amounts[:total][:shopify_payments] += transaction['amount'].to_f
           refunded_amounts[transaction_location_id][:total_payments] += transaction['amount'].to_f
           refunded_amounts[:total][:total_payments] += transaction['amount'].to_f
+        else
+          puts
+          puts
+          puts
+          "*******" * 100
+          puts transaction['gateway']
+          "*******" * 100
+          puts
+          puts
+          puts
         end
       end
     end
