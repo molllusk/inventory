@@ -23,11 +23,11 @@ namespace :daily_sales_receipts do
     subtotal_price = 0.0
     total_tax = 0.0
     line_item_discounts = 0.0
-    transactions = Hash.new { |hash, key| hash[key] = {"sale" => 0, "refund" => 0, "authorization" => 0, "capture" => 0} }
-    types = []
-    gateways = []
+    # transactions = Hash.new { |hash, key| hash[key] = {"sale" => 0, "refund" => 0, "authorization" => 0, "capture" => 0} }
+    # types = []
+    # gateways = []
 
-    p orders.map { |order| "##{order['order_number']}" }
+    # p orders.map { |order| "##{order['order_number']}" }
 
     refunds = []
     variant_ids = []
@@ -41,7 +41,7 @@ namespace :daily_sales_receipts do
         # p line_item['fulfillment_status']
         variant_ids << line_item['variant_id']
 
-        line_item_discounts += line_item['total_discount'].to_f
+        # line_item_discounts += line_item['total_discount'].to_f
         # p line_item.as_json
         if line_item['gift_card'] || line_item['product_id'] == 1045344714837 # mollusk money
           gift_card_sales += line_item['price'].to_f
@@ -60,9 +60,9 @@ namespace :daily_sales_receipts do
       end
 
       ShopifyClient.transactions(order['id']).each do |transaction|
-        types << transaction['kind']
-        gateways << transaction['gateway']
-        transactions[transaction['gateway']][transaction['kind']] += transaction['amount'].to_f
+        # types << transaction['kind']
+        # gateways << transaction['gateway']
+        # transactions[transaction['gateway']][transaction['kind']] += transaction['amount'].to_f
 
         next unless %w(capture sale).include?(transaction['kind']) && transaction['status'] == 'success'
 
@@ -73,16 +73,6 @@ namespace :daily_sales_receipts do
           paypal_payments += transaction['amount'].to_f
         when 'shopify_payments'
           shopify_payments += transaction['amount'].to_f
-        else
-          puts
-          puts
-          puts
-          "*******" * 100
-          puts transaction['gateway']
-          "*******" * 100
-          puts
-          puts
-          puts
         end
       end
     end
@@ -142,29 +132,19 @@ namespace :daily_sales_receipts do
           refunded_amounts[:total][:shopify_payments] += transaction['amount'].to_f
           refunded_amounts[transaction_location_id][:total_payments] += transaction['amount'].to_f
           refunded_amounts[:total][:total_payments] += transaction['amount'].to_f
-        else
-          puts
-          puts
-          puts
-          "*******" * 100
-          puts transaction['gateway']
-          "*******" * 100
-          puts
-          puts
-          puts
         end
       end
     end
 
     refunded_shipping = refunded_amounts[:total][:total_payments] - refunded_amounts[:total][:sub_total] - refunded_amounts[:total][:tax]
 
-    p refunded_amounts
+    # p refunded_amounts
 
-    p line_item_discounts
+    # p line_item_discounts
 
-    p transactions
-    p types.uniq
-    p gateways.uniq
+    # p transactions
+    # p types.uniq
+    # p gateways.uniq
 
     ShopifySalesReceipt.create(
         date: 2.days.ago.beginning_of_day,
