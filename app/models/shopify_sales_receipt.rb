@@ -15,6 +15,10 @@ class ShopifySalesReceipt < ApplicationRecord
       raise(ArgumentError, "Invalid sort option: #{ sort_option.inspect }")
     end
   }
+
+  def sum_check
+    product_sales + gift_card_sales + sales_tax + shipping - discount - shopify_payments - paypal_payments - gift_card_payments
+  end
 end
 
 # == Schema Information

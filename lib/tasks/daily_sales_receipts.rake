@@ -20,14 +20,19 @@ namespace :daily_sales_receipts do
     shopify_payments = 0.0
     paypal_payments = 0.0
     gift_card_payments = 0.0
+    subtotal_price = 0.0
+    total_tax = 0.0
 
     refunds = []
     variant_ids = []
     orders.each do |order|
+      subtotal_price += order['subtotal_price'].to_f
+      p total_tax += order['total_tax'].to_f
       discount += order['total_discounts'].to_f
       sales_tax += order['tax_lines'].reduce(0) { |sum, tax_line| sum + tax_line['price'].to_f }
       # p order['line_items'].map { |o| { order: order['id'], amount: o['price'].to_f }}
       order['line_items'].each do |line_item|
+        # p line_item['fulfillment_status']
         variant_ids << line_item['variant_id']
         # p line_item.as_json
         if line_item['gift_card'] || line_item['product_id'] == 1045344714837 # mollusk money
