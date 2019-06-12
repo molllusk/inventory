@@ -49,7 +49,7 @@ namespace :daily_sales_receipts do
         order_refunds.each { |refund| refunds << refund }
       end
 
-      sleep(1)
+      sleep(0.5)
 
       transactions = ShopifyClient.transactions(order['id'])
 
