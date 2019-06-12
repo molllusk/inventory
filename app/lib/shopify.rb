@@ -203,7 +203,7 @@ class ShopifyClient
   end
 
   def self.yesterdays_closed_order_count(store = :RETAIL)
-    day = 4.days.ago
+    day = 1.days.ago
 
     min_date = day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
     min_date -= min_date.utc_offset
@@ -222,7 +222,7 @@ class ShopifyClient
 
     pages = (yesterdays_closed_order_count / 250.0).ceil
 
-    day = 4.days.ago
+    day = 1.days.ago
 
     min_date =  day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
     min_date -= min_date.utc_offset
@@ -247,7 +247,7 @@ class ShopifyClient
   def self.orders_closed_yesterday(store = :RETAIL)
     orders = yesterdays_closed_orders(store)
 
-    day = 4.days.ago
+    day = 1.days.ago
     min_date =  day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day #Date.yesterday.beginning_of_day.to_time.in_time_zone('Pacific Time (US & Canada)')
     min_date -= min_date.utc_offset
 
