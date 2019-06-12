@@ -259,16 +259,16 @@ class ShopifyClient
 
   def self.transactions(order_id, store = :RETAIL)
     response = connection(store).get "#{API_VERSION}/orders/#{order_id}/transactions.json"
-    response.body['transactions']
+    response.body['transactions'] || []
   end
 
   def self.fulfillments(order_id, store = :RETAIL)
     response = connection(store).get "#{API_VERSION}/orders/#{order_id}/fulfillments.json"
-    response.body['fulfillments']
+    response.body['fulfillments'] || []
   end
 
   def self.refunds(order_id, store = :RETAIL)
     response = connection(store).get "#{API_VERSION}/orders/#{order_id}/refunds.json"
-    response.body['refunds']
+    response.body['refunds'] || []
   end
 end
