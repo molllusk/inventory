@@ -5,7 +5,7 @@ namespace :daily_sales_receipts do
 
     orders = ShopifyClient.orders_closed_yesterday
 
-    day = 2.days.ago
+    day = 3.days.ago
     min_date =  day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day #Date.yesterday.beginning_of_day.to_time.in_time_zone('Pacific Time (US & Canada)')
     min_date -= min_date.utc_offset
 
@@ -167,7 +167,7 @@ namespace :daily_sales_receipts do
     p gateways.uniq
 
     ShopifySalesReceipt.create(
-        date: 2.days.ago.beginning_of_day,
+        date: 3.days.ago.beginning_of_day,
         product_sales: product_sales,
         discount: discount,
         gift_card_sales: gift_card_sales,
