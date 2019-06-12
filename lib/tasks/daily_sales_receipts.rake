@@ -5,7 +5,7 @@ namespace :daily_sales_receipts do
 
     orders = ShopifyClient.orders_closed_yesterday
 
-    day = 1.days.ago
+    day = 2.days.ago
     min_date =  day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day #Date.yesterday.beginning_of_day.to_time.in_time_zone('Pacific Time (US & Canada)')
     min_date -= min_date.utc_offset
 
@@ -22,18 +22,26 @@ namespace :daily_sales_receipts do
     gift_card_payments = 0.0
     subtotal_price = 0.0
     total_tax = 0.0
+    line_item_discounts = 0.0
+    transactions = Hash.new { |hash, key| hash[key] = {"sale" => 0, "refund" => 0, "authorization" => 0, "capture" => 0} }
+    types = []
+    gateways = []
+
+    p orders.map { |order| "##{order['order_number']}" }
 
     refunds = []
     variant_ids = []
     orders.each do |order|
       subtotal_price += order['subtotal_price'].to_f
-      p total_tax += order['total_tax'].to_f
+      total_tax += order['total_tax'].to_f
       discount += order['total_discounts'].to_f
       sales_tax += order['tax_lines'].reduce(0) { |sum, tax_line| sum + tax_line['price'].to_f }
       # p order['line_items'].map { |o| { order: order['id'], amount: o['price'].to_f }}
       order['line_items'].each do |line_item|
         # p line_item['fulfillment_status']
         variant_ids << line_item['variant_id']
+
+        line_item_discounts += line_item['total_discount'].to_f
         # p line_item.as_json
         if line_item['gift_card'] || line_item['product_id'] == 1045344714837 # mollusk money
           gift_card_sales += line_item['price'].to_f
@@ -52,8 +60,11 @@ namespace :daily_sales_receipts do
       end
 
       ShopifyClient.transactions(order['id']).each do |transaction|
-        # p transaction['kind']
-        next unless %w(capture sale).include?(transaction['kind'])
+        types << transaction['kind']
+        gateways << transaction['gateway']
+        transactions[transaction['gateway']][transaction['kind']] += transaction['amount'].to_f
+
+        next unless %w(capture sale).include?(transaction['kind']) && transaction['status'] == 'success'
 
         case transaction['gateway']
         when 'gift_card'
@@ -149,8 +160,14 @@ namespace :daily_sales_receipts do
 
     p refunded_amounts
 
+    p line_item_discounts
+
+    p transactions
+    p types.uniq
+    p gateways.uniq
+
     ShopifySalesReceipt.create(
-        date: 1.days.ago.beginning_of_day,
+        date: 2.days.ago.beginning_of_day,
         product_sales: product_sales,
         discount: discount,
         gift_card_sales: gift_card_sales,
