@@ -22,34 +22,24 @@ namespace :daily_sales_receipts do
     gift_card_payments = 0.0
     subtotal_price = 0.0
     total_tax = 0.0
-    line_item_discounts = 0.0
-    # transactions = Hash.new { |hash, key| hash[key] = {"sale" => 0, "refund" => 0, "authorization" => 0, "capture" => 0} }
-    # types = []
-    # gateways = []
-
-    # p orders.map { |order| "##{order['order_number']}" }
 
     refunds = []
     variant_ids = []
+
     orders.each do |order|
       subtotal_price += order['subtotal_price'].to_f
       total_tax += order['total_tax'].to_f
       discount += order['total_discounts'].to_f
       sales_tax += order['tax_lines'].reduce(0) { |sum, tax_line| sum + tax_line['price'].to_f }
-      # p order['line_items'].map { |o| { order: order['id'], amount: o['price'].to_f }}
+
       order['line_items'].each do |line_item|
-        # p line_item['fulfillment_status']
         variant_ids << line_item['variant_id']
 
-        # line_item_discounts += line_item['total_discount'].to_f
-        # p line_item.as_json
         if line_item['gift_card'] || line_item['product_id'] == 1045344714837 # mollusk money
           gift_card_sales += line_item['price'].to_f
         else
           product_sales += line_item['price'].to_f
         end
-
-        # discount += line_item['total_discount'].to_f
       end
 
       shipping += order['shipping_lines'].reduce(0) { |sum, shipping_line| sum + shipping_line['price'].to_f }
@@ -59,11 +49,11 @@ namespace :daily_sales_receipts do
         order_refunds.each { |refund| refunds << refund }
       end
 
-      ShopifyClient.transactions(order['id']).each do |transaction|
-        # types << transaction['kind']
-        # gateways << transaction['gateway']
-        # transactions[transaction['gateway']][transaction['kind']] += transaction['amount'].to_f
+      sleep(1)
 
+      transactions = ShopifyClient.transactions(order['id'])
+
+      transactions.each do |transaction|
         next unless %w(capture sale).include?(transaction['kind']) && transaction['status'] == 'success'
 
         case transaction['gateway']
@@ -93,8 +83,6 @@ namespace :daily_sales_receipts do
 
     sum_costs = inventory_items.reduce(0) { |sum, inventory_item| sum + inventory_item['cost'].to_f }
 
-    p sum_costs
-
     refunded_amounts = Hash.new { |hash, key| hash[key] = { sub_total: 0, tax: 0, shipping: 0, discount: 0, shopify_payments: 0, paypal_payments: 0, gift_card_payments: 0, total_payments: 0 } }
 
     refunds.each do |refund|
@@ -112,7 +100,7 @@ namespace :daily_sales_receipts do
       end
 
       refund['transactions'].each do |transaction|
-        next unless transaction['kind'] == 'refund' # transaction['status'] == 'success' / what about void?
+        next unless transaction['kind'] == 'refund' && transaction['status'] == 'success'
 
         transaction_location_id = transaction['location_id']
 
@@ -137,14 +125,6 @@ namespace :daily_sales_receipts do
     end
 
     refunded_shipping = refunded_amounts[:total][:total_payments] - refunded_amounts[:total][:sub_total] - refunded_amounts[:total][:tax]
-
-    # p refunded_amounts
-
-    # p line_item_discounts
-
-    # p transactions
-    # p types.uniq
-    # p gateways.uniq
 
     ShopifySalesReceipt.create(
         date: 2.days.ago.beginning_of_day,
