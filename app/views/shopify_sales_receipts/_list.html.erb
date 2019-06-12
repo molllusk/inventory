@@ -29,7 +29,7 @@
         <td><%= number_to_currency(receipt.paypal_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
         <td><%= number_to_currency(receipt.gift_card_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
         <td>
-          <% if receipt.sum_check == 0.0 %>
+          <% if receipt.sum_check.to_d.truncate(2).to_f == 0.0 %>
             <p style='color: green'><i class="fa fa-check"></i></p>
           <% elsif receipt.sum_check > 0 %>
             <p style='color: red'><%= number_to_currency(receipt.sum_check, :unit => "$", :separator => ".", :delimiter => ",") %></p>
