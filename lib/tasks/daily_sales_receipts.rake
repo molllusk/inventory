@@ -46,6 +46,7 @@ namespace :daily_sales_receipts do
 
       if %w(refunded partially_refunded).include?(order['financial_status'])
         order_refunds = ShopifyClient.refunds(order['id'])
+        p order['order_name'] if order_refunds.present?
         order_refunds.each { |refund| refunds << refund }
       end
 

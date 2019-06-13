@@ -1,9 +1,10 @@
+<h2>QBO Authentication</h2>
 <!-- somewhere in your document include the Javascript -->
 <script type="text/javascript" src="https://appcenter.intuit.com/Content/IA/intuit.ipp.anywhere.js"></script>
 
 <!-- configure the Intuit object: 'grantUrl' is a URL in your application which kicks off the flow, see below -->
 <script>
-intuit.ipp.anywhere.setup({menuProxy: '/path/to/blue-dot', grantUrl: 'admin/quickbooks/authenticate'});
+intuit.ipp.anywhere.setup({menuProxy: '/path/to/blue-dot', grantUrl: '/quickbooks/authenticate'});
 </script>
 
 <!-- this will display a button that the user clicks to start the flow -->
