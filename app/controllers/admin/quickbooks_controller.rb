@@ -12,7 +12,7 @@ module Admin
       token = at.token
       secret = at.secret
       realm_id = params['realmId']
-      # store the token, secret & RealmID somewhere for this user, you will need all 3 to work with Quickbooks-Ruby
+      QboToken.create(token: token, secret: secret, realm_id: realm_id)
     end
   end
 end
