@@ -7,3 +7,5 @@ OAUTH_CONSUMER_SECRET = ENV['QBO_OAUTH_CONSUMER_SECRET']
     :authorize_url        => "https://appcenter.intuit.com/Connect/Begin",
     :access_token_path    => "/oauth/v1/get_access_token"
 })
+
+Quickbooks.sandbox_mode = true

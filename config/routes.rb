@@ -16,7 +16,7 @@ Rails.application.routes.draw do
   end
 
   namespace :callbacks do
-    get '/quickbooks/authenticate', to: 'callbacks_quickbooks#authenticate'
-    get '/quickbooks/oauth_callback', to: 'callbacks_quickbooks#oauth_callback'
+    get '/quickbooks/authenticate', to: 'quickbooks#authenticate'
+    get '/quickbooks/oauth_callback', to: 'quickbooks#oauth_callback'
   end
 end
