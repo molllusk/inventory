@@ -31,7 +31,7 @@ namespace :daily_sales_receipts do
     refunds = []
     refund_order_names = []
     order_names = []
-    # variant_ids = []
+    variant_ids = []
 
     orders.each do |order|
       if %w(refunded partially_refunded).include?(order['financial_status'])
@@ -53,12 +53,12 @@ namespace :daily_sales_receipts do
       sales_tax += order['tax_lines'].reduce(0) { |sum, tax_line| sum + tax_line['price'].to_f }
 
       order['line_items'].each do |line_item|
-        # variant_ids << line_item['variant_id']
+        variant_ids << line_item['variant_id']
 
         if line_item['gift_card'] || line_item['product_id'] == 1045344714837 # mollusk money
-          gift_card_sales += line_item['price'].to_f
+          gift_card_sales += line_item['price'].to_f * line_item['quantity'].to_f
         else
-          product_sales += line_item['price'].to_f
+          product_sales += line_item['price'].to_f * line_item['quantity'].to_f
         end
       end
 
@@ -82,13 +82,37 @@ namespace :daily_sales_receipts do
       end
     end
 
-    # variant_ids = variant_ids.compact
+    # variant_ids.compact!
 
-    # inventory_item_ids = []
+    # # inventory_item_ids = []
+    # missing_sd = []
+    # missing_barcode = []
 
-    # variant_ids.each do |variant_id|
-    #   sleep(0.5)
-    #   variant = ShopifyClient.get_variant(variant_id)
+    # barcodes = variant_ids.map do |variant_id|
+    #   sd = ShopifyDatum.find_by(variant_id: variant_id)
+    #   missing_sd << variant_id if sd.blank?
+    #   barcode = sd&.barcode
+    #   missing_barcode << variant_id if barcode.blank?
+    #   barcode
+    # end.compact
+
+    # puts "shit " * 100 if barcodes.length != variant_ids.length
+    # p missing_sd
+    # p missing_barcode
+    # # [22616747901013]
+
+    # missing_vends = []
+
+    # vend_products = barcodes.map do |barcode|
+    #   vd = VendDatum.find_by(sku: barcode)
+    #   missing_vends << barcode if vd.blank?
+    #   vd
+    # end.compact
+
+    # puts "fuck " * 100 if barcodes.length != vend_products.length
+    # p missing_vends
+    #
+
     #   inventory_item_ids << variant['inventory_item_id'] unless variant.blank?
     # end
 
@@ -98,14 +122,14 @@ namespace :daily_sales_receipts do
 
     # sum_costs = inventory_items.reduce(0) { |sum, inventory_item| sum + inventory_item['cost'].to_f }
 
-    p order_names
-    p refund_order_names
+    # p order_names
+    # p refund_order_names
 
     refunded_amounts = Hash.new { |hash, key| hash[key] = { sub_total: 0, tax: 0, shipping: 0, discount: 0, shopify_payments: 0, paypal_payments: 0, gift_card_payments: 0, total_payments: 0 } }
 
     refunds.each do |refund|
       refund['refund_line_items'].each do |line_item|
-        p line_item['location_id']
+        # p line_item['location_id']
         refunded_amounts[line_item['location_id']][:sub_total] += line_item['subtotal'].to_f
         refunded_amounts[line_item['location_id']][:tax] += line_item['total_tax'].to_f # or do we want tax lines total
         refunded_amounts[line_item['location_id']][:discount] += line_item['total_discount'].to_f # or do we want some allocated/set amount
@@ -134,7 +158,7 @@ namespace :daily_sales_receipts do
 
     refunded_shipping = refunded_amounts[:total][:total_payments] - refunded_amounts[:total][:sub_total] - refunded_amounts[:total][:tax]
 
-    p refunded_amounts
+    # p refunded_amounts
 
     ShopifySalesReceipt.create(
         date: day.beginning_of_day,

@@ -13,7 +13,10 @@ Rails.application.routes.draw do
 
   namespace :admin do
     root to: '#index'
-    get '/quickbooks/authenticate', to: 'admin_quickbooks#authenticate'
-    get '/quickbooks/oauth_callback', to: 'admin_quickbooks#oauth_callback'
+  end
+
+  namespace :callbacks do
+    get '/quickbooks/authenticate', to: 'callbacks_quickbooks#authenticate'
+    get '/quickbooks/oauth_callback', to: 'callbacks_quickbooks#oauth_callback'
   end
 end

@@ -1,4 +1,4 @@
-module Admin
+module Callbacks
   class QuickbooksController < Admin::Controller
     def authenticate
       callback = 'https://mollusk.herokuapp.com/admin/quickbooks/oauth_callback'
