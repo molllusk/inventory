@@ -202,7 +202,7 @@ class ShopifyClient
     attributes
   end
 
-  def self.closed_order_since_count(day, store = :RETAIL)
+  def self.closed_orders_since_count(day, store = :RETAIL)
     min_date = day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
     min_date -= min_date.utc_offset
 
@@ -218,7 +218,7 @@ class ShopifyClient
   def self.closed_orders_since(day, store = :RETAIL)
     orders = []
 
-    pages = (closed_order_since_count(day, store) / 250.0).ceil
+    pages = (closed_orders_since_count(day, store) / 250.0).ceil
 
     min_date =  day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
     min_date -= min_date.utc_offset
@@ -240,19 +240,6 @@ class ShopifyClient
     end
     orders
   end
-
-  # def self.orders_closed_yesterday(store = :RETAIL)
-  #   orders = yesterdays_closed_orders(store)
-
-  #   day = 3.days.ago
-  #   min_date =  day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day #Date.yesterday.beginning_of_day.to_time.in_time_zone('Pacific Time (US & Canada)')
-  #   min_date -= min_date.utc_offset
-
-  #   max_date = day.to_time.in_time_zone('Pacific Time (US & Canada)').end_of_day #Date.yesterday.end_of_day.to_time.in_time_zone('Pacific Time (US & Canada)')
-  #   max_date -= max_date.utc_offset
-
-  #   orders.select { |order| min_date <= Time.parse(order['closed_at']) && Time.parse(order['closed_at']) <= max_date }
-  # end
 
   def self.transactions(order_id, store = :RETAIL)
     response = connection(store).get "#{API_VERSION}/orders/#{order_id}/transactions.json"
