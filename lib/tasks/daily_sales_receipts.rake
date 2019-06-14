@@ -4,10 +4,9 @@ namespace :daily_sales_receipts do
     require File.join(Rails.root, 'app', 'lib', 'shopify.rb')
 
     days_ago = args[:days_ago].blank? ? 1 : args[:days_ago].to_i
-
-    puts "Getting orders from #{days_ago} day(s) ago..."
-
     day = days_ago.days.ago
+
+    puts "Getting orders from #{days_ago} day(s) ago #{day.strftime("%m/%d/%Y")}..."
 
     min_date = day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
     min_date -= min_date.utc_offset
@@ -35,8 +34,6 @@ namespace :daily_sales_receipts do
 
     orders.each do |order|
       if %w(refunded partially_refunded).include?(order['financial_status'])
-        sleep(0.5)
-
         ShopifyClient.refunds(order['id']).each do |refund|
           next if Time.parse(refund['created_at']) < min_date || Time.parse(refund['created_at']) > max_date
           refund_order_names << order['name']    
@@ -63,8 +60,6 @@ namespace :daily_sales_receipts do
       end
 
       shipping += order['shipping_lines'].reduce(0) { |sum, shipping_line| sum + shipping_line['price'].to_f }
-
-      sleep(0.5)
 
       transactions = ShopifyClient.transactions(order['id'])
 
@@ -128,15 +123,21 @@ namespace :daily_sales_receipts do
     refunded_amounts = Hash.new { |hash, key| hash[key] = { sub_total: 0, tax: 0, shipping: 0, discount: 0, shopify_payments: 0, paypal_payments: 0, gift_card_payments: 0, total_payments: 0 } }
 
     refunds.each do |refund|
+      fulfillments = ShopifyClient.fulfillments(refund['order_id'])
+
       refund['refund_line_items'].each do |line_item|
-        # p line_item['location_id']
-        refunded_amounts[line_item['location_id']][:sub_total] += line_item['subtotal'].to_f
-        refunded_amounts[line_item['location_id']][:tax] += line_item['total_tax'].to_f # or do we want tax lines total
-        refunded_amounts[line_item['location_id']][:discount] += line_item['total_discount'].to_f # or do we want some allocated/set amount
+        fulfillment = fulfillments.detect { |fulfillment| fulfillment['variant_id'] == line_item['variant_id'] }
+        location_id = fulfillment['location_id'] || 'no_location'
+
+        refund_discounts = line_item['line_item']['discount_allocations'].reduce(0) { |sum, discount_allocation| sum + discount_allocation['amount'].to_f }
+
+        refunded_amounts[location_id][:sub_total] += line_item['subtotal'].to_f
+        refunded_amounts[location_id][:tax] += line_item['total_tax'].to_f # or do we want tax lines total
+        refunded_amounts[location_id][:discount] += refund_discounts
 
         refunded_amounts[:total][:sub_total] += line_item['subtotal'].to_f
         refunded_amounts[:total][:tax] += line_item['total_tax'].to_f
-        refunded_amounts[:total][:discount] += line_item['total_discount'].to_f
+        refunded_amounts[:total][:discount] += refund_discounts
       end
 
       refund['transactions'].each do |transaction|

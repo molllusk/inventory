@@ -30,6 +30,7 @@ class ShopifyClient
   ]
 
   def self.connection(store = :RETAIL)
+    sleep(0.5)
     Faraday.new(url: const_get("#{store.to_s.upcase}_BASE_URL")) do |faraday|
       faraday.response :json
       faraday.adapter Faraday.default_adapter
@@ -234,7 +235,6 @@ class ShopifyClient
         updated_at_min: min_date
       }
 
-      sleep(0.5)
       response = connection(store).get "#{API_VERSION}/orders.json", params
       orders += response.body['orders']
     end
