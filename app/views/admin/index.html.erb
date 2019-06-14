@@ -4,7 +4,9 @@
 
 <!-- configure the Intuit object: 'grantUrl' is a URL in your application which kicks off the flow, see below -->
 <script>
-intuit.ipp.anywhere.setup({menuProxy: '/path/to/blue-dot', grantUrl: 'callbacks/quickbooks/authenticate'});
+window.onload = function () {
+  intuit.ipp.anywhere.setup({menuProxy: '/path/to/blue-dot', grantUrl: '/callbacks/quickbooks/authenticate'});
+}
 </script>
 
 <!-- this will display a button that the user clicks to start the flow -->
