@@ -5,7 +5,7 @@
 <!-- configure the Intuit object: 'grantUrl' is a URL in your application which kicks off the flow, see below -->
 <script>
 window.onload = function () {
-  intuit.ipp.anywhere.setup({menuProxy: '/path/to/blue-dot', grantUrl: '/callbacks/quickbooks/authenticate'});
+  intuit.ipp.anywhere.setup({menuProxy: '/path/to/blue-dot', grantUrl: 'https://mollusk.herokuapp.com/callbacks/quickbooks/authenticate'});
 }
 </script>
 
