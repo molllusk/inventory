@@ -26,12 +26,13 @@ namespace :daily_sales_receipts do
     gift_card_payments = 0.0
     subtotal_price = 0.0
     total_tax = 0.0
+    sales_costs = 0.0
 
     refunds = []
     refund_order_names = []
     order_names = []
 
-    costs_report = Hash.new(0)
+    location_sales_costs = Hash.new(0)
 
     orders.each do |order|
       if %w(refunded partially_refunded).include?(order['financial_status'])
@@ -61,8 +62,8 @@ namespace :daily_sales_receipts do
 
         if shopify_product.present?
           cost = shopify_product.get_cost_from_vend * line_item['quantity'].to_f
-          costs_report[:total] += cost
-          costs_report[location_id] += cost
+          sales_costs += cost
+          location_sales_costs[location_id] += cost
         else
           Airbrake.notify("Item sold but missing from app as shopify product by variant id: { variant_id: #{variant_id}, product_id: #{line_item['product_id']} }")
         end
@@ -116,8 +117,8 @@ namespace :daily_sales_receipts do
         refund_discounts = line_item['line_item']['discount_allocations'].reduce(0) { |sum, discount_allocation| sum + discount_allocation['amount'].to_f }
         sub_total = line_item['line_item']['price'].to_f * line_item['quantity'].to_f
 
-        refunded_amounts[:sub_total] += sub_total
-        refunded_amounts[:tax] += line_item['total_tax'].to_f # or do we want tax lines total
+        refunded_amounts[:product_sales] += sub_total
+        refunded_amounts[:sales_tax] += line_item['total_tax'].to_f # or do we want tax lines total
         refunded_amounts[:discount] += refund_discounts
       end
 
@@ -126,10 +127,10 @@ namespace :daily_sales_receipts do
 
         case transaction['gateway']
         when 'gift_card'
-          refunded_amounts[:gift_card] += transaction['amount'].to_f
+          refunded_amounts[:gift_card_payments] += transaction['amount'].to_f
           refunded_amounts[:total_payments] += transaction['amount'].to_f
         when 'paypal'
-          refunded_amounts[:paypal] += transaction['amount'].to_f
+          refunded_amounts[:paypal_payments] += transaction['amount'].to_f
           refunded_amounts[:total_payments] += transaction['amount'].to_f
         when 'shopify_payments'
           refunded_amounts[:shopify_payments] += transaction['amount'].to_f
@@ -138,10 +139,14 @@ namespace :daily_sales_receipts do
       end
     end
 
-    refunded_amounts[:shipping] = refunded_amounts[:sub_total] + refunded_amounts[:tax] - refunded_amounts[:discount] - refunded_amounts[:total_payments]
+    refunded_amounts[:shipping] = refunded_amounts[:product_sales] + refunded_amounts[:sales_tax] - refunded_amounts[:discount] - refunded_amounts[:total_payments]
+    refunded_amounts[:location_costs] = refund_costs_by_location
+    refunded_amounts[:date] = day.beginning_of_day
+    
+    costs_report = { cost: sales_costs, location_costs: location_sales_costs, date: day.beginning_of_day} 
 
-    # p order_names
-    # p refund_order_names
+    ShopifySalesCost.create(costs_report)
+    ShopifyRefund.create(refunded_amounts)
 
     # puts "costs report"
     # p costs_report
@@ -149,11 +154,8 @@ namespace :daily_sales_receipts do
     # puts "Refunded Amounts"
     # p refunded_amounts
 
-    # puts "Refund Costs by Location"
-    # p refund_costs_by_location
-
-    # puts "refunded shipping"
-    # p refunded_shipping
+    # p order_names
+    # p refund_order_names
 
     ShopifySalesReceipt.create(
         date: day.beginning_of_day,

@@ -1,5 +1,0 @@
-<%# app/views/students/index.js.erb %>
-<% js = escape_javascript(
-  render(partial: 'list', locals: { shopify_sales_receipts: @shopify_sales_receipts })
-) %>
-$("#filterrific_results").html("<%= js %>");

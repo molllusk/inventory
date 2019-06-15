@@ -8,7 +8,6 @@ Rails.application.routes.draw do
   resources :fluid_inventory_thresholds
   resources :fluid_inventory_updates
   resources :products
-  resources :shopify_sales_receipts
   resources :users
 
   namespace :admin do
@@ -19,4 +18,6 @@ Rails.application.routes.draw do
     get '/quickbooks/authenticate', to: 'quickbooks#authenticate'
     get '/quickbooks/oauth_callback', to: 'quickbooks#oauth_callback'
   end
+
+  get '/daily_reports', to: 'daily_reports#index'
 end
