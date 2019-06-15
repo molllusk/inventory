@@ -1,21 +1,4 @@
 class ShopifySalesReceipt < ApplicationRecord
-  filterrific(
-    default_filter_params: { sorted_by: 'date_desc' },
-    available_filters: [ :sorted_by ]
-  )
-
-  scope :sorted_by, lambda { |sort_option|
-    # extract the sort direction from the param value.
-    direction = (sort_option =~ /desc$/) ? 'desc' : 'asc'
-
-    case sort_option.to_s
-    when /^date_/
-      order("shopify_sales_receipts.date #{ direction }")
-    else
-      raise(ArgumentError, "Invalid sort option: #{ sort_option.inspect }")
-    end
-  }
-
   def sum_check
     product_sales + gift_card_sales + sales_tax + shipping - discount - shopify_payments - paypal_payments - gift_card_payments
   end
