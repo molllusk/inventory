@@ -1,7 +1,7 @@
 module Callbacks
   class QuickbooksController < Admin::Controller
     def authenticate
-      callback = 'https://mollusk.herokuapp.com/admin/quickbooks/oauth_callback'
+      callback = 'https://mollusk.herokuapp.com/callbacks/quickbooks/oauth_callback'
       token = QB_OAUTH_CONSUMER.get_request_token(:oauth_callback => callback)
       session[:qb_request_token] = token
       redirect_to("https://appcenter.intuit.com/Connect/Begin?oauth_token=#{token.token}") and return
