@@ -1,18 +1,21 @@
 module Callbacks
   class QuickbooksController < Admin::Controller
     def authenticate
-      callback = 'https://mollusk.herokuapp.com/callbacks/quickbooks/oauth_callback'
-      token = QB_OAUTH_CONSUMER.get_request_token(:oauth_callback => callback)
-      session[:qb_request_token] = token
-      redirect_to("https://appcenter.intuit.com/Connect/Begin?oauth_token=#{token.token}") and return
+      redirect_uri = 'https://mollusk.herokuapp.com/callbacks/quickbooks/oauth_callback'
+      grant_url = ::QB_OAUTH2_CONSUMER.auth_code.authorize_url(:redirect_uri => redirect_uri, :response_type => "code", :state => SecureRandom.hex(12), :scope => "com.intuit.quickbooks.accounting")
+      redirect_to grant_url
     end
 
     def oauth_callback
-      at = session[:qb_request_token].get_access_token(:oauth_verifier => params[:oauth_verifier])
-      token = at.token
-      secret = at.secret
-      realm_id = params['realmId']
-      QboToken.create(token: token, secret: secret, realm_id: realm_id)
+      if params[:state]
+        redirect_uri = 'https://mollusk.herokuapp.com/admin'
+        if resp = ::QB_OAUTH2_CONSUMER.auth_code.get_token(params[:code], :redirect_uri => redirect_uri)
+
+          # save your tokens here. For example:
+          QboToken.create(token: resp.token, secret: resp.refresh_token, realm_id: params[:realmId])
+          # quickbooks_credentials.update_attributes(access_token: resp.token, refresh_token: resp.refresh_token, realm_id: params[:realmId])
+        end
+      end
     end
   end
 end

@@ -1,11 +1,12 @@
-OAUTH_CONSUMER_KEY = ENV['QBO_OAUTH_CONSUMER_KEY']
-OAUTH_CONSUMER_SECRET = ENV['QBO_OAUTH_CONSUMER_SECRET']
+OAUTH_CONSUMER_KEY = ENV["QBO_OAUTH_CONSUMER_KEY"]
+OAUTH_CONSUMER_SECRET = ENV["QBO_OAUTH_CONSUMER_SECRET"]
 
-::QB_OAUTH_CONSUMER = OAuth::Consumer.new(OAUTH_CONSUMER_KEY, OAUTH_CONSUMER_SECRET, {
-    :site                 => "https://oauth.intuit.com",
-    :request_token_path   => "/oauth/v1/get_request_token",
-    :authorize_url        => "https://appcenter.intuit.com/Connect/Begin",
-    :access_token_path    => "/oauth/v1/get_access_token"
-})
+oauth_params = {
+  :site => "https://appcenter.intuit.com/connect/oauth2",
+  :authorize_url => "https://appcenter.intuit.com/connect/oauth2",
+  :token_url => "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer"
+}
+
+::QB_OAUTH2_CONSUMER = OAuth2::Client.new(OAUTH_CONSUMER_KEY, OAUTH_CONSUMER_SECRET, oauth_params)
 
 Quickbooks.sandbox_mode = true
