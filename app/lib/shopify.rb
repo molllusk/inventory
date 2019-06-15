@@ -209,7 +209,7 @@ class ShopifyClient
 
     count_params = {
       status: 'closed',
-      created_at_min: min_date,
+      updated_at_min: min_date,
     }
 
     count_response = connection(store).get "#{API_VERSION}/orders/count.json", count_params
@@ -223,9 +223,6 @@ class ShopifyClient
 
     min_date =  day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
     min_date -= min_date.utc_offset
-
-    max_date = day.to_time.in_time_zone('Pacific Time (US & Canada)').end_of_day
-    max_date -= max_date.utc_offset
 
     pages.times do |page|
       params = {
