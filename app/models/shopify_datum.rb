@@ -36,6 +36,16 @@ class ShopifyDatum < ApplicationRecord
   def third_party_or_sale?
     tags.detect { |tag| %w[3rdparty sale].include?(tag.strip.downcase) }.present?
   end
+
+  def get_cost_from_vend
+    vend_product = product.vend_datum
+    if vend_product.present?
+      vend_product.supply_price.to_f
+    else
+      Airbrake.notify("Item in shopify order but missing from app as vend product via barcode: { barcode: #{barcode}, product_id: #{shopify_product_id}, variant_id: #{variant_id} }")
+      0.0
+    end
+  end
 end
 
 # == Schema Information

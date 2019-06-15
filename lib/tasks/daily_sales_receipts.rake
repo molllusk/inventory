@@ -26,12 +26,12 @@ namespace :daily_sales_receipts do
     gift_card_payments = 0.0
     subtotal_price = 0.0
     total_tax = 0.0
-    products = {}
 
     refunds = []
     refund_order_names = []
     order_names = []
-    variant_ids = []
+
+    costs_report = Hash.new(0)
 
     orders.each do |order|
       if %w(refunded partially_refunded).include?(order['financial_status'])
@@ -50,9 +50,22 @@ namespace :daily_sales_receipts do
       discount += order['total_discounts'].to_f
       sales_tax += order['tax_lines'].reduce(0) { |sum, tax_line| sum + tax_line['price'].to_f }
 
+      fulfillments = ShopifyClient.fulfillments(order['id'])
+
       order['line_items'].each do |line_item|
-        variant_ids << line_item['variant_id']
-        products[line_item['variant_id']] = line_item['product_id']
+        variant_id = line_item['variant_id']
+        fulfillment = fulfillments.detect { |fulfillment| fulfillment['line_items'].detect { |fulfillment_line_item| fulfillment_line_item['variant_id'] == variant_id } }
+        location_id = fulfillment.present? && fulfillment['location_id'].present? ? fulfillment['location_id'] : 'no_location'
+
+        shopify_product = ShopifyDatum.find_by(variant_id: variant_id)
+
+        if shopify_product.present?
+          cost = shopify_product.get_cost_from_vend * line_item['quantity'].to_f
+          costs_report[:total] += cost
+          costs_report[location_id] += cost
+        else
+          puts "Item sold in Shopify Order but missing from app as shopify product by variant id. In test, these were LA boards: { variant_id: #{variant_id}, product_id: #{line_item['product_id']} }"
+        end
 
         if line_item['gift_card'] || line_item['product_id'] == 1045344714837 # mollusk money
           gift_card_sales += line_item['price'].to_f * line_item['quantity'].to_f
@@ -79,61 +92,26 @@ namespace :daily_sales_receipts do
       end
     end
 
-    variant_ids.compact!
-
-    # inventory_item_ids = []
-    missing_sd = []
-    missing_barcode = []
-
-    barcodes = variant_ids.map do |variant_id|
-      sd = ShopifyDatum.find_by(variant_id: variant_id)
-      missing_sd << variant_id if sd.blank?
-      barcode = sd&.barcode
-      missing_barcode << variant_id if barcode.blank?
-      barcode
-    end.compact
-
-    puts "shit " * 100 if barcodes.length != variant_ids.length
-    puts "Missing Shopify Datum Variant Ids"
-    p missing_sd
-    p missing_sd.map { |s| products[s] }
-    puts "Missing Barcode on Shopify Datum Variant Ids"
-    p missing_barcode
-
-    missing_vends = []
-
-    vend_products = barcodes.map do |barcode|
-      vd = VendDatum.find_by(sku: barcode)
-      missing_vends << barcode if vd.blank?
-      vd
-    end.compact
-
-    puts "fuck " * 100 if barcodes.length != vend_products.length
-    puts "Missing vend for shopify Barcodes:"
-    p missing_vends
-
-    # ShopifyInventory::locations.key(location_id)
-
-    # inventory_item_ids << variant['inventory_item_id'] unless variant.blank?
-    # end
-
-    # inventory_item_ids = inventory_item_ids.compact
-
-    # inventory_items = ShopifyClient.get_inventory_items(inventory_item_ids)
-
-    # sum_costs = inventory_items.reduce(0) { |sum, inventory_item| sum + inventory_item['cost'].to_f }
-
-    # p order_names
-    # p refund_order_names
-
-    refunded_amounts = Hash.new { |hash, key| hash[key] = { sub_total: 0, tax: 0, shipping: 0, discount: 0, shopify_payments: 0, paypal_payments: 0, gift_card_payments: 0, total_payments: 0 } }
+    refunded_amounts = Hash.new { |hash, key| hash[key] = { sub_total: 0, tax: 0, shipping: 0, discount: 0, cost: 0 } }
+    refunded_payments = Hash.new(0)
 
     refunds.each do |refund|
       fulfillments = ShopifyClient.fulfillments(refund['order_id'])
 
       refund['refund_line_items'].each do |line_item|
-        fulfillment = fulfillments.detect { |fulfillment| fulfillment['variant_id'] == line_item['variant_id'] }
-        location_id = fulfillment['location_id'] || 'no_location'
+        variant_id = line_item['line_item']['variant_id']
+        fulfillment = fulfillments.detect { |fulfillment| fulfillment['line_items'].detect { |fulfillment_line_item| fulfillment_line_item['variant_id'] == variant_id } }
+        location_id = fulfillment.present? && fulfillment['location_id'].present? ? fulfillment['location_id'] : 'no_location'
+
+        shopify_product = ShopifyDatum.find_by(variant_id: variant_id)
+
+        if shopify_product.present?
+          refund_cost = shopify_product.get_cost_from_vend * line_item['quantity'].to_f
+          refunded_amounts[:total][:cost] += refund_cost
+          refunded_amounts[location_id][:cost] += refund_cost
+        else
+          Airbrake.notify("Item Refunded but missing from app as shopify product by variant id: { product_id: #{line_item['line_item']['product_id']}, variant_id: #{variant_id} }")
+        end
 
         refund_discounts = line_item['line_item']['discount_allocations'].reduce(0) { |sum, discount_allocation| sum + discount_allocation['amount'].to_f }
         sub_total = line_item['line_item']['price'].to_f * line_item['quantity'].to_f
@@ -152,33 +130,45 @@ namespace :daily_sales_receipts do
 
         case transaction['gateway']
         when 'gift_card'
-          refunded_amounts[:total][:gift_card_payments] += transaction['amount'].to_f
-          refunded_amounts[:total][:total_payments] += transaction['amount'].to_f
+          refunded_payments[:gift_card] += transaction['amount'].to_f
+          refunded_payments[:total] += transaction['amount'].to_f
         when 'paypal'
-          refunded_amounts[:total][:paypal_payments] += transaction['amount'].to_f
-          refunded_amounts[:total][:total_payments] += transaction['amount'].to_f
+          refunded_payments[:paypal] += transaction['amount'].to_f
+          refunded_payments[:total] += transaction['amount'].to_f
         when 'shopify_payments'
-          refunded_amounts[:total][:shopify_payments] += transaction['amount'].to_f
-          refunded_amounts[:total][:total_payments] += transaction['amount'].to_f
+          refunded_payments[:shopify_payments] += transaction['amount'].to_f
+          refunded_payments[:total] += transaction['amount'].to_f
         end
       end
     end
 
-    refunded_shipping = (refunded_amounts[:total][:sub_total] + refunded_amounts[:total][:tax] - refunded_amounts[:total][:discount]) - refunded_amounts[:total][:total_payments]
+    refunded_shipping = (refunded_amounts[:total][:sub_total] + refunded_amounts[:total][:tax] - refunded_amounts[:total][:discount]) - refunded_payments[:tota]
 
-    p refunded_amounts
+    # p order_names
+    # p refund_order_names
+    # puts "costs report"
+    # p costs_report
 
-    # ShopifySalesReceipt.create(
-    #     date: day.beginning_of_day,
-    #     product_sales: product_sales,
-    #     discount: discount,
-    #     gift_card_sales: gift_card_sales,
-    #     shipping: shipping,
-    #     sales_tax: sales_tax,
-    #     shopify_payments: shopify_payments,
-    #     paypal_payments: paypal_payments,
-    #     gift_card_payments: gift_card_payments
-    #   )
+    # puts "Refunded Amounts"
+    # p refunded_amounts
+
+    # puts "Refund Payments"
+    # p refunded_payments
+
+    # puts "refunded shipping"
+    # p refunded_shipping
+
+    ShopifySalesReceipt.create(
+        date: day.beginning_of_day,
+        product_sales: product_sales,
+        discount: discount,
+        gift_card_sales: gift_card_sales,
+        shipping: shipping,
+        sales_tax: sales_tax,
+        shopify_payments: shopify_payments,
+        paypal_payments: paypal_payments,
+        gift_card_payments: gift_card_payments
+      )
 
   end
 end
