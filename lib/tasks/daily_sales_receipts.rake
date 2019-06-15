@@ -64,7 +64,7 @@ namespace :daily_sales_receipts do
           costs_report[:total] += cost
           costs_report[location_id] += cost
         else
-          puts "Item sold in Shopify Order but missing from app as shopify product by variant id. In test, these were LA boards: { variant_id: #{variant_id}, product_id: #{line_item['product_id']} }"
+          Airbrake.notify("Item sold but missing from app as shopify product by variant id: { variant_id: #{variant_id}, product_id: #{line_item['product_id']} }")
         end
 
         if line_item['gift_card'] || line_item['product_id'] == 1045344714837 # mollusk money
@@ -92,8 +92,8 @@ namespace :daily_sales_receipts do
       end
     end
 
-    refunded_amounts = Hash.new { |hash, key| hash[key] = { sub_total: 0, tax: 0, shipping: 0, discount: 0, cost: 0 } }
-    refunded_payments = Hash.new(0)
+    refunded_amounts = Hash.new(0)
+    refund_costs_by_location = Hash.new(0)
 
     refunds.each do |refund|
       fulfillments = ShopifyClient.fulfillments(refund['order_id'])
@@ -107,8 +107,8 @@ namespace :daily_sales_receipts do
 
         if shopify_product.present?
           refund_cost = shopify_product.get_cost_from_vend * line_item['quantity'].to_f
-          refunded_amounts[:total][:cost] += refund_cost
-          refunded_amounts[location_id][:cost] += refund_cost
+          refunded_amounts[:cost] += refund_cost
+          refund_costs_by_location[location_id] += refund_cost
         else
           Airbrake.notify("Item Refunded but missing from app as shopify product by variant id: { product_id: #{line_item['line_item']['product_id']}, variant_id: #{variant_id} }")
         end
@@ -116,13 +116,9 @@ namespace :daily_sales_receipts do
         refund_discounts = line_item['line_item']['discount_allocations'].reduce(0) { |sum, discount_allocation| sum + discount_allocation['amount'].to_f }
         sub_total = line_item['line_item']['price'].to_f * line_item['quantity'].to_f
 
-        refunded_amounts[location_id][:sub_total] += sub_total
-        refunded_amounts[location_id][:tax] += line_item['total_tax'].to_f # or do we want tax lines total
-        refunded_amounts[location_id][:discount] += refund_discounts
-
-        refunded_amounts[:total][:sub_total] += sub_total
-        refunded_amounts[:total][:tax] += line_item['total_tax'].to_f
-        refunded_amounts[:total][:discount] += refund_discounts
+        refunded_amounts[:sub_total] += sub_total
+        refunded_amounts[:tax] += line_item['total_tax'].to_f # or do we want tax lines total
+        refunded_amounts[:discount] += refund_discounts
       end
 
       refund['transactions'].each do |transaction|
@@ -130,30 +126,31 @@ namespace :daily_sales_receipts do
 
         case transaction['gateway']
         when 'gift_card'
-          refunded_payments[:gift_card] += transaction['amount'].to_f
-          refunded_payments[:total] += transaction['amount'].to_f
+          refunded_amounts[:gift_card] += transaction['amount'].to_f
+          refunded_amounts[:total_payments] += transaction['amount'].to_f
         when 'paypal'
-          refunded_payments[:paypal] += transaction['amount'].to_f
-          refunded_payments[:total] += transaction['amount'].to_f
+          refunded_amounts[:paypal] += transaction['amount'].to_f
+          refunded_amounts[:total_payments] += transaction['amount'].to_f
         when 'shopify_payments'
-          refunded_payments[:shopify_payments] += transaction['amount'].to_f
-          refunded_payments[:total] += transaction['amount'].to_f
+          refunded_amounts[:shopify_payments] += transaction['amount'].to_f
+          refunded_amounts[:total_payments] += transaction['amount'].to_f
         end
       end
     end
 
-    refunded_shipping = (refunded_amounts[:total][:sub_total] + refunded_amounts[:total][:tax] - refunded_amounts[:total][:discount]) - refunded_payments[:tota]
+    refunded_amounts[:shipping] = refunded_amounts[:sub_total] + refunded_amounts[:tax] - refunded_amounts[:discount] - refunded_amounts[:total_payments]
 
     # p order_names
     # p refund_order_names
+
     # puts "costs report"
     # p costs_report
 
     # puts "Refunded Amounts"
     # p refunded_amounts
 
-    # puts "Refund Payments"
-    # p refunded_payments
+    # puts "Refund Costs by Location"
+    # p refund_costs_by_location
 
     # puts "refunded shipping"
     # p refunded_shipping
