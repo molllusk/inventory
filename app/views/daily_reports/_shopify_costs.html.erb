@@ -1,0 +1,24 @@
+<table class="products full_width">
+  <tr>
+    <th>Date</th>
+    <th>Total</th>
+    <th>Costs by Location</th>
+  </tr>
+  <% @shopify_costs.each do |cost| %>
+    <tr>
+      <td>
+        <%= cost.date.strftime("%m/%d/%Y")  %>
+      </td>
+      <td>
+        <%= number_to_currency(cost.cost, :unit => "$", :separator => ".", :delimiter => ",") %>
+      </td>
+      <td>
+        <%= render partial: 'shopify_costs_by_location', locals: { location_costs: cost.location_costs } %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<div class='center'>
+<%= will_paginate @shopify_costs %>
+</div>
