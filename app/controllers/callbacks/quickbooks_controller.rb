@@ -12,7 +12,7 @@ module Callbacks
         if resp = ::QB_OAUTH2_CONSUMER.auth_code.get_token(params[:code], :redirect_uri => redirect_uri)
           QboToken.find_each { |token| token.destroy }
           QboToken.create(token: resp.token, secret: resp.refresh_token, realm_id: params[:realmId])
-          flash[:success] = "QBO Connected!"
+          flash[:success] = "Success! QBO Authenticated! Please close this window"
           redirect_to admin_root_path
         end
       end
