@@ -11,7 +11,7 @@ module Callbacks
         redirect_uri = 'https://mollusk.herokuapp.com/callbacks/quickbooks/oauth_callback'
         if resp = ::QB_OAUTH2_CONSUMER.auth_code.get_token(params[:code], :redirect_uri => redirect_uri)
           QboToken.find_each { |token| token.destroy }
-          QboToken.create(token: resp.token, secret: resp.refresh_token, realm_id: params[:realmId])
+          QboToken.create(token: resp.token, refresh_token: resp.refresh_token, realm_id: params[:realmId])
           flash[:success] = "Success! QBO Authenticated! Please close this window"
           redirect_to admin_root_path
         end
