@@ -144,7 +144,7 @@ namespace :daily_sales_receipts do
         refunded_amounts[:discount] += refund_discounts
       end
 
-      refunded_shipping = refund['order_adjustments'].reduce(0) { |sum, adjustment| adjustment['kind'] == 'shipping_refund' ? sum + adjustment['amount'].to_f : sum }
+      refunded_shipping = refund['order_adjustments'].reduce(0) { |sum, adjustment| adjustment['kind'] == 'shipping_refund' ? sum + adjustment['amount'].to_f : sum } * -1
       refunded_amounts[:refunded_shipping] += refunded_shipping
       refund_totals_by_order[order_name]['refunded_shipping'] = refunded_shipping
 
@@ -183,10 +183,10 @@ namespace :daily_sales_receipts do
     # puts "Refunded Amounts"
     # p refunded_amounts
 
-    # p order_names
-    # p sales_totals_by_order
-    # p refund_order_names
-    # p refund_totals_by_order
+    p order_names
+    p sales_totals_by_order
+    p refund_order_names
+    p refund_totals_by_order
 
     ShopifySalesReceipt.create(
         date: day.beginning_of_day,
