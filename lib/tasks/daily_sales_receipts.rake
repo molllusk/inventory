@@ -24,17 +24,22 @@ namespace :daily_sales_receipts do
     shopify_payments = 0.0
     paypal_payments = 0.0
     gift_card_payments = 0.0
-    subtotal_price = 0.0
-    total_tax = 0.0
     sales_costs = 0.0
 
     refunds = []
     refund_order_names = []
     order_names = []
 
+    order_names_by_id = {}
+
+    sales_totals_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
+    refund_totals_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
+
     location_sales_costs = Hash.new(0)
 
     orders.each do |order|
+      order_names_by_id[order['id']] = order['name']
+
       if %w(refunded partially_refunded).include?(order['financial_status'])
         ShopifyClient.refunds(order['id']).each do |refund|
           next if Time.parse(refund['created_at']) < min_date || Time.parse(refund['created_at']) > max_date
@@ -44,12 +49,15 @@ namespace :daily_sales_receipts do
       end
 
       next if Time.parse(order['closed_at']) < min_date || Time.parse(order['closed_at']) > max_date
-      order_names << order['name']
+      order_name = order['name']
+      order_names << order_name
+      order_tax = order['tax_lines'].reduce(0) { |sum, tax_line| sum + tax_line['price'].to_f }
 
-      subtotal_price += order['subtotal_price'].to_f
-      total_tax += order['total_tax'].to_f
+      sales_totals_by_order[order_name]['sales_tax'] = order_tax
+      sales_totals_by_order[order_name]['total_discounts'] = order['total_discounts'].to_f
+
       discount += order['total_discounts'].to_f
-      sales_tax += order['tax_lines'].reduce(0) { |sum, tax_line| sum + tax_line['price'].to_f }
+      sales_tax += order_tax
 
       fulfillments = ShopifyClient.fulfillments(order['id'])
 
@@ -62,6 +70,7 @@ namespace :daily_sales_receipts do
 
         if shopify_product.present?
           cost = shopify_product.get_cost_from_vend * line_item['quantity'].to_f
+          sales_totals_by_order[order_name]['cost'] += cost
           sales_costs += cost
           location_sales_costs[location_id] += cost
         else
@@ -70,12 +79,17 @@ namespace :daily_sales_receipts do
 
         if line_item['gift_card'] || line_item['product_id'] == 1045344714837 # mollusk money
           gift_card_sales += line_item['price'].to_f * line_item['quantity'].to_f
+          sales_totals_by_order[order_name]['gift_card_sales'] += line_item['price'].to_f * line_item['quantity'].to_f
         else
           product_sales += line_item['price'].to_f * line_item['quantity'].to_f
+          sales_totals_by_order[order_name]['product_sales'] += line_item['price'].to_f * line_item['quantity'].to_f
         end
       end
 
-      shipping += order['shipping_lines'].reduce(0) { |sum, shipping_line| sum + shipping_line['price'].to_f }
+      order_shipping = order['shipping_lines'].reduce(0) { |sum, shipping_line| sum + shipping_line['price'].to_f }
+
+      sales_totals_by_order[order_name]['shipping'] = order_shipping
+      shipping += order_shipping
 
       transactions = ShopifyClient.transactions(order['id'])
 
@@ -84,10 +98,13 @@ namespace :daily_sales_receipts do
 
         case transaction['gateway']
         when 'gift_card'
+          sales_totals_by_order[order_name]['gift_card_payments'] += transaction['amount'].to_f
           gift_card_payments += transaction['amount'].to_f
         when 'paypal'
+          sales_totals_by_order[order_name]['paypal_payments'] += transaction['amount'].to_f
           paypal_payments += transaction['amount'].to_f
         when 'shopify_payments'
+          sales_totals_by_order[order_name]['shopify_payments'] += transaction['amount'].to_f
           shopify_payments += transaction['amount'].to_f
         end
       end
@@ -97,6 +114,7 @@ namespace :daily_sales_receipts do
     refund_costs_by_location = Hash.new(0)
 
     refunds.each do |refund|
+      order_name = order_names_by_id[refund['order_id']]
       fulfillments = ShopifyClient.fulfillments(refund['order_id'])
 
       refund['refund_line_items'].each do |line_item|
@@ -108,6 +126,7 @@ namespace :daily_sales_receipts do
 
         if shopify_product.present?
           refund_cost = shopify_product.get_cost_from_vend * line_item['quantity'].to_f
+          refund_totals_by_order[order_name]['cost'] += refund_cost
           refunded_amounts[:cost] += refund_cost
           refund_costs_by_location[location_id] += refund_cost
         else
@@ -117,29 +136,39 @@ namespace :daily_sales_receipts do
         refund_discounts = line_item['line_item']['discount_allocations'].reduce(0) { |sum, discount_allocation| sum + discount_allocation['amount'].to_f }
         sub_total = line_item['line_item']['price'].to_f * line_item['quantity'].to_f
 
+        refund_totals_by_order[order_name]['product_sales'] += sub_total
+        refund_totals_by_order[order_name]['sales_tax'] += line_item['total_tax'].to_f # or do we want tax lines total
+        refund_totals_by_order[order_name]['discount'] += refund_discounts
         refunded_amounts[:product_sales] += sub_total
         refunded_amounts[:sales_tax] += line_item['total_tax'].to_f # or do we want tax lines total
         refunded_amounts[:discount] += refund_discounts
       end
+
+      refunded_shipping = refund['order_adjustments'].reduce(0) { |sum, adjustment| adjustment['kind'] == 'shipping_refund' ? sum + adjustment['amount'].to_f : sum }
+      refunded_amounts[:refunded_shipping] += refunded_shipping
+      refund_totals_by_order[order_name]['refunded_shipping'] = refunded_shipping
 
       refund['transactions'].each do |transaction|
         next unless transaction['kind'] == 'refund' && transaction['status'] == 'success'
 
         case transaction['gateway']
         when 'gift_card'
+          refund_totals_by_order[order_name]['gift_card_payments'] += transaction['amount'].to_f
           refunded_amounts[:gift_card_payments] += transaction['amount'].to_f
           refunded_amounts[:total_payments] += transaction['amount'].to_f
         when 'paypal'
+          refund_totals_by_order[order_name]['paypal_payments'] += transaction['amount'].to_f
           refunded_amounts[:paypal_payments] += transaction['amount'].to_f
           refunded_amounts[:total_payments] += transaction['amount'].to_f
         when 'shopify_payments'
+          refund_totals_by_order[order_name]['shopify_payments'] += transaction['amount'].to_f
           refunded_amounts[:shopify_payments] += transaction['amount'].to_f
           refunded_amounts[:total_payments] += transaction['amount'].to_f
         end
       end
     end
 
-    refunded_amounts[:shipping] = refunded_amounts[:product_sales] + refunded_amounts[:sales_tax] - refunded_amounts[:discount] - refunded_amounts[:total_payments]
+    refunded_amounts[:shipping] = refunded_amounts[:product_sales] + refunded_amounts[:sales_tax] + refunded_amounts[:refunded_shipping] - refunded_amounts[:discount] - refunded_amounts[:total_payments]
     refunded_amounts[:location_costs] = refund_costs_by_location
     refunded_amounts[:date] = day.beginning_of_day
     
@@ -155,7 +184,9 @@ namespace :daily_sales_receipts do
     # p refunded_amounts
 
     # p order_names
+    # p sales_totals_by_order
     # p refund_order_names
+    # p refund_totals_by_order
 
     ShopifySalesReceipt.create(
         date: day.beginning_of_day,

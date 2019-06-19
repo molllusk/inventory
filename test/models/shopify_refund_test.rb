@@ -18,6 +18,7 @@ end
 #  location_costs     :json
 #  paypal_payments    :float            default(0.0)
 #  product_sales      :float            default(0.0)
+#  refunded_shipping  :float            default(0.0)
 #  sales_tax          :float            default(0.0)
 #  shipping           :float            default(0.0)
 #  shopify_payments   :float            default(0.0)

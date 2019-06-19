@@ -4,7 +4,8 @@
     <th>Product Sales</th>
     <th>Discounts</th>
     <th>Sales Tax</th>
-    <th>Shipping</th>
+    <th>Refunded Shipping</th>
+    <th>Return Shipping Fees</th>
     <th>Shopify Payments</th>
     <th>Paypal Payments</th>
     <th>Gift Card Payments</th>
@@ -17,6 +18,7 @@
       <td><%= number_to_currency(refund.product_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= number_to_currency(refund.discount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= number_to_currency(refund.sales_tax, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+      <td><%= number_to_currency(refund.refunded_shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= number_to_currency(refund.shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= number_to_currency(refund.shopify_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= number_to_currency(refund.paypal_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
