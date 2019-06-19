@@ -15,6 +15,9 @@ namespace :daily_sales_receipts do
     puts "Getting orders from #{days_ago} day(s) ago #{min_date.strftime("%m/%d/%Y")}..."
 
     orders = ShopifyClient.closed_orders_since(day)
+    expected_order_count = ShopifyClient.closed_orders_since_count(day)
+
+    Airbrake.notify("Expected #{expected_order_count} orders, but got #{orders.count} while running daily financial reports") unless orders.count == expected_order_count
 
     product_sales = 0.0
     discount = 0.0
