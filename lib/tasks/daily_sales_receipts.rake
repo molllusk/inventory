@@ -41,7 +41,6 @@ namespace :daily_sales_receipts do
     costs_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
     orders.each do |order|
-      p order['closed_at']
       order_names_by_id[order['id']] = order['name']
       costs_by_location = Hash.new(0)
 
