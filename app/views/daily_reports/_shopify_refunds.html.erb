@@ -14,7 +14,7 @@
   </tr>
   <% @shopify_refunds.each do |refund| %>
     <tr>
-      <td><a href='<%= shopify_refund_path(refund) %>' target='_blank'><%= refund.date.strftime("%m/%d/%Y") %></a></td>
+      <td><a href='<%= shopify_refund_path(refund) %>' target='_blank'><%= refund.date.strftime("%m/%d/%Y") %> <i class='fa fa-external-link-alt'></i></a></td>
       <td><%= number_to_currency(refund.product_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= number_to_currency(refund.discount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= number_to_currency(refund.sales_tax, :unit => "$", :separator => ".", :delimiter => ",") %></td>
