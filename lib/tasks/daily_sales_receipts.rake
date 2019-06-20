@@ -7,10 +7,10 @@ namespace :daily_sales_receipts do
     day = days_ago.days.ago
 
     min_date = day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
-    # min_date -= min_date.utc_offset
+    min_date -= min_date.utc_offset
 
     max_date = day.to_time.in_time_zone('Pacific Time (US & Canada)').end_of_day
-    # max_date -= max_date.utc_offset
+    max_date -= max_date.utc_offset
 
     puts "Getting orders from #{days_ago} day(s) ago #{min_date.strftime("%m/%d/%Y")}..."
 

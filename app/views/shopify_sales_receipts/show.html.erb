@@ -58,7 +58,7 @@
   <% @shopify_sales_receipt.shopify_sales_receipt_orders.each do |order| %>
     <tr>
       <td><%= order.closed_at.strftime("%m/%d/%Y")  %></td>
-      <td><a href='https://mollusksurf.myshopify.com/admin/orders/<%= order.order_id %>' target='_blank'><%= order.name %></a></td>
+      <td><a href='https://mollusksurf.myshopify.com/admin/orders/<%= order.order_id %>' target='_blank'><%= order.name %> <i class='fa fa-external-link-alt'></i></a></td>
       <td><%= number_to_currency(order.product_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= number_to_currency(order.gift_card_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= number_to_currency(order.discount, :unit => "$", :separator => ".", :delimiter => ",") %></td>

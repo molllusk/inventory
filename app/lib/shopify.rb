@@ -205,7 +205,7 @@ class ShopifyClient
 
   def self.closed_orders_since_count(day, store = :RETAIL)
     min_date = day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
-    # min_date -= min_date.utc_offset
+    min_date -= min_date.utc_offset
 
     count_params = {
       status: 'closed',
@@ -222,7 +222,7 @@ class ShopifyClient
     pages = (closed_orders_since_count(day, store) / 250.0).ceil
 
     min_date =  day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
-    # min_date -= min_date.utc_offset
+    min_date -= min_date.utc_offset
 
     pages.times do |page|
       params = {
