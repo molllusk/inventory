@@ -1,4 +1,5 @@
 class ShopifySalesCost < ApplicationRecord
+  has_many :shopify_sales_cost_orders, dependent: :destroy
 end
 
 # == Schema Information

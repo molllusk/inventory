@@ -1,4 +1,6 @@
 class ShopifySalesReceiptOrder < ApplicationRecord
+  belongs_to :shopify_sales_receipt
+
   def sum_check
     product_sales + gift_card_sales + sales_tax + shipping - discount - shopify_payments - paypal_payments - gift_card_payments
   end

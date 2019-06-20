@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_20_040213) do
+ActiveRecord::Schema.define(version: 2019_06_20_055015) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -130,6 +130,17 @@ ActiveRecord::Schema.define(version: 2019_06_20_040213) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.float "refunded_shipping", default: 0.0
+  end
+
+  create_table "shopify_sales_cost_orders", force: :cascade do |t|
+    t.bigint "order_id"
+    t.string "name"
+    t.datetime "closed_at"
+    t.float "cost", default: 0.0
+    t.json "location_costs"
+    t.integer "shopify_sales_cost_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "shopify_sales_costs", force: :cascade do |t|

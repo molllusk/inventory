@@ -7,7 +7,7 @@
   <% @shopify_costs.each do |cost| %>
     <tr>
       <td>
-        <%= cost.date.strftime("%m/%d/%Y")  %>
+        <a href='<%= shopify_sales_cost_path(cost) %>' target='_blank'><%= cost.date.strftime("%m/%d/%Y") %> <i class='fa fa-external-link-alt'></i></a>
       </td>
       <td>
         <%= number_to_currency(cost.cost, :unit => "$", :separator => ".", :delimiter => ",") %>

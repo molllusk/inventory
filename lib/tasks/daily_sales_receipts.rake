@@ -38,9 +38,12 @@ namespace :daily_sales_receipts do
 
     sales_totals_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
     refund_totals_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
+    costs_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
     orders.each do |order|
+      p order['closed_at']
       order_names_by_id[order['id']] = order['name']
+      costs_by_location = Hash.new(0)
 
       if %w(refunded partially_refunded).include?(order['financial_status'])
         ShopifyClient.refunds(order['id']).each do |refund|
@@ -74,8 +77,9 @@ namespace :daily_sales_receipts do
 
         if shopify_product.present?
           cost = shopify_product.get_cost_from_vend * line_item['quantity'].to_f
-          # sales_totals_by_order[order_name][:cost] += cost
+          costs_by_order[order_name][:cost] += cost
           costs_report[:cost] += cost
+          costs_by_location[location_id] += cost
           location_sales_costs[location_id] += cost
         else
           Airbrake.notify("Item sold but missing from app as shopify product by variant id: { variant_id: #{variant_id}, product_id: #{line_item['product_id']} }")
@@ -89,6 +93,10 @@ namespace :daily_sales_receipts do
           sales_totals_by_order[order_name][:product_sales] += line_item['price'].to_f * line_item['quantity'].to_f
         end
       end
+
+      costs_by_order[order_name][:order_id] = order['id']
+      costs_by_order[order_name][:closed_at] = order['closed_at']
+      costs_by_order[order_name][:location_costs] = costs_by_location
 
       order_shipping = order['shipping_lines'].reduce(0) { |sum, shipping_line| sum + shipping_line['price'].to_f }
 
@@ -199,6 +207,11 @@ namespace :daily_sales_receipts do
     refund_totals_by_order.each do |order_name, values|
       values[:name] = order_name
       shopify_refund.shopify_refund_orders << ShopifyRefundOrder.create(values)
+    end
+
+    costs_by_order.each do |order_name, values|
+      values[:name] = order_name
+      shopify_sales_cost.shopify_sales_cost_orders << ShopifySalesCostOrder.create(values)
     end
 
     # p order_names
