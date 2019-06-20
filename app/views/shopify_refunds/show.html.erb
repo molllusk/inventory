@@ -1,0 +1,73 @@
+<div class='center'>
+  <h2>Shopify Refund for <%= @shopify_refund.date.strftime("%m/%d/%Y") %></h2>
+</div>
+
+<table class="products full_width">
+  <tr>
+    <th>Day</th>
+    <th>Product Sales</th>
+    <th>Discounts</th>
+    <th>Sales Tax</th>
+    <th>Refunded Shipping</th>
+    <th>Return Shipping Fees</th>
+    <th>Shopify Payments</th>
+    <th>Paypal Payments</th>
+    <th>Gift Card Payments</th>
+    <th>Costs</th>
+    <th>Costs by Location</th>
+  </tr>
+  <tr>
+    <td><%= @shopify_refund.date.strftime("%m/%d/%Y")  %></td>
+    <td><%= number_to_currency(@shopify_refund.product_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+    <td><%= number_to_currency(@shopify_refund.discount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+    <td><%= number_to_currency(@shopify_refund.sales_tax, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+    <td><%= number_to_currency(@shopify_refund.refunded_shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+    <td><%= number_to_currency(@shopify_refund.shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+    <td><%= number_to_currency(@shopify_refund.shopify_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+    <td><%= number_to_currency(@shopify_refund.paypal_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+    <td><%= number_to_currency(@shopify_refund.gift_card_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+    <td><%= number_to_currency(@shopify_refund.cost, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+    <td>
+      <%= render partial: '/daily_reports/shopify_costs_by_location', locals: { location_costs: @shopify_refund.location_costs } %>
+    </td>
+  </tr>
+</table>
+
+<div class='center'>
+  <h2>Orders</h2>
+</div>
+
+<table class="products full_width">
+  <tr>
+    <th>Created At</th>
+    <th>Order Name</th>
+    <th>Product Sales</th>
+    <th>Discounts</th>
+    <th>Sales Tax</th>
+    <th>Refunded Shipping</th>
+    <th>Return Shipping Fees</th>
+    <th>Shopify Payments</th>
+    <th>Paypal Payments</th>
+    <th>Gift Card Payments</th>
+    <th>Costs</th>
+    <th>Costs by Location</th>
+  </tr>
+  <% @shopify_refund.shopify_refund_orders.each do |order| %>
+    <tr>
+      <td><%= order.created_at.strftime("%m/%d/%Y") %></td>
+      <td><a href='https://mollusksurf.myshopify.com/admin/orders/<%= order.order_id %>' target='_blank'><%= order.name %></a></td>
+      <td><%= number_to_currency(order.product_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+      <td><%= number_to_currency(order.discount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+      <td><%= number_to_currency(order.sales_tax, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+      <td><%= number_to_currency(order.refunded_shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+      <td><%= number_to_currency(order.shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+      <td><%= number_to_currency(order.shopify_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+      <td><%= number_to_currency(order.paypal_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+      <td><%= number_to_currency(order.gift_card_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+      <td><%= number_to_currency(order.cost, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+      <td>
+        <%= render partial: '/daily_reports/shopify_costs_by_location', locals: { location_costs: order.location_costs } %>
+      </td>
+    </tr>
+  <% end %>
+</table>

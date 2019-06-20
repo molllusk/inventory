@@ -1,4 +1,5 @@
 class ShopifyRefund < ApplicationRecord
+  has_many :shopify_refund_orders, dependent: :destroy
 end
 
 # == Schema Information

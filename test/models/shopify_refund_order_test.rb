@@ -1,25 +1,30 @@
-class ShopifySalesReceipt < ApplicationRecord
-  has_many :shopify_sales_receipt_orders, dependent: :destroy
+require 'test_helper'
 
-  def sum_check
-    product_sales + gift_card_sales + sales_tax + shipping - discount - shopify_payments - paypal_payments - gift_card_payments
-  end
+class ShopifyRefundOrderTest < ActiveSupport::TestCase
+  # test "the truth" do
+  #   assert true
+  # end
 end
 
 # == Schema Information
 #
-# Table name: shopify_sales_receipts
+# Table name: shopify_refund_orders
 #
 #  id                 :bigint(8)        not null, primary key
-#  date               :datetime
+#  cost               :float            default(0.0)
 #  discount           :float            default(0.0)
 #  gift_card_payments :float            default(0.0)
-#  gift_card_sales    :float            default(0.0)
+#  location_costs     :json
+#  name               :string
 #  paypal_payments    :float            default(0.0)
 #  product_sales      :float            default(0.0)
+#  refunded_shipping  :float            default(0.0)
 #  sales_tax          :float            default(0.0)
 #  shipping           :float            default(0.0)
 #  shopify_payments   :float            default(0.0)
+#  total_payments     :float            default(0.0)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  order_id           :bigint(8)
+#  shopify_refund_id  :integer
 #

@@ -1,0 +1,48 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  id: 1
+  name: MyString
+  created_at: 2019-06-19 20:54:34
+  sales_tax: 1.5
+  discount: 1.5
+  product_sales: 1.5
+  shipping: 1.5
+  shopify_payments: 1.5
+  gift_card_payments: 1.5
+  paypal_payments: 1.5
+  gift_card_sales: 1.5
+
+two:
+  id: 1
+  name: MyString
+  created_at: 2019-06-19 20:54:34
+  sales_tax: 1.5
+  discount: 1.5
+  product_sales: 1.5
+  shipping: 1.5
+  shopify_payments: 1.5
+  gift_card_payments: 1.5
+  paypal_payments: 1.5
+  gift_card_sales: 1.5
+
+# == Schema Information
+#
+# Table name: shopify_sales_receipt_orders
+#
+#  id                       :bigint(8)        not null, primary key
+#  closed_at                :datetime
+#  discount                 :float            default(0.0)
+#  gift_card_payments       :float            default(0.0)
+#  gift_card_sales          :float            default(0.0)
+#  name                     :string
+#  paypal_payments          :float            default(0.0)
+#  product_sales            :float            default(0.0)
+#  sales_tax                :float            default(0.0)
+#  shipping                 :float            default(0.0)
+#  shopify_payments         :float            default(0.0)
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
+#  order_id                 :bigint(8)
+#  shopify_sales_receipt_id :integer
+#

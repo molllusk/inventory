@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_19_230352) do
+ActiveRecord::Schema.define(version: 2019_06_20_040213) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -96,6 +96,25 @@ ActiveRecord::Schema.define(version: 2019_06_19_230352) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "shopify_refund_orders", force: :cascade do |t|
+    t.bigint "order_id"
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.integer "shopify_refund_id"
+    t.float "cost", default: 0.0
+    t.float "discount", default: 0.0
+    t.float "gift_card_payments", default: 0.0
+    t.float "shopify_payments", default: 0.0
+    t.float "paypal_payments", default: 0.0
+    t.json "location_costs"
+    t.float "product_sales", default: 0.0
+    t.float "refunded_shipping", default: 0.0
+    t.float "sales_tax", default: 0.0
+    t.float "shipping", default: 0.0
+    t.float "total_payments", default: 0.0
+    t.datetime "updated_at", null: false
+  end
+
   create_table "shopify_refunds", force: :cascade do |t|
     t.float "cost", default: 0.0
     t.float "product_sales", default: 0.0
@@ -117,6 +136,23 @@ ActiveRecord::Schema.define(version: 2019_06_19_230352) do
     t.float "cost", default: 0.0
     t.json "location_costs", default: {}
     t.datetime "date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "shopify_sales_receipt_orders", force: :cascade do |t|
+    t.bigint "order_id"
+    t.string "name"
+    t.datetime "closed_at"
+    t.float "sales_tax", default: 0.0
+    t.float "discount", default: 0.0
+    t.float "product_sales", default: 0.0
+    t.float "shipping", default: 0.0
+    t.float "shopify_payments", default: 0.0
+    t.float "gift_card_payments", default: 0.0
+    t.float "paypal_payments", default: 0.0
+    t.float "gift_card_sales", default: 0.0
+    t.integer "shopify_sales_receipt_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

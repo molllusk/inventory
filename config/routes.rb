@@ -9,6 +9,8 @@ Rails.application.routes.draw do
   resources :fluid_inventory_updates
   resources :products
   resources :users
+  resources :shopify_sales_receipts
+  resources :shopify_refunds
 
   namespace :admin do
     root to: '#index'
