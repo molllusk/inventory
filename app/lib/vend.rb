@@ -34,7 +34,7 @@ class VendClient
     end
   end
 
-  def self.paginator(path)
+  def self.paginator(path, params = {})
     page = 0
     data = []
     loop do

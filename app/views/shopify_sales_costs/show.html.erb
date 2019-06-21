@@ -1,5 +1,5 @@
 <div class='center'>
-  <h2>Shopify Sales Costs for <%= @shopify_sales_cost.date.strftime("%m/%d/%Y") %></h2>
+  <h2>Shopify Sales Costs for <%= @shopify_sales_cost.in_time_zone("Pacific Time (US & Canada)").date.strftime("%m/%d/%Y") %></h2>
 </div>
 
 <table class="products full_width">
@@ -10,7 +10,7 @@
   </tr>
   <tr>
     <td>
-      <%= @shopify_sales_cost.date.strftime("%m/%d/%Y")  %>
+      <%= @shopify_sales_cost.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%Y")  %>
     </td>
     <td>
       <%= number_to_currency(@shopify_sales_cost.cost, :unit => "$", :separator => ".", :delimiter => ",") %>
@@ -35,7 +35,7 @@
   <% @shopify_sales_cost.shopify_sales_cost_orders.each do |order| %>
     <tr>
       <td>
-        <%= order.closed_at.strftime("%m/%d/%Y")  %>
+        <%= order.closed_at.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%Y")  %>
       </td>
       <td><a href='https://mollusksurf.myshopify.com/admin/orders/<%= order.order_id %>' target='_blank'><%= order.name %> <i class='fa fa-external-link-alt'></i></a></td>
       <td>
