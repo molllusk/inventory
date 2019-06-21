@@ -153,8 +153,6 @@ namespace :daily_sales_receipts do
         refund_discounts = line_item['line_item']['discount_allocations'].reduce(0) { |sum, discount_allocation| sum + discount_allocation['amount'].to_f }
         sub_total = line_item['line_item']['price'].to_f * line_item['quantity'].to_f
 
-        refund_totals_by_order[order_name][:created_at] = refund['created_at']
-        refund_totals_by_order[order_name][:order_id] = refund['order_id']
         refund_totals_by_order[order_name][:product_sales] += sub_total
         refund_totals_by_order[order_name][:sales_tax] += line_item['total_tax'].to_f # or do we want tax lines total
         refund_totals_by_order[order_name][:discount] += refund_discounts
@@ -163,11 +161,13 @@ namespace :daily_sales_receipts do
         refunded_amounts[:discount] += refund_discounts
       end
 
-      refund_totals_by_order[order_name][:location_costs] = costs_by_location
-
       refunded_shipping = refund['order_adjustments'].reduce(0) { |sum, adjustment| adjustment['kind'] == 'shipping_refund' ? sum + adjustment['amount'].to_f : sum } * -1
       refunded_amounts[:refunded_shipping] += refunded_shipping
+
       refund_totals_by_order[order_name][:refunded_shipping] = refunded_shipping
+      refund_totals_by_order[order_name][:created_at] = refund['created_at']
+      refund_totals_by_order[order_name][:order_id] = refund['order_id']
+      refund_totals_by_order[order_name][:location_costs] = costs_by_location
 
       refund['transactions'].each do |transaction|
         next unless transaction['kind'] == 'refund' && transaction['status'] == 'success'
@@ -205,6 +205,7 @@ namespace :daily_sales_receipts do
 
     refund_totals_by_order.each do |order_name, values|
       values[:name] = order_name
+      values[:shipping] = values[:product_sales] + values[:sales_tax] + values[:refunded_shipping] - values[:discount] - values[:total_payments]
       shopify_refund.shopify_refund_orders << ShopifyRefundOrder.create(values)
     end
 

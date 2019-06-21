@@ -54,6 +54,10 @@ class VendClient
     all_products.select { |product| product['is_active'] }
   end
 
+  def self.register_sales
+    paginator('register_sales')
+  end
+
   def self.get_inventory
     paginator('inventory')
   end
