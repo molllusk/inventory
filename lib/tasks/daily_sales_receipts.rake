@@ -7,10 +7,8 @@ namespace :daily_sales_receipts do
     day = days_ago.days.ago
 
     min_date = day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
-    # min_date -= min_date.utc_offset
 
     max_date = day.to_time.in_time_zone('Pacific Time (US & Canada)').end_of_day
-    # max_date -= max_date.utc_offset
 
     puts "Getting orders from #{days_ago} day(s) ago #{min_date.strftime("%m/%d/%Y")}..."
 
@@ -33,8 +31,6 @@ namespace :daily_sales_receipts do
     refund_costs_by_location = Hash.new(0)
         
     order_names_by_id = {}
-    # order_names = []
-    # refund_order_names = []
 
     sales_totals_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
     refund_totals_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
@@ -47,14 +43,12 @@ namespace :daily_sales_receipts do
       if %w(refunded partially_refunded).include?(order['financial_status'])
         ShopifyClient.refunds(order['id']).each do |refund|
           next if Time.parse(refund['created_at']) < min_date || Time.parse(refund['created_at']) > max_date
-          # refund_order_names << order['name']    
           refunds << refund
         end
       end
 
       next if Time.parse(order['closed_at']) < min_date || Time.parse(order['closed_at']) > max_date
       order_name = order['name']
-      # order_names << order_name
       order_tax = order['tax_lines'].reduce(0) { |sum, tax_line| sum + tax_line['price'].to_f }
 
       sales_totals_by_order[order_name][:order_id] = order['id']
@@ -213,11 +207,5 @@ namespace :daily_sales_receipts do
       values[:name] = order_name
       shopify_sales_cost.shopify_sales_cost_orders << ShopifySalesCostOrder.create(values)
     end
-
-    # p order_names
-    # p refund_order_names
-
-    # p sales_totals_by_order
-    # p refund_totals_by_order
   end
 end
