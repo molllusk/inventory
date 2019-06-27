@@ -13,7 +13,7 @@
   </tr>
   <% @shopify_sales_receipts.each do |receipt| %>
     <tr>
-      <td><a href='<%= shopify_sales_receipt_path(receipt) %>' target='_blank'><%= receipt.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%Y")  %> <i class='fa fa-external-link-alt'></i></a></td>
+      <td><a href='<%= shopify_sales_receipt_path(receipt) %>' target='_blank'><%= receipt.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %> <i class='fa fa-external-link-alt'></i></a></td>
       <td><%= number_to_currency(receipt.product_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= number_to_currency(receipt.gift_card_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= number_to_currency(receipt.discount, :unit => "$", :separator => ".", :delimiter => ",") %></td>

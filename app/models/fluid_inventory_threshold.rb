@@ -1,14 +1,3 @@
-# == Schema Information
-#
-# Table name: fluid_inventory_thresholds
-#
-#  id           :bigint(8)        not null, primary key
-#  product_type :bigint(8)
-#  threshold    :integer
-#  created_at   :datetime         not null
-#  updated_at   :datetime         not null
-#
-
 class FluidInventoryThreshold < ApplicationRecord
   enum product_type: {
     "Art" => 1,
@@ -64,3 +53,14 @@ class FluidInventoryThreshold < ApplicationRecord
     "Womens Wetsuits" => 51
   }
 end
+
+# == Schema Information
+#
+# Table name: fluid_inventory_thresholds
+#
+#  id           :bigint(8)        not null, primary key
+#  product_type :bigint(8)
+#  threshold    :integer
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
+#

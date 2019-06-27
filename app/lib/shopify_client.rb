@@ -1,4 +1,4 @@
-class ShopifyClient
+module ShopifyClient
   RETAIL_BASE_URL = "https://#{ENV['SHOPIFY_USER']}:#{ENV['SHOPIFY_PASSWORD']}@mollusksurf.myshopify.com".freeze
   WHOLESALE_BASE_URL = "https://#{ENV['WHOLESALE_SHOPIFY_USER']}:#{ENV['WHOLESALE_SHOPIFY_PASSWORD']}@molluskats.myshopify.com".freeze
   SF_RETAIL_INVENTORY_LOCATION = 49481991.freeze
@@ -205,7 +205,6 @@ class ShopifyClient
 
   def self.closed_orders_since_count(day, store = :RETAIL)
     min_date = day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
-    # min_date -= min_date.utc_offset
 
     count_params = {
       status: 'closed',
@@ -222,7 +221,6 @@ class ShopifyClient
     pages = (closed_orders_since_count(day, store) / 250.0).ceil
 
     min_date =  day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
-    # min_date -= min_date.utc_offset
 
     pages.times do |page|
       params = {
