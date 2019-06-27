@@ -1,5 +1,5 @@
 class ShopifyRefundOrder < ApplicationRecord
-  belongs_to :shopify_refund
+  belongs_to :shopify_refund, optional: true
 end
 
 # == Schema Information

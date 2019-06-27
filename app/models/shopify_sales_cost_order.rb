@@ -1,5 +1,5 @@
 class ShopifySalesCostOrder < ApplicationRecord
-  belongs_to :shopify_sales_cost
+  belongs_to :shopify_sales_cost, optional: true
 end
 
 # == Schema Information

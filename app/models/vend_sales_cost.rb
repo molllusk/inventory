@@ -1,5 +1,5 @@
 class VendSalesCost < ApplicationRecord
-  belongs_to :daily_vend_cost
+  belongs_to :daily_vend_cost, optional: true
 
   def outlet_name
     VendClient::OUTLET_NAMES_BY_ID[outlet_id]

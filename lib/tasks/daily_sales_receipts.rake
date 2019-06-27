@@ -190,24 +190,24 @@ namespace :daily_sales_receipts do
     refunded_amounts[:location_costs] = refund_costs_by_location
     costs_report[:location_costs] = location_sales_costs
     
-    shopify_sales_cost = ShopifySalesCost.create(costs_report)
-    shopify_refund = ShopifyRefund.create(refunded_amounts)
-    shopify_sales_receipt = ShopifySalesReceipt.create(shopify_sales_receipt)
+    shopify_sales_cost = ShopifySalesCost.create!(costs_report)
+    shopify_refund = ShopifyRefund.create!(refunded_amounts)
+    shopify_sales_receipt = ShopifySalesReceipt.create!(shopify_sales_receipt)
 
     sales_totals_by_order.each do |order_name, values|
       values[:name] = order_name
-      shopify_sales_receipt.shopify_sales_receipt_orders << ShopifySalesReceiptOrder.create(values)
+      shopify_sales_receipt.shopify_sales_receipt_orders << ShopifySalesReceiptOrder.create!(values)
     end
 
     refund_totals_by_order.each do |order_name, values|
       values[:name] = order_name
       values[:shipping] = values[:product_sales] + values[:sales_tax] + values[:refunded_shipping] - values[:discount] - values[:total_payments]
-      shopify_refund.shopify_refund_orders << ShopifyRefundOrder.create(values)
+      shopify_refund.shopify_refund_orders << ShopifyRefundOrder.create!(values)
     end
 
     costs_by_order.each do |order_name, values|
       values[:name] = order_name
-      shopify_sales_cost.shopify_sales_cost_orders << ShopifySalesCostOrder.create(values)
+      shopify_sales_cost.shopify_sales_cost_orders << ShopifySalesCostOrder.create!(values)
     end
 
     ##########################
@@ -274,27 +274,27 @@ namespace :daily_sales_receipts do
       end
     end
 
-    vend_sales = DailyVendSale.create(date: min_date)
-    vend_costs = DailyVendCost.create(date: min_date)
+    vend_sales = DailyVendSale.create!(date: min_date)
+    vend_costs = DailyVendCost.create!(date: min_date)
 
     vend_sales_receipt.each do |location, receipt|
       receipt[:outlet_id] = location
-      vend_sales.vend_sales_receipts << VendSalesReceipt.create(receipt)
+      vend_sales.vend_sales_receipts << VendSalesReceipt.create!(receipt)
     end
 
     vend_sales_costs.each do |location, cost|
       cost[:outlet_id] = location
-      vend_costs.vend_sales_costs << VendSalesCost.create(cost)
+      vend_costs.vend_sales_costs << VendSalesCost.create!(cost)
     end
 
     vend_sales_receipt_by_sale.each do |sale_id, receipt|
       receipt[:sale_id] = sale_id
-      vend_sales.vend_sales_receipt_sales << VendSalesReceiptSale.create(receipt)
+      vend_sales.vend_sales_receipt_sales << VendSalesReceiptSale.create!(receipt)
     end
 
     vend_sales_costs_by_sale.each do |sale_id, cost|
       cost[:sale_id] = sale_id
-      vend_costs.vend_sales_cost_sales << VendSalesCostSale.create(cost)
+      vend_costs.vend_sales_cost_sales << VendSalesCostSale.create!(cost)
     end
   end
 end

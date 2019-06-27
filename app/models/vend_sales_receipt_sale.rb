@@ -1,4 +1,6 @@
 class VendSalesReceiptSale < ApplicationRecord
+  belongs_to :daily_vend_sale, optional: true
+
   def outlet_name
     VendClient::OUTLET_NAMES_BY_ID[outlet_id]
   end
