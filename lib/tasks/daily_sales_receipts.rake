@@ -1,7 +1,5 @@
 namespace :daily_sales_receipts do
   task :pull, [:days_ago] => [:environment] do |task, args|
-    require File.join(Rails.root, 'app', 'lib', 'vend_client.rb')
-    require File.join(Rails.root, 'app', 'lib', 'shopify_client.rb')
 
     days_ago = args[:days_ago].blank? ? 1 : args[:days_ago].to_i
     day = days_ago.days.ago
@@ -211,34 +209,59 @@ namespace :daily_sales_receipts do
     vend_sales = VendClient.sales(day)
 
     vend_sales_receipt = Hash.new { |hash, key| hash[key] = Hash.new(0) }
+    vend_sales_receipt_by_sale = Hash.new { |hash, key| hash[key] = Hash.new(0) }
+
     vend_sales_costs = Hash.new { |hash, key| hash[key] = Hash.new(0) }
+    vend_sales_costs_by_sale = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
     vend_sales.each do |sale|
       outlet = sale['outlet_id']
+      sale_id = sale['id']
+
+      vend_sales_receipt_by_sale[sale_id][:outlet_id] = outlet
+      vend_sales_costs_by_sale[sale_id][:outlet_id] = outlet
+      vend_sales_receipt_by_sale[sale_id][:sale_at] = sale['sale_date']
+      vend_sales_costs_by_sale[sale_id][:sale_at] = sale['sale_date']
 
       sale['line_items'].each do |item|
-        if item['product_id'] == '801eea1d-3e65-11e2-b1f5-4040782fde00' # Gift Cards
-          vend_sales_receipt[outlet][:gift_card_sales] += item['price']
-        elsif item['product_id'] == '0adfd74a-153e-11e6-f182-ae0e9b7d09f8' # Shipping
-          vend_sales_receipt[outlet][:shipping] += item['price']
+        vend_sales_receipt_by_sale
+
+        case item['product_id']
+        when '801eea1d-3e65-11e2-b1f5-4040782fde00' # Gift Cards
+          vend_sales_receipt[outlet][:gift_card_sales] += item['price_total']
+          vend_sales_receipt_by_sale[sale_id][:gift_card_sales] += item['price_total']
+        when '0adfd74a-153e-11e6-f182-ae0e9b7d09f8' # Shipping
+          vend_sales_receipt[outlet][:shipping] += item['price_total']
+          vend_sales_receipt_by_sale[sale_id][:shipping] += item['price_total']
+        when '5ddba61e-3598-11e2-b1f5-4040782fde00' #discount
+          vend_sales_receipt[outlet][:discount_sales] += item['price_total']
+          vend_sales_receipt_by_sale[sale_id][:discount_sales] += item['price_total']
         else
-          vend_sales_receipt[outlet][:product_sales] += item['price']
+          vend_sales_receipt[outlet][:product_sales] += item['price_total'] + item['discount_total']
+          vend_sales_receipt_by_sale[sale_id][:product_sales] += item['price_total'] + item['discount_total']
         end
 
-        vend_sales_receipt[outlet][:discount] += item['discount']
-        vend_sales_receipt[outlet][:sales_tax] += item['tax']
+        vend_sales_receipt[outlet][:discount] += item['discount_total']
+        vend_sales_receipt_by_sale[sale_id][:discount] += item['discount_total']
 
-        vend_sales_costs[outlet][:cost] += item['cost']
+        vend_sales_receipt[outlet][:sales_tax] += item['tax_total'] 
+        vend_sales_receipt_by_sale[sale_id][:sales_tax] += item['tax_total']
+
+        vend_sales_costs[outlet][:cost] += item['cost_total']
+        vend_sales_costs_by_sale[sale_id][:cost] += item['cost_total']
       end
 
       sale['payments'].each do |payment|
         case payment['retailer_payment_type_id']
         when '0adfd74a-153e-11e9-ef2a-7cd37d28240d', 'eb021256-8eed-11e0-8e09-4040f540b50a' # credit sf, credit other locations
           vend_sales_receipt[outlet][:credit_payments] += payment['amount']
+          vend_sales_receipt_by_sale[sale_id][:credit_payments] += payment['amount']
         when '5e4b6218-8eed-11e0-8e09-4040f540b50a' # cash or check
           vend_sales_receipt[outlet][:cash_or_check_payments] += payment['amount']
+          vend_sales_receipt_by_sale[sale_id][:cash_or_check_payments] += payment['amount']
         when 'd1477a96-a0f8-11e0-8317-4040f540b50a' # gift card
           vend_sales_receipt[outlet][:gift_card_payments] += payment['amount']
+          vend_sales_receipt_by_sale[sale_id][:gift_card_payments] += payment['amount']
         end
       end
     end
@@ -254,6 +277,16 @@ namespace :daily_sales_receipts do
     vend_sales_costs.each do |location, cost|
       cost[:outlet_id] = location
       vend_costs.vend_sales_costs << VendSalesCost.create(cost)
+    end
+
+    vend_sales_receipt_by_sale.each do |sale_id, receipt|
+      receipt[:sale_id] = sale_id
+      vend_sales.vend_sales_receipt_sales << VendSalesReceiptSale.create(receipt)
+    end
+
+    vend_sales_costs_by_sale.each do |sale_id, cost|
+      cost[:sale_id] = sale_id
+      vend_costs.vend_sales_cost_sales << VendSalesCostSale.create(cost)
     end
   end
 end

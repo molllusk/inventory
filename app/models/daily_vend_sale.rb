@@ -1,5 +1,6 @@
 class DailyVendSale < ApplicationRecord
   has_many :vend_sales_receipts, dependent: :destroy
+  has_many :vend_sales_receipt_sales, dependent: :destroy
 end
 
 # == Schema Information

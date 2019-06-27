@@ -14,8 +14,6 @@ Rails.application.routes.draw do
   resources :shopify_sales_costs
   resources :daily_vend_costs
   resources :daily_vend_sales
-  resources :vend_sales_receipts
-  resources :vend_sales_costs
 
   namespace :admin do
     root to: '#index'

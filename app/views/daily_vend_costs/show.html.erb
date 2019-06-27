@@ -1,0 +1,45 @@
+<div class='center'>
+  <h2>Vend Sales Costs for <%= @daily_vend_costs.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%Y") %></h2>
+</div>
+
+<table class="products full_width">
+  <tr>
+    <th>Outlet</th>
+    <th>Cost</th>
+  </tr>
+  <% @daily_vend_costs.vend_sales_costs.sort_by(&:outlet_id).each do |cost| %>
+    <tr>
+      <td>
+        <%= cost.outlet_name %>
+      </td>
+      <td>
+        <%= number_to_currency(cost.cost, :unit => "$", :separator => ".", :delimiter => ",") %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<div class='center'>
+  <h2>Orders</h2>
+</div>
+
+<table class="products full_width">
+  <tr>
+    <th>Sale at</th>
+    <th>Outlet</th>
+    <th>Cost</th>
+  </tr>
+  <% @daily_vend_costs.vend_sales_cost_sales.sort_by { |sale| [ sale.outlet_id, sale.sale_at ] }.each do |sale| %>
+    <tr>
+      <td>
+        <a href='https://mollusksurf.vendhq.com/register_sale/viewreceipt/<%= sale.sale_id %>' target='_blank'><%= sale.sale_at.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %> <i class='fa fa-external-link-alt'></i></a>
+      </td>
+      <td>
+        <%= sale.outlet_name %>
+      </td>
+      <td>
+        <%= number_to_currency(sale.cost, :unit => "$", :separator => ".", :delimiter => ",") %>
+      </td>
+    </tr>
+  <% end %>
+</table>

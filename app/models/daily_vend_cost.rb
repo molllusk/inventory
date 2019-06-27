@@ -1,5 +1,6 @@
 class DailyVendCost < ApplicationRecord
   has_many :vend_sales_costs, dependent: :destroy
+  has_many :vend_sales_cost_sales, dependent: :destroy
 end
 
 # == Schema Information

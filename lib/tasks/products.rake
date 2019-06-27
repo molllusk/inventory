@@ -1,8 +1,5 @@
 namespace :products do
   task pull: :environment do
-    require File.join(Rails.root, 'app', 'lib', 'vend_client.rb')
-    require File.join(Rails.root, 'app', 'lib', 'shopify_client.rb')
-
     retail_shopify_products = ShopifyClient.all_products
     wholesale_shopify_products = ShopifyClient.all_products(:wholesale)
     vend_products = VendClient.active_products

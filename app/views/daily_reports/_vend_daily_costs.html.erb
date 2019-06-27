@@ -1,0 +1,30 @@
+<table class="products full_width">
+  <tr>
+    <th>Date</th>
+    <th>Outlet</th>
+    <th>Cost</th>
+  </tr>
+  <% @vend_costs.each do |costs| %>
+    <tr>
+      <td class='border-bottom' rowspan='<%= costs.vend_sales_costs.count %>' style='background-color: #FFFFFF'>
+        <a href='<%= daily_vend_costs_path(costs) %>' target='_blank'><%= costs.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y") %> <i class='fa fa-external-link-alt'></i></a>
+      </td>
+      <% costs.vend_sales_costs.sort_by(&:outlet_id).each_with_index do |sales_cost, index| %>
+        <% last_row = (index == (costs.vend_sales_costs.count - 1)) %>
+        <% if index.positive? %>
+          <tr>
+        <% end %>
+          <td class='<%= 'border-bottom' if last_row %>'>
+            <%= sales_cost.outlet_name %>
+          </td>
+          <td class='<%= 'border-bottom' if last_row %>'>
+            <%= number_to_currency(sales_cost.cost, :unit => "$", :separator => ".", :delimiter => ",") %>
+          </td>
+        </tr>
+      <% end %>
+  <% end %>
+</table>
+
+<div class='center'>
+<%= will_paginate @vend_costs %>
+</div>

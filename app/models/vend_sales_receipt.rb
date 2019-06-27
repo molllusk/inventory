@@ -1,13 +1,12 @@
 class VendSalesReceipt < ApplicationRecord
   belongs_to :daily_vend_sale
-  has_many :vend_sales_receipt_orders
 
   def outlet_name
     VendClient::OUTLET_NAMES_BY_ID[outlet_id]
   end
 
   def sum_check
-    product_sales + gift_card_sales + sales_tax + shipping - discount - credit_payments - cash_or_check_payments - gift_card_payments
+    product_sales + gift_card_sales + sales_tax + shipping + discount_sales - discount - credit_payments - cash_or_check_payments - gift_card_payments
   end
 end
 
@@ -19,6 +18,7 @@ end
 #  cash_or_check_payments :float            default(0.0)
 #  credit_payments        :float            default(0.0)
 #  discount               :float            default(0.0)
+#  discount_sales         :float            default(0.0)
 #  gift_card_payments     :float            default(0.0)
 #  gift_card_sales        :float            default(0.0)
 #  product_sales          :float            default(0.0)

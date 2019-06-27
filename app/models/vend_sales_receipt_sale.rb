@@ -1,30 +1,16 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+class VendSalesReceiptSale < ApplicationRecord
+  def outlet_name
+    VendClient::OUTLET_NAMES_BY_ID[outlet_id]
+  end
 
-one:
-  gift_card_sales: 1.5
-  gift_card_payments: 1.5
-  credit_payments: 1.5
-  cash_or_check_payments: 1.5
-  product_sales: 1.5
-  discount: 1.5
-  sales_tax: 1.5
-  date: 2019-06-25 12:31:43
-  shipping: 1.5
-
-two:
-  gift_card_sales: 1.5
-  gift_card_payments: 1.5
-  credit_payments: 1.5
-  cash_or_check_payments: 1.5
-  product_sales: 1.5
-  discount: 1.5
-  sales_tax: 1.5
-  date: 2019-06-25 12:31:43
-  shipping: 1.5
+  def sum_check
+    product_sales + gift_card_sales + sales_tax + shipping - discount_sales - discount - credit_payments - cash_or_check_payments - gift_card_payments
+  end
+end
 
 # == Schema Information
 #
-# Table name: vend_sales_receipts
+# Table name: vend_sales_receipt_sales
 #
 #  id                     :bigint(8)        not null, primary key
 #  cash_or_check_payments :float            default(0.0)
@@ -34,10 +20,12 @@ two:
 #  gift_card_payments     :float            default(0.0)
 #  gift_card_sales        :float            default(0.0)
 #  product_sales          :float            default(0.0)
+#  sale_at                :datetime
 #  sales_tax              :float            default(0.0)
 #  shipping               :float            default(0.0)
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  daily_vend_sale_id     :integer
 #  outlet_id              :string
+#  sale_id                :string
 #

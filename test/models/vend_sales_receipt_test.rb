@@ -14,6 +14,7 @@ end
 #  cash_or_check_payments :float            default(0.0)
 #  credit_payments        :float            default(0.0)
 #  discount               :float            default(0.0)
+#  discount_sales         :float            default(0.0)
 #  gift_card_payments     :float            default(0.0)
 #  gift_card_sales        :float            default(0.0)
 #  product_sales          :float            default(0.0)
