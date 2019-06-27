@@ -64,6 +64,7 @@ class VendClient
     min_date -= min_date.utc_offset
     max_date = day.to_time.in_time_zone('Pacific Time (US & Canada)').end_of_day
     max_date -= max_date.utc_offset
+
     response = connection.get 'search', { page_size: 10000, type: 'sales', date_from: min_date.iso8601, date_to: max_date.iso8601 }
     response.body['data']
   end
@@ -93,6 +94,7 @@ class VendClient
       vend_deleted_at: product['deleted_at'],
       vend_type: product['type']
     }
+
     SAVED_ATTRIBUTES.each { |saved_attribute| cleaned[saved_attribute] = product[saved_attribute.to_s] }
     cleaned
   end

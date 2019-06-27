@@ -5,5 +5,7 @@ class DailyReportsController < ApplicationController
     @shopify_sales_receipts = ShopifySalesReceipt.order('date DESC').paginate(page: params[:page], per_page: 10)
     @shopify_costs = ShopifySalesCost.order('date DESC').paginate(page: params[:page], per_page: 10)
     @shopify_refunds = ShopifyRefund.order('date DESC').paginate(page: params[:page], per_page: 10)
+    @vend_costs = DailyVendCost.order('date DESC').paginate(page: params[:page], per_page: 10)
+    @vend_sales = DailyVendSale.order('date DESC').paginate(page: params[:page], per_page: 10)
   end
 end

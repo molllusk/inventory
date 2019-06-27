@@ -1,0 +1,47 @@
+<table class="products full_width">
+  <tr>
+    <th>Day</th>
+    <th>Outlet</th>
+    <th>Product Sales</th>
+    <th>Gift Card Sales</th>
+    <th>Discounts</th>
+    <th>Sales Tax</th>
+    <th>Shipping</th>
+    <th>Credit Payments</th>
+    <th>Cash or Check Payments</th>
+    <th>Gift Card Payments</th>
+    <th>Sum Check</th>
+  </tr>
+  <% @vend_sales.each do |day| %>
+    <tr>
+      <td rowspan='<%= day.vend_sales_receipts.count %>' style='background-color: #FFFFFF'><%= day.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%Y")  %></td>
+      <% day.vend_sales_receipts.each_with_index do |receipt, index| %>
+        <% if index.positive? %>
+          <tr>
+        <% end %>
+          <td><%= receipt.outlet_name %></td>
+          <td><%= number_to_currency(receipt.product_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+          <td><%= number_to_currency(receipt.gift_card_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+          <td><%= number_to_currency(receipt.discount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+          <td><%= number_to_currency(receipt.sales_tax, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+          <td><%= number_to_currency(receipt.shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+          <td><%= number_to_currency(receipt.credit_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+          <td><%= number_to_currency(receipt.cash_or_check_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+          <td><%= number_to_currency(receipt.gift_card_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+          <td>
+            <% if receipt.sum_check.to_d.truncate(2).to_f == 0.0 %>
+              <p style='color: green'><i class="fa fa-check"></i></p>
+            <% elsif receipt.sum_check > 0 %>
+              <p style='color: red'><%= number_to_currency(receipt.sum_check, :unit => "$", :separator => ".", :delimiter => ",") %></p>
+            <% else %>
+              <p style='color: blue'><%= number_to_currency(receipt.sum_check, :unit => "$", :separator => ".", :delimiter => ",") %></p>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+  <% end %>
+</table>
+
+<div class='center'>
+<%= will_paginate @vend_sales %>
+</div>

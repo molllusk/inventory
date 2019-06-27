@@ -1,4 +1,4 @@
-class ShopifyClient
+module ShopifyClient
   RETAIL_BASE_URL = "https://#{ENV['SHOPIFY_USER']}:#{ENV['SHOPIFY_PASSWORD']}@mollusksurf.myshopify.com".freeze
   WHOLESALE_BASE_URL = "https://#{ENV['WHOLESALE_SHOPIFY_USER']}:#{ENV['WHOLESALE_SHOPIFY_PASSWORD']}@molluskats.myshopify.com".freeze
   SF_RETAIL_INVENTORY_LOCATION = 49481991.freeze

@@ -10,10 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_20_055015) do
+ActiveRecord::Schema.define(version: 2019_06_25_194747) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "daily_vend_costs", force: :cascade do |t|
+    t.datetime "date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "daily_vend_sales", force: :cascade do |t|
+    t.datetime "date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "fluid_inventory_thresholds", force: :cascade do |t|
     t.integer "threshold"
@@ -220,6 +232,29 @@ ActiveRecord::Schema.define(version: 2019_06_20_055015) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "inventory"
+  end
+
+  create_table "vend_sales_costs", force: :cascade do |t|
+    t.string "outlet_id"
+    t.integer "daily_vend_cost_id"
+    t.float "cost", default: 0.0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "vend_sales_receipts", force: :cascade do |t|
+    t.float "gift_card_sales", default: 0.0
+    t.float "gift_card_payments", default: 0.0
+    t.float "credit_payments", default: 0.0
+    t.float "cash_or_check_payments", default: 0.0
+    t.float "product_sales", default: 0.0
+    t.float "discount", default: 0.0
+    t.float "sales_tax", default: 0.0
+    t.string "outlet_id"
+    t.float "shipping", default: 0.0
+    t.integer "daily_vend_sale_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
 end

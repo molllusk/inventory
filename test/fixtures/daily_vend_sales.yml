@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  date: 2019-06-25 12:42:36
+
+two:
+  date: 2019-06-25 12:42:36
+
+# == Schema Information
+#
+# Table name: daily_vend_sales
+#
+#  id         :bigint(8)        not null, primary key
+#  date       :datetime
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
