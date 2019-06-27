@@ -7,7 +7,7 @@
   <% @vend_costs.each do |costs| %>
     <tr>
       <td class='border-bottom' rowspan='<%= costs.vend_sales_costs.count %>' style='background-color: #FFFFFF'>
-        <a href='<%= daily_vend_costs_path(costs) %>' target='_blank'><%= costs.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y") %> <i class='fa fa-external-link-alt'></i></a>
+        <a href='<%= daily_vend_cost_path(costs) %>' target='_blank'><%= costs.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y") %> <i class='fa fa-external-link-alt'></i></a>
       </td>
       <% costs.vend_sales_costs.sort_by(&:outlet_id).each_with_index do |sales_cost, index| %>
         <% last_row = (index == (costs.vend_sales_costs.count - 1)) %>
