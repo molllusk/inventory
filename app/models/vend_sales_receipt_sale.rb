@@ -6,7 +6,7 @@ class VendSalesReceiptSale < ApplicationRecord
   end
 
   def sum_check
-    product_sales + gift_card_sales + sales_tax + shipping - discount_sales - discount - credit_payments - cash_or_check_payments - gift_card_payments
+    product_sales + gift_card_sales + sales_tax + shipping + discount_sales - discount - credit_payments - cash_or_check_payments - gift_card_payments
   end
 end
 
