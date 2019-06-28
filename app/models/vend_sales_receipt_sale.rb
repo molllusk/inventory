@@ -22,6 +22,7 @@ end
 #  gift_card_payments     :float            default(0.0)
 #  gift_card_sales        :float            default(0.0)
 #  product_sales          :float            default(0.0)
+#  receipt_number         :integer
 #  sale_at                :datetime
 #  sales_tax              :float            default(0.0)
 #  shipping               :float            default(0.0)

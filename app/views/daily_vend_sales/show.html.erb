@@ -48,6 +48,7 @@
 <table class="products full_width">
   <tr>
     <th>Sale at</th>
+    <th>Receipt Number</th>
     <th>Outlet</th>
     <th>Product Sales</th>
     <th>Gift Card Sales</th>
@@ -62,7 +63,8 @@
   </tr>
   <% @daily_vend_sale.vend_sales_receipt_sales.sort_by { |sale| [ sale.outlet_id, sale.sale_at ] }.each do |sale| %>
     <tr>
-      <td><a href='https://mollusksurf.vendhq.com/api/2.0/sales/<%= sale.sale_id %>' target='_blank'><%= sale.sale_at.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %> <i class='fa fa-external-link-alt'></i></td>
+      <td><%= sale.sale_at.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %></td>
+      <td><a href='https://mollusksurf.vendhq.com/api/2.0/sales/<%= sale.sale_id %>' target='_blank'><%= sale.receipt_number %> <i class='fa fa-external-link-alt'></i></a></td>
       <td><%= sale.outlet_name %></td>
       <td><%= number_to_currency(sale.product_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= number_to_currency(sale.gift_card_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>

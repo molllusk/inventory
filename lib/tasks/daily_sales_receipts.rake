@@ -223,13 +223,18 @@ namespace :daily_sales_receipts do
     vend_sales_costs_by_sale = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
     vend_sales.each do |sale|
+      next if sale['status'] = 'CLOSED'
       outlet = sale['outlet_id']
       sale_id = sale['id']
 
       vend_sales_receipt_by_sale[sale_id][:outlet_id] = outlet
       vend_sales_costs_by_sale[sale_id][:outlet_id] = outlet
+      
       vend_sales_receipt_by_sale[sale_id][:sale_at] = sale['sale_date']
       vend_sales_costs_by_sale[sale_id][:sale_at] = sale['sale_date']
+      
+      vend_sales_receipt_by_sale[sale_id][:receipt_number] = sale['receipt_number']
+      vend_sales_costs_by_sale[sale_id][:receipt_number] = sale['receipt_number']
 
       sale['line_items'].each do |item|
         vend_sales_receipt_by_sale
@@ -239,8 +244,8 @@ namespace :daily_sales_receipts do
           vend_sales_receipt[outlet][:gift_card_sales] += item['price_total']
           vend_sales_receipt_by_sale[sale_id][:gift_card_sales] += item['price_total']
         when '0adfd74a-153e-11e6-f182-ae0e9b7d09f8' # Shipping
-          vend_sales_receipt[outlet][:shipping] += item['price_total']
-          vend_sales_receipt_by_sale[sale_id][:shipping] += item['price_total']
+          vend_sales_receipt[outlet][:shipping] += item['price_total'] + item['discount_total']
+          vend_sales_receipt_by_sale[sale_id][:shipping] += item['price_total'] + item['discount_total']
         when '5ddba61e-3598-11e2-b1f5-4040782fde00' #discount
           vend_sales_receipt[outlet][:discount_sales] += item['price_total']
           vend_sales_receipt_by_sale[sale_id][:discount_sales] += item['price_total']
