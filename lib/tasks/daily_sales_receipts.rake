@@ -223,7 +223,7 @@ namespace :daily_sales_receipts do
     vend_sales_costs_by_sale = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
     vend_sales.each do |sale|
-      next if sale['status'] = 'CLOSED'
+      next unless sale['status'] == 'CLOSED'
       outlet = sale['outlet_id']
       sale_id = sale['id']
 
