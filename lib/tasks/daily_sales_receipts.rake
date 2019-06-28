@@ -239,23 +239,25 @@ namespace :daily_sales_receipts do
       sale['line_items'].each do |item|
         vend_sales_receipt_by_sale
 
+        discount = item['discount_total'].negative? ? 0 : item['discount_total']
+
         case item['product_id']
         when '801eea1d-3e65-11e2-b1f5-4040782fde00' # Gift Cards
-          vend_sales_receipt[outlet][:gift_card_sales] += item['price_total']
-          vend_sales_receipt_by_sale[sale_id][:gift_card_sales] += item['price_total']
+          vend_sales_receipt[outlet][:gift_card_sales] += item['price_total'] + discount
+          vend_sales_receipt_by_sale[sale_id][:gift_card_sales] += item['price_total'] + discount
         when '0adfd74a-153e-11e6-f182-ae0e9b7d09f8' # Shipping
-          vend_sales_receipt[outlet][:shipping] += item['price_total'] + item['discount_total']
-          vend_sales_receipt_by_sale[sale_id][:shipping] += item['price_total'] + item['discount_total']
+          vend_sales_receipt[outlet][:shipping] += item['price_total'] + discount
+          vend_sales_receipt_by_sale[sale_id][:shipping] += item['price_total'] + discount
         when '5ddba61e-3598-11e2-b1f5-4040782fde00' #discount
-          vend_sales_receipt[outlet][:discount_sales] += item['price_total']
-          vend_sales_receipt_by_sale[sale_id][:discount_sales] += item['price_total']
+          vend_sales_receipt[outlet][:discount_sales] += item['price_total'] + discount
+          vend_sales_receipt_by_sale[sale_id][:discount_sales] += item['price_total'] + discount
         else
-          vend_sales_receipt[outlet][:product_sales] += item['price_total'] + item['discount_total']
-          vend_sales_receipt_by_sale[sale_id][:product_sales] += item['price_total'] + item['discount_total']
+          vend_sales_receipt[outlet][:product_sales] += item['price_total'] + discount
+          vend_sales_receipt_by_sale[sale_id][:product_sales] += item['price_total'] + discount
         end
 
-        vend_sales_receipt[outlet][:discount] += item['discount_total']
-        vend_sales_receipt_by_sale[sale_id][:discount] += item['discount_total']
+        vend_sales_receipt[outlet][:discount] += discount
+        vend_sales_receipt_by_sale[sale_id][:discount] += discount
 
         vend_sales_receipt[outlet][:sales_tax] += item['tax_total'] 
         vend_sales_receipt_by_sale[sale_id][:sales_tax] += item['tax_total']
