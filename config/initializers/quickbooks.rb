@@ -8,5 +8,3 @@ oauth_params = {
 }
 
 ::QB_OAUTH2_CONSUMER = OAuth2::Client.new(OAUTH_CONSUMER_KEY, OAUTH_CONSUMER_SECRET, oauth_params)
-
-Quickbooks.sandbox_mode = true
