@@ -1,12 +1,18 @@
 class VendSalesReceipt < ApplicationRecord
   belongs_to :daily_vend_sale, optional: true
 
+  DEFAULT_PARAMS = {}
+
   def outlet_name
     VendClient::OUTLET_NAMES_BY_ID[outlet_id]
   end
 
   def sum_check
     product_sales + gift_card_sales + sales_tax + shipping + discount_sales - discount - credit_payments - cash_or_check_payments - gift_card_payments
+  end
+
+  def qbo_params
+
   end
 end
 

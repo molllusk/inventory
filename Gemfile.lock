@@ -1,3 +1,16 @@
+GIT
+  remote: https://github.com/ruckus/quickbooks-ruby.git
+  revision: c19b7466fa3ebfd77ced09493d8346c2de205d81
+  branch: 389-oauth2
+  specs:
+    quickbooks-ruby (0.6.1)
+      activemodel
+      multipart-post
+      nokogiri
+      oauth (= 0.4.7)
+      oauth2 (~> 1.4)
+      roxml (= 4.0.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -140,12 +153,6 @@ GEM
     pg (0.20.0)
     public_suffix (3.0.3)
     puma (3.12.0)
-    quickbooks-ruby (0.6.6)
-      activemodel
-      multipart-post
-      nokogiri
-      oauth (~> 0.4.5)
-      roxml (>= 3.3.1, < 4.1)
     rack (2.0.6)
     rack-protection (2.0.5)
       rack
@@ -263,7 +270,7 @@ DEPENDENCIES
   oauth2
   pg (= 0.20.0)
   puma (~> 3.7)
-  quickbooks-ruby
+  quickbooks-ruby!
   rails (~> 5.2.2)
   rails_12factor
   sassc-rails (>= 2.1.0)
