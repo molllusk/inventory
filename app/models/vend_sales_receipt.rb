@@ -1,8 +1,6 @@
 class VendSalesReceipt < ApplicationRecord
   belongs_to :daily_vend_sale, optional: true
 
-  DEFAULT_PARAMS = {}
-
   def outlet_name
     VendClient::OUTLET_NAMES_BY_ID[outlet_id]
   end
@@ -12,6 +10,10 @@ class VendSalesReceipt < ApplicationRecord
   end
 
   def qbo_params
+
+  end
+
+  def post_to_qbo
 
   end
 end

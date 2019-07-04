@@ -4,6 +4,14 @@ class ShopifySalesReceipt < ApplicationRecord
   def sum_check
     product_sales + gift_card_sales + sales_tax + shipping - discount - shopify_payments - paypal_payments - gift_card_payments
   end
+
+  def qbo_params
+
+  end
+
+  def post_to_qbo
+
+  end
 end
 
 # == Schema Information
