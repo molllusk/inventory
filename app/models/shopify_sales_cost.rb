@@ -3,7 +3,7 @@ class ShopifySalesCost < ApplicationRecord
 
   def location_cost(location)
     location_id = ShopifyInventory::locations[location].to_s
-    location_costs.present? ? (location_costs[location_id] || 0.0) : 0.0
+    location_costs.present? ? (location_costs[location_id] || 0) : 0
   end
 
   def journal_entry_params
@@ -17,19 +17,19 @@ class ShopifySalesCost < ApplicationRecord
       {
         account_id: '3476', # Cost of Goods Sold
         amount: cost,
-        description: 'Total Cost of Sales',
+        description: 'Total Cost of Sales Shopify',
         posting_type: 'Debit'
       },
       {
         account_id: '3491', # Inventory Asset
-        amount: location_cost('Jam Warehouse Retail'),
-        description: 'Total Cost of Sales',
+        amount: location_cost('Jam Warehouse Retail').to_f,
+        description: 'Total Cost of Sales Shopify',
         posting_type: 'Credit'
       },
       {
         account_id: '3617', #Inventory Asset - San Francisco
-        amount: location_cost('Mollusk SF'),
-        description: 'Total Cost of Sales',
+        amount: location_cost('Mollusk SF').to_f,
+        description: 'Total Cost of Sales Shopify',
         posting_type: 'Credit'
       }
     ]
@@ -43,9 +43,21 @@ class ShopifySalesCost < ApplicationRecord
     journal_entry = Qbo.journal_entry(journal_entry_params)
 
     journal_line_item_details.each do |details|
-      line_item = Qbo.journal_entry_line_item({ amount: details[:amount], description: details[:description] })
-      line_item.journal_entry_line_detail.account_ref = Qbo.account_ref(details[:account_id])
-      line_item.journal_entry_line_detail.posting_type = details[:posting_type]
+      next if details[:amount] == 0.0
+      
+      line_item_params = {
+        amount: details[:amount],
+        description: details[:description]
+      }
+
+      journal_entry_line_detail = {
+        account_ref: Qbo.base_ref(details[:account_id]),
+        class_ref: Qbo.base_ref(Qbo::MOLLUSK_WEST_CLASS),
+        posting_type: details[:posting_type]
+      }
+
+      line_item = Qbo.journal_entry_line_item(line_item_params, journal_entry_line_detail)
+      
       journal_entry.line_items << line_item
     end
 
