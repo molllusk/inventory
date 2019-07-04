@@ -5,12 +5,95 @@ class ShopifySalesReceipt < ApplicationRecord
     product_sales + gift_card_sales + sales_tax + shipping - discount - shopify_payments - paypal_payments - gift_card_payments
   end
 
-  def qbo_params
+  def sales_reciept_params
+    {
+      txn_date: date
+    }
+  end
 
+  def sales_reciept_line_item_details
+    [
+      {
+        item_id: '172114', # Taxable Retail Sales
+        amount: product_sales,
+        quantity: 1,
+        # description: 'Taxable Retail Sales'
+      },
+      {
+        item_id: '172117', # Gift Certificates
+        amount: gift_card_sales,
+        quantity: 1,
+        # description: 'Gift Certificate sales'
+      },
+      {
+        item_id: '173274', # Shipping-Non Taxable
+        amount: shipping,
+        quantity: 1,
+        # description: 'Shipping-Non Taxable'
+      },
+      {
+        item_id: '172116', # San Francisco (sales tax)
+        amount: sales_tax,
+        quantity: 1,
+        # description: 'San Francisco sales tax'
+      },
+      {
+        item_id: '172119', # Discount
+        amount: -discount,
+        quantity: 1,
+        # description: 'Discount'
+      },
+      {
+        item_id: '174882', # Shopify Payments
+        amount: -shopify_payments,
+        quantity: 1,
+        # description: 'Credit Payments'
+      },
+      {
+        item_id: '175037', # Paypal Payment
+        amount: -paypal_payments,
+        quantity: 1,
+        # description: 'Paypal payments',
+      },
+      {
+        item_id: '172117', # Gift Certificates
+        amount: -gift_card_payments,
+        quantity: 1,
+        # description: 'Gift certificate payments',
+      },
+      {
+        item_id: '177181', # Over/Short
+        amount: sum_check,
+        quantity: 1,
+        # description: 'Over/Short'
+      }
+    ]
   end
 
   def post_to_qbo
+    Qbo.create_sales_reciept(sales_reciept)
+  end
 
+  def sales_reciept
+    sales_reciept = Qbo.sales_reciept(sales_reciept_params)
+
+    sales_reciept_line_item_details.each do |details|
+      line_item_params = {
+        amount: details[:amount],
+        # description: details[:description]
+      }
+
+      sales_reciept_line_detail = {
+        item_ref: Qbo.base_ref(details[:item_id]),
+        class_ref: Qbo.base_ref(Qbo::MOLLUSK_WEST_CLASS),
+      }
+
+      line_item = Qbo.sales_reciept_line_item(line_item_params, sales_reciept_line_detail)
+
+      sales_receipt.line_items << line_item
+    end
+
+    sales_receipt
   end
 end
 

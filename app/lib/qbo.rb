@@ -17,9 +17,18 @@ module Qbo
     @token ||= QboToken.last.refresh
   end
 
-  def self.journal_entry_line_item(params, entry_details)
+  def self.realm_id
+    @realm_id ||= QboToken.last.realm_id
+  end
+
+  def self.service_params
+    { access_token: token, company_id: realm_id }
+  end
+
+  def self.sales_receipt_line_item(params, receipt_details)
     line = Quickbooks::Model::Line.new(params)
-    line.journal_entry! do |detail|
+
+    line.sales_item! do |detail|
       entry_details.each do |key, value|
         detail.send("#{key}=", value)
       end
@@ -27,8 +36,31 @@ module Qbo
     line
   end
 
-  def self.journal_entry_line_item_detail(params)
-    Quickbooks::Model::JournalEntryLineDetail.new(params)
+  def self.sales_receipt(params)
+    Quickbooks::Model::SalesReceipt.new(params)
+  end
+
+  def self.create_sales_receipt(sales_receipt)
+    service = Quickbooks::Service::SalesReceipt.new(service_params)
+
+    service.create(sales_receipt)
+  end
+
+  def self.create_journal_entry(journal_entry)
+    service = Quickbooks::Service::JournalEntry.new(service_params)
+
+    service.create(journal_entry)
+  end
+
+  def self.journal_entry_line_item(params, entry_details)
+    line = Quickbooks::Model::Line.new(params)
+
+    line.journal_entry! do |detail|
+      entry_details.each do |key, value|
+        detail.send("#{key}=", value)
+      end
+    end
+    line
   end
 
   def self.base_ref(id)
