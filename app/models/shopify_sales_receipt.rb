@@ -5,13 +5,13 @@ class ShopifySalesReceipt < ApplicationRecord
     product_sales + gift_card_sales + sales_tax + shipping - discount - shopify_payments - paypal_payments - gift_card_payments
   end
 
-  def sales_reciept_params
+  def sales_receipt_params
     {
       txn_date: date
     }
   end
 
-  def sales_reciept_line_item_details
+  def sales_receipt_line_item_details
     [
       {
         item_id: '172114', # Taxable Retail Sales
@@ -71,20 +71,20 @@ class ShopifySalesReceipt < ApplicationRecord
   end
 
   def post_to_qbo
-    Qbo.create_sales_reciept(sales_reciept)
+    Qbo.create_sales_receipt(sales_receipt)
   end
 
-  def sales_reciept
-    sales_reciept = Qbo.sales_reciept(sales_reciept_params)
+  def sales_receipt
+    sales_receipt = Qbo.sales_receipt(sales_receipt_params)
 
-    sales_reciept_line_item_details.each do |details|
-      sales_reciept_line_detail = {
+    sales_receipt_line_item_details.each do |details|
+      sales_receipt_line_detail = {
         unit_price: details[:amount],
         item_ref: Qbo.base_ref(details[:item_id]),
         class_ref: Qbo.base_ref(Qbo::MOLLUSK_WEST_CLASS),
       }
 
-      line_item = Qbo.sales_reciept_line_item(sales_reciept_line_detail)
+      line_item = Qbo.sales_receipt_line_item(sales_receipt_line_detail)
 
       sales_receipt.line_items << line_item
     end
