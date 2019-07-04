@@ -22,6 +22,7 @@ module Qbo
   end
 
   def self.service_params
+    sleep(0.5)
     { access_token: token, company_id: realm_id }
   end
 

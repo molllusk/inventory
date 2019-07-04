@@ -210,10 +210,6 @@ namespace :daily_sales_receipts do
       shopify_sales_cost.shopify_sales_cost_orders << ShopifySalesCostOrder.create!(values)
     end
 
-    shopify_sales_cost.post_to_qbo
-    shopify_refund.post_to_qbo
-    shopify_sales_receipt.post_to_qbo
-
     ##########################
     ########  VEND ########
     ##########################
@@ -308,7 +304,10 @@ namespace :daily_sales_receipts do
       vend_costs.vend_sales_cost_sales << VendSalesCostSale.create!(cost)
     end
 
+    shopify_sales_cost.post_to_qbo
+    shopify_refund.post_to_qbo
+    shopify_sales_receipt.post_to_qbo
     vend_costs.post_to_qbo
-    # vend_sales.post_to_qbo
+    vend_sales.post_to_qbo
   end
 end
