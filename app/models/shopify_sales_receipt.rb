@@ -78,17 +78,13 @@ class ShopifySalesReceipt < ApplicationRecord
     sales_reciept = Qbo.sales_reciept(sales_reciept_params)
 
     sales_reciept_line_item_details.each do |details|
-      line_item_params = {
-        amount: details[:amount],
-        # description: details[:description]
-      }
-
       sales_reciept_line_detail = {
+        unit_price: details[:amount]
         item_ref: Qbo.base_ref(details[:item_id]),
         class_ref: Qbo.base_ref(Qbo::MOLLUSK_WEST_CLASS),
       }
 
-      line_item = Qbo.sales_reciept_line_item(line_item_params, sales_reciept_line_detail)
+      line_item = Qbo.sales_reciept_line_item(sales_reciept_line_detail)
 
       sales_receipt.line_items << line_item
     end
