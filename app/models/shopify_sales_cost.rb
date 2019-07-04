@@ -1,6 +1,11 @@
 class ShopifySalesCost < ApplicationRecord
   has_many :shopify_sales_cost_orders, dependent: :destroy
 
+  def location_cost(location)
+    location_id = ShopifyInventory::locations[location]
+    location_costs.present? ? (location_costs[location_id] || 0.0) : 0.0
+  end
+
   def journal_entry_params
     {
       txn_date: date
@@ -12,27 +17,22 @@ class ShopifySalesCost < ApplicationRecord
       {
         account_id: 50000,
         amount: cost,
-        description: 'Total Cost of Sales'
+        description: 'Total Cost of Sales',
+        posting_type: 'Debit'
       },
       {
         account_id: 11001,
-        amount: jam_cost,
-        description: 'Total Cost of Sales'
+        amount: location_cost('Jam Warehouse Retail'),
+        description: 'Total Cost of Sales',
+        posting_type: 'Credit'
       },
       {
         account_id: 11001,
-        amount: sf_cost,
-        description: 'Total Cost of Sales'
+        amount: location_cost('Mollusk SF'),
+        description: 'Total Cost of Sales',
+        posting_type: 'Credit'
       }
     ]
-  end
-
-  def jam_cost
-    location_costs.present? ? (location_costs[ShopifyInventory::locations['Jam Warehouse Retail']] || 0.0) : 0.0
-  end
-
-  def sf_cost
-    location_costs.present? ? (location_costs[ShopifyInventory::locations['Mollusk SF']] || 0.0) : 0.0
   end
 
   def post_to_qbo
@@ -44,8 +44,8 @@ class ShopifySalesCost < ApplicationRecord
 
     journal_line_item_details.each do |details|
       line_item = Qbo.journal_entry_line_item({ amount: details[:amount], description: details[:description] })
-      line_item.journal_entry_line_detail.account_ref = Qbo.account_ref(details: account_id)
-      line_item.journal_entry_line_detail.posting_type = account_id == 11001 ? 'Credit' : 'Debit'
+      line_item.journal_entry_line_detail.account_ref = Qbo.account_ref(details[:account_id])
+      line_item.journal_entry_line_detail.posting_type = details[:posting_type]
       journal_entry.line_items << line_item
     end
 
