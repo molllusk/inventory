@@ -27,7 +27,7 @@ class DailyVendCost < ApplicationRecord
 
       details << {
         account_id: '3476', # cost of goods sold
-        amount: sales_cost.cost
+        amount: sales_cost.cost,
         description: 'Total Cost of Sales Vend',
         posting_type: 'Debit',
         class_id: CLASS_ID_BY_OUTLET[sales_cost.outlet_name]
