@@ -25,8 +25,8 @@ module Qbo
     { access_token: token, company_id: realm_id }
   end
 
-  def self.sales_receipt_line_item(receipt_details)
-    line = Quickbooks::Model::Line.new
+  def self.sales_receipt_line_item(params, receipt_details)
+    line = Quickbooks::Model::Line.new(params)
 
     line.sales_item! do |detail|
       receipt_details.each do |key, value|
