@@ -15,19 +15,19 @@ class ShopifySalesCost < ApplicationRecord
   def journal_line_item_details
     [
       {
-        account_id: "50000",
+        account_id: '3476', # Cost of Goods Sold
         amount: cost,
         description: 'Total Cost of Sales',
         posting_type: 'Debit'
       },
       {
-        account_id: "11001",
+        account_id: '3491', # Inventory Asset
         amount: location_cost('Jam Warehouse Retail'),
         description: 'Total Cost of Sales',
         posting_type: 'Credit'
       },
       {
-        account_id: "11001",
+        account_id: '3617', #Inventory Asset - San Francisco
         amount: location_cost('Mollusk SF'),
         description: 'Total Cost of Sales',
         posting_type: 'Credit'
