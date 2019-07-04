@@ -57,7 +57,7 @@ class ShopifySalesReceipt < ApplicationRecord
       },
       {
         item_id: '177181', # Over/Short
-        amount: sum_check,
+        amount: sum_check.abs,
         description: 'Over/Short'
       }
     ]
