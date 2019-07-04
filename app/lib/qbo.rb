@@ -38,7 +38,15 @@ module Qbo
   end
 
   def self.journal_entry(params)
-    service = Quickbooks::JournalEntry::Class.new(params)
+    Quickbooks::Model::JournalEntry.new(params)
+  end
+
+  def self.create_journal_entry(journal_entry)
+    service = Quickbooks::Service::JournalEntry.new
+    service.access_token = token
+    service.company_id = QboToken.last.realm_id
+
+    created_entry = service.create(journal_entry)
   end
 end
 
