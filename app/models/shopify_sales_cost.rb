@@ -15,19 +15,19 @@ class ShopifySalesCost < ApplicationRecord
   def journal_line_item_details
     [
       {
-        account_id: '3476', # Cost of Goods Sold
+        account_id: '3476', # 50000 Cost of Goods Sold
         amount: cost,
         description: 'Total Cost of Sales Shopify',
         posting_type: 'Debit'
       },
       {
-        account_id: '3491', # Inventory Asset
+        account_id: '3491', # 11000 Inventory Asset
         amount: location_cost('Jam Warehouse Retail').to_f,
         description: 'Total Cost of Sales Shopify',
         posting_type: 'Credit'
       },
       {
-        account_id: '3617', #Inventory Asset - San Francisco
+        account_id: '3617', # 11001 Inventory Asset - San Francisco
         amount: location_cost('Mollusk SF').to_f,
         description: 'Total Cost of Sales Shopify',
         posting_type: 'Credit'
@@ -43,8 +43,6 @@ class ShopifySalesCost < ApplicationRecord
     journal_entry = Qbo.journal_entry(journal_entry_params)
 
     journal_line_item_details.each do |details|
-      next if details[:amount] == 0.0
-      
       line_item_params = {
         amount: details[:amount],
         description: details[:description]
@@ -57,7 +55,7 @@ class ShopifySalesCost < ApplicationRecord
       }
 
       line_item = Qbo.journal_entry_line_item(line_item_params, journal_entry_line_detail)
-      
+
       journal_entry.line_items << line_item
     end
 

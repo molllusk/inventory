@@ -210,6 +210,8 @@ namespace :daily_sales_receipts do
       shopify_sales_cost.shopify_sales_cost_orders << ShopifySalesCostOrder.create!(values)
     end
 
+    shopify_sales_cost.post_to_qbo
+
     ##########################
     ########  VEND ########
     ##########################
@@ -303,5 +305,7 @@ namespace :daily_sales_receipts do
       cost[:sale_id] = sale_id
       vend_costs.vend_sales_cost_sales << VendSalesCostSale.create!(cost)
     end
+
+    vend_costs.post_to_qbo
   end
 end
