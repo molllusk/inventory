@@ -212,6 +212,7 @@ namespace :daily_sales_receipts do
 
     shopify_sales_cost.post_to_qbo
     shopify_refund.post_to_qbo
+    shopify_sales_receipt.post_to_qbo
 
     ##########################
     ########  VEND ########
@@ -308,5 +309,6 @@ namespace :daily_sales_receipts do
     end
 
     vend_costs.post_to_qbo
+    # vend_sales.post_to_qbo
   end
 end
