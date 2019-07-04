@@ -21,7 +21,7 @@ module Qbo
     line = Quickbooks::Model::Line.new(params)
     line.journal_entry! do |detail|
       entry_details.each do |key, value|
-        detail.send(key) = value
+        detail.send("#{key}=", value)
       end
     end
     line
