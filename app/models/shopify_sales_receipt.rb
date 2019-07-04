@@ -7,7 +7,9 @@ class ShopifySalesReceipt < ApplicationRecord
 
   def sales_receipt_params
     {
-      txn_date: date
+      txn_date: date,
+      customer_ref: Qbo.base_ref(Qbo::SHOPIFY_CUSTOMER_ID),
+      deposit_to_account_ref: Qbo.base_ref(3544) # undeposited funds account id
     }
   end
 
@@ -16,56 +18,47 @@ class ShopifySalesReceipt < ApplicationRecord
       {
         item_id: '172114', # Taxable Retail Sales
         amount: product_sales,
-        quantity: 1,
-        # description: 'Taxable Retail Sales'
+        description: 'Taxable Retail Sales'
       },
       {
         item_id: '172117', # Gift Certificates
         amount: gift_card_sales,
-        quantity: 1,
-        # description: 'Gift Certificate sales'
+        description: 'Gift Certificate Sales'
       },
       {
         item_id: '173274', # Shipping-Non Taxable
         amount: shipping,
-        quantity: 1,
-        # description: 'Shipping-Non Taxable'
+        description: 'Shipping-Non Taxable'
       },
       {
         item_id: '172116', # San Francisco (sales tax)
         amount: sales_tax,
-        quantity: 1,
-        # description: 'San Francisco sales tax'
+        description: 'San Francisco Sales Tax'
       },
       {
         item_id: '172119', # Discount
         amount: -discount,
-        quantity: 1,
-        # description: 'Discount'
+        description: 'Discount'
       },
       {
         item_id: '174882', # Shopify Payments
         amount: -shopify_payments,
-        quantity: 1,
-        # description: 'Credit Payments'
+        description: 'Credit Payments'
       },
       {
         item_id: '175037', # Paypal Payment
         amount: -paypal_payments,
-        quantity: 1,
-        # description: 'Paypal payments',
+        description: 'Paypal Payments',
       },
       {
         item_id: '172117', # Gift Certificates
         amount: -gift_card_payments,
-        quantity: 1,
-        # description: 'Gift certificate payments',
+        description: 'Gift Certificate payments',
       },
       {
         item_id: '177181', # Over/Short
         amount: sum_check,
-        quantity: 1,
-        # description: 'Over/Short'
+        description: 'Over/Short'
       }
     ]
   end
@@ -85,6 +78,7 @@ class ShopifySalesReceipt < ApplicationRecord
 
       sales_receipt_line_detail = {
         unit_price: details[:amount],
+        quantity: 1,
         item_ref: Qbo.base_ref(details[:item_id]),
         class_ref: Qbo.base_ref(Qbo::MOLLUSK_WEST_CLASS),
       }
