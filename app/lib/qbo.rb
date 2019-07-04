@@ -46,7 +46,7 @@ module Qbo
     service.access_token = token
     service.company_id = QboToken.last.realm_id
 
-    created_entry = service.create(journal_entry)
+    service.create(journal_entry)
   end
 end
 
