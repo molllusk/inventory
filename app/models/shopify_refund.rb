@@ -21,19 +21,19 @@ class ShopifyRefund < ApplicationRecord
         posting_type: 'Debit'
       },
       {
-        account_id: '3633', # CA Board of Equalization Payable:Sales Tax Payable
+        account_id: '3549', # 25500 *Sales Tax Payable
         amount: sales_tax,
-        description: 'Sales tax',
+        description: 'Sales Tax Payable',
         posting_type: 'Debit'
       },
       {
-        account_id: '3638', # Shipping Income
+        account_id: '3557', # 43000 Freight Income
         amount: refunded_shipping,
         description: 'Refunded Shipping',
         posting_type: 'Debit'
       },
       {
-        account_id: '3646', # Discounts given
+        account_id: '3454', # 43000 Sales Discounts
         amount: discount,
         description: 'Discounts',
         posting_type: 'Credit'
@@ -57,7 +57,7 @@ class ShopifyRefund < ApplicationRecord
         posting_type: 'Credit'
       },
       {
-        account_id: '3638', # Shipping Income
+        account_id: '3557', # 43000 Freight Income
         amount: shipping,
         description: 'Return Shipping Fees',
         posting_type: 'Credit'

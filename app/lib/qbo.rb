@@ -26,6 +26,18 @@ module Qbo
     { access_token: token, company_id: realm_id }
   end
 
+  def self.list_items
+    Quickbooks::Service::Item.new(service_params).all
+  end
+
+  def self.list_accounts
+    Quickbooks::Service::Account.new(service_params).all
+  end
+
+  def self.list_classes
+    Quickbooks::Service::Class.new(service_params).all
+  end
+
   def self.sales_receipt_line_item(params, receipt_details)
     line = Quickbooks::Model::Line.new(params)
 
@@ -42,6 +54,12 @@ module Qbo
   end
 
   def self.create_sales_receipt(sales_receipt)
+    service = Quickbooks::Service::SalesReceipt.new(service_params)
+
+    service.create(sales_receipt)
+  end
+
+  def self.list_classes(sales_receipt)
     service = Quickbooks::Service::SalesReceipt.new(service_params)
 
     service.create(sales_receipt)

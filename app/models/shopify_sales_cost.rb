@@ -21,7 +21,7 @@ class ShopifySalesCost < ApplicationRecord
         posting_type: 'Debit'
       },
       {
-        account_id: '3491', # 11000 Inventory Asset
+        account_id: '3491', # 11137 Finished Goods - Shopify
         amount: location_cost('Jam Warehouse Retail').to_f,
         description: 'Total Cost of Sales Shopify',
         posting_type: 'Credit'
