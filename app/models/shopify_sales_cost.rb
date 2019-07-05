@@ -21,15 +21,15 @@ class ShopifySalesCost < ApplicationRecord
         posting_type: 'Debit'
       },
       {
-        account_id: '3491', # 11137 Finished Goods - Shopify
+        account_id: '3652', # 11137 Finished Goods - Shopify
         amount: location_cost('Jam Warehouse Retail').to_f,
-        description: 'Total Cost of Sales Shopify',
+        description: 'Total Cost of Sales Shopify - Jam Warehouse',
         posting_type: 'Credit'
       },
       {
         account_id: '3617', # 11001 Inventory Asset - San Francisco
         amount: location_cost('Mollusk SF').to_f,
-        description: 'Total Cost of Sales Shopify',
+        description: 'Total Cost of Sales Shopify - San Francisco',
         posting_type: 'Credit'
       }
     ]
