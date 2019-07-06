@@ -68,15 +68,15 @@ class ShopifyRefund < ApplicationRecord
         description: 'Returned COGS',
         posting_type: 'Debit'
       },
-      {
-        account_id: '3491', # 11000 Inventory Asset
-        amount: location_cost('Jam Warehouse Retail').to_f,
-        description: 'Costs by Jam Location',
-        posting_type: 'Credit'
-      },
+      # {
+      #   account_id: '3491', # 11000 Inventory Asset
+      #   amount: location_cost('Jam Warehouse Retail').to_f,
+      #   description: 'Costs by Jam Location',
+      #   posting_type: 'Credit'
+      # },
       {
         account_id: '3617', # 11001 Inventory Asset
-        amount: location_cost('Mollusk SF').to_f,
+        amount: location_cost('Mollusk SF').to_f + location_cost('Jam Warehouse Retail').to_f,
         description: 'Costs by SF Location',
         posting_type: 'Credit'
       }
