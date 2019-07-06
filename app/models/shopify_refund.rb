@@ -77,7 +77,7 @@ class ShopifyRefund < ApplicationRecord
       {
         account_id: '3617', # 11001 Inventory Asset - San Francisco
         amount: location_cost('Mollusk SF').to_f + location_cost('Jam Warehouse Retail').to_f,
-        description: 'Costs by SF Location (includes returns from Jam purchases)',
+        description: 'Costs by SF Location (includes cost of returns from Jam purchases)',
         posting_type: 'Credit'
       }
     ]
