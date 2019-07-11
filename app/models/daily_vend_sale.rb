@@ -63,17 +63,17 @@ class DailyVendSale < ApplicationRecord
       },
       {
         item_id: '181527', # Cash/Check Payment - Retail
-        amount: -receipt.cash_or_check_payments,
+        amount: receipt.cash_or_check_payments == 0.0 ? 0.0 : -receipt.cash_or_check_payments,
         description: 'Credit Payments'
       },
       {
         item_id: CREDIT_CARD_PAYMENT_ID_BY_OUTLET[receipt.outlet_name], # Paypal Payment
-        amount: -receipt.credit_payments,
+        amount: receipt.credit_payments == 0.0 ? 0.0 : -receipt.credit_payments,
         description: "Credit Card Payment - #{receipt.outlet_name}",
       },
       {
         item_id: '172117', # Gift Certificates
-        amount: -receipt.gift_card_payments,
+        amount: receipt.gift_card_payments == 0.0 ? 0.0 : -receipt.gift_card_payments,
         description: 'Gift Certificate payments',
       },
       {
