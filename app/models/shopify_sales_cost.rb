@@ -31,6 +31,18 @@ class ShopifySalesCost < ApplicationRecord
         amount: location_cost('Mollusk SF').to_f,
         description: 'Total Cost of Sales Shopify - San Francisco',
         posting_type: 'Credit'
+      },
+      {
+        account_id: '3618', # 11002 Inventory Asset - Silver Lake
+        amount: location_cost('Mollusk SL').to_f,
+        description: 'Total Cost of Sales Shopify - Silver Lake',
+        posting_type: 'Credit'
+      },
+      {
+        account_id: '3626', # 11003 Inventory Asset - Venice Beach
+        amount: location_cost('Mollusk VB').to_f,
+        description: 'Total Cost of Sales Shopify - Venice Beach',
+        posting_type: 'Credit'
       }
     ]
   end
@@ -74,8 +86,3 @@ end
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #
-
-
-  # - “50000 Cost of Goods Sold” - COGS value passed as “DEBITS”
-  # - “11001 Inventory Asset - San Francisco” - SF COGS value passed as “CREDITS”
-  # - “11000 Inventory Asset” - Jam COGS value passed as “CREDITS”

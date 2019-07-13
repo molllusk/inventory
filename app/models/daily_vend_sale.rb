@@ -57,23 +57,23 @@ class DailyVendSale < ApplicationRecord
         description: "#{receipt.outlet_name} Sales Tax"
       },
       {
-        item_id: '172119', # Discount
+        item_id: '181577', # Discount
         amount: receipt.discount_sales - receipt.discount,
         description: 'Discount'
       },
       {
         item_id: '181527', # Cash/Check Payment - Retail
-        amount: receipt.cash_or_check_payments == 0.0 ? 0.0 : -receipt.cash_or_check_payments,
-        description: 'Credit Payments'
+        amount: -receipt.cash_or_check_payments,
+        description: 'Cash or Check Payments'
       },
       {
         item_id: CREDIT_CARD_PAYMENT_ID_BY_OUTLET[receipt.outlet_name], # Paypal Payment
-        amount: receipt.credit_payments == 0.0 ? 0.0 : -receipt.credit_payments,
+        amount: -receipt.credit_payments,
         description: "Credit Card Payment - #{receipt.outlet_name}",
       },
       {
         item_id: '172117', # Gift Certificates
-        amount: receipt.gift_card_payments == 0.0 ? 0.0 : -receipt.gift_card_payments,
+        amount: -receipt.gift_card_payments,
         description: 'Gift Certificate payments',
       },
       {

@@ -59,12 +59,6 @@ module Qbo
     service.create(sales_receipt)
   end
 
-  def self.list_classes(sales_receipt)
-    service = Quickbooks::Service::SalesReceipt.new(service_params)
-
-    service.create(sales_receipt)
-  end
-
   def self.create_journal_entry(journal_entry)
     service = Quickbooks::Service::JournalEntry.new(service_params)
 

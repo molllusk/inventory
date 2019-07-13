@@ -36,7 +36,7 @@ class ShopifySalesReceipt < ApplicationRecord
         description: 'San Francisco Sales Tax'
       },
       {
-        item_id: '172119', # Discount
+        item_id: '181577', # Discount
         amount: -discount,
         description: 'Discount'
       },
