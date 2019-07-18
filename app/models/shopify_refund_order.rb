@@ -7,6 +7,7 @@ end
 # Table name: shopify_refund_orders
 #
 #  id                 :bigint(8)        not null, primary key
+#  arbitrary_discount :float            default(0.0)
 #  cost               :float            default(0.0)
 #  discount           :float            default(0.0)
 #  gift_card_payments :float            default(0.0)
