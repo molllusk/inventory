@@ -72,6 +72,7 @@ namespace :daily_sales_receipts do
 
         if shopify_product.present?
           cost = shopify_product.get_cost_from_vend * line_item['quantity'].to_f
+
           costs_by_order[order_name][:cost] += cost
           costs_report[:cost] += cost
           costs_by_location[location_id] += cost
@@ -172,14 +173,17 @@ namespace :daily_sales_receipts do
         when 'gift_card'
           refund_totals_by_order[order_name][:gift_card_payments] += transaction['amount'].to_f
           refunded_amounts[:gift_card_payments] += transaction['amount'].to_f
+          refund_totals_by_order[order_name][:total_payments] += transaction['amount'].to_f
           refunded_amounts[:total_payments] += transaction['amount'].to_f
         when 'paypal'
           refund_totals_by_order[order_name][:paypal_payments] += transaction['amount'].to_f
           refunded_amounts[:paypal_payments] += transaction['amount'].to_f
+          refund_totals_by_order[order_name][:total_payments] += transaction['amount'].to_f
           refunded_amounts[:total_payments] += transaction['amount'].to_f
         when 'shopify_payments'
           refund_totals_by_order[order_name][:shopify_payments] += transaction['amount'].to_f
           refunded_amounts[:shopify_payments] += transaction['amount'].to_f
+          refund_totals_by_order[order_name][:total_payments] += transaction['amount'].to_f
           refunded_amounts[:total_payments] += transaction['amount'].to_f
         end
       end
