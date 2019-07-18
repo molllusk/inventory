@@ -133,7 +133,17 @@ module ShopifyClient
 
   def self.get_variant(variant_id, store = :RETAIL)
     response = connection(store).get "#{API_VERSION}/variants/#{variant_id}.json"
-    response.body['variant']
+    response.body['variant'] || {}
+  end
+
+  def self.get_cost(variant_id, store = :RETAIL)
+    variant = get_variant(variant_id, store)
+    return unless variant.present?
+
+    inventory_item_id = variant['inventory_item_id']
+    inventory_item = get_inventory_item(inventory_item_id, store)
+
+    inventory_item['cost']
   end
 
   # might be able to get rid of and replace this and the inventory location constants

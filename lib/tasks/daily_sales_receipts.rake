@@ -137,17 +137,20 @@ namespace :daily_sales_receipts do
         fulfillment = fulfillments.detect { |fulfillment| fulfillment['line_items'].detect { |fulfillment_line_item| fulfillment_line_item['variant_id'] == variant_id } }
         location_id = fulfillment.present? && fulfillment['location_id'].present? ? fulfillment['location_id'] : 'no_location'
 
+        refund_cost = 0.0
         shopify_product = ShopifyDatum.find_by(variant_id: variant_id)
+        raw_cost = shopify_product.present? ? shopify_product.get_cost : ShopifyClient.get_cost(variant_id)
 
-        if shopify_product.present?
-          refund_cost = shopify_product.get_cost * line_item['quantity'].to_f
-          refund_totals_by_order[order_name][:cost] += refund_cost
-          refunded_amounts[:cost] += refund_cost
-          costs_by_location[location_id] += refund_cost
-          refund_costs_by_location[location_id] += refund_cost
+        if raw_cost.present?
+          refund_cost = raw_cost * line_item['quantity'].to_f
         else
-          Airbrake.notify("Item Refunded but missing from app as shopify product by variant id: { product_id: #{line_item['line_item']['product_id']}, variant_id: #{variant_id} }")
+          Airbrake.notify("Refunded missing COST in both systems variant id: { product_id: #{line_item['line_item']['product_id']}, variant_id: #{variant_id} }")
         end
+
+        refund_totals_by_order[order_name][:cost] += refund_cost
+        refunded_amounts[:cost] += refund_cost
+        costs_by_location[location_id] += refund_cost
+        refund_costs_by_location[location_id] += refund_cost
 
         refund_discounts = line_item['line_item']['discount_allocations'].reduce(0) { |sum, discount_allocation| sum + discount_allocation['amount'].to_f }
         sub_total = line_item['line_item']['price'].to_f * line_item['quantity'].to_f
