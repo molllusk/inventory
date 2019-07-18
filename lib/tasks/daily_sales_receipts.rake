@@ -196,7 +196,7 @@ namespace :daily_sales_receipts do
       end
     end
 
-    refunded_amounts[:shipping] = refunded_amounts[:product_sales] + refunded_amounts[:sales_tax] + refunded_amounts[:refunded_shipping] - refunded_amounts[:discount] - refunded_amounts[:total_payments]
+    refunded_amounts[:shipping] = refunded_amounts[:product_sales] + refunded_amounts[:sales_tax] + refunded_amounts[:refunded_shipping] + refunded_amounts[:arbitrary_discount] - refunded_amounts[:discount] - refunded_amounts[:total_payments]
 
     refunded_amounts[:location_costs] = refund_costs_by_location
     costs_report[:location_costs] = location_sales_costs
@@ -212,7 +212,7 @@ namespace :daily_sales_receipts do
 
     refund_totals_by_order.each do |order_name, values|
       values[:name] = order_name
-      values[:shipping] = values[:product_sales] + values[:sales_tax] + values[:refunded_shipping] - values[:discount] - values[:total_payments]
+      values[:shipping] = values[:product_sales] + values[:sales_tax] + values[:refunded_shipping] + values[:arbitrary_discount] - values[:discount] - values[:total_payments]
       shopify_refund.shopify_refund_orders << ShopifyRefundOrder.create!(values)
     end
 
