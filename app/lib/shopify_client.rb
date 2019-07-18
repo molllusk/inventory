@@ -142,8 +142,9 @@ module ShopifyClient
 
     inventory_item_id = variant['inventory_item_id']
     inventory_item = get_inventory_item(inventory_item_id, store)
+    return unless inventory_item.present?
 
-    inventory_item['cost']
+    inventory_item['cost'].to_f
   end
 
   # might be able to get rid of and replace this and the inventory location constants
