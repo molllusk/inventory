@@ -2,7 +2,7 @@ class ShopifySalesReceipt < ApplicationRecord
   has_many :shopify_sales_receipt_orders, dependent: :destroy
 
   def sum_check
-    product_sales + gift_card_sales + sales_tax + shipping - discount - shopify_payments - paypal_payments - gift_card_payments
+    product_sales.round(2) + gift_card_sales.round(2) + sales_tax.round(2) + shipping.round(2) - discount.round(2) - shopify_payments.round(2) - paypal_payments.round(2) - gift_card_payments.round(2)
   end
 
   def sales_receipt_params
