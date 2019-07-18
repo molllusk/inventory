@@ -1,6 +1,19 @@
 class ShopifySalesCost < ApplicationRecord
   has_many :shopify_sales_cost_orders, dependent: :destroy
 
+  enum store: {
+    retail: 0,
+    wholesale: 1
+  }
+
+  scope :retail, lambda {
+    where(store: :retail)
+  }
+
+  scope :wholesale, lambda {
+    where(store: :wholesale)
+  }
+
   def location_cost(location)
     location_id = ShopifyInventory::locations[location].to_s
     location_costs.present? ? (location_costs[location_id] || 0) : 0
@@ -83,6 +96,7 @@ end
 #  cost           :float            default(0.0)
 #  date           :datetime
 #  location_costs :json
+#  store          :integer          default("retail")
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #

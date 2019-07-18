@@ -11,13 +11,13 @@ namespace :daily_sales_receipts do
     puts "Getting orders from #{days_ago} day(s) ago #{min_date.strftime("%m/%d/%Y")}..."
 
     ##########################
-    ########  SHOPIFY ########
+    ##### SHOPIFY RETAIL #####
     ##########################
 
     orders = ShopifyClient.closed_orders_since(day)
     expected_order_count = ShopifyClient.closed_orders_since_count(day)
 
-    Airbrake.notify("Expected #{expected_order_count} orders, but got #{orders.count} while running daily financial reports") unless orders.count == expected_order_count
+    Airbrake.notify("Expected #{expected_order_count} RETAIL orders, but got #{orders.count} while running daily reports") unless orders.count == expected_order_count
 
     shopify_sales_receipt = Hash.new(0)
     costs_report = Hash.new(0)
@@ -221,9 +221,107 @@ namespace :daily_sales_receipts do
       shopify_sales_cost.shopify_sales_cost_orders << ShopifySalesCostOrder.create!(values)
     end
 
-    ##########################
+    ###########################
+    #### SHOPIFY WHOLESALE ####
+    ###########################
+
+    # wholesale_orders = ShopifyClient.closed_orders_since(day, :WHOLESALE)
+    # wholesale_expected_order_count = ShopifyClient.closed_orders_since_count(day, :WHOLESALE)
+
+    # Airbrake.notify("Expected #{wholesale_expected_order_count} RETAIL orders, but got #{wholesale_orders.count} while running daily reports") unless wholesale_orders.count == wholesale_expected_order_count
+
+    # wholesale_shopify_sales_receipt = Hash.new(0)
+    # wholesale_costs_report = Hash.new(0)
+
+    # wholesale_shopify_sales_receipt[:date] = min_date
+    # wholesale_costs_report[:date] = min_date
+
+    # wholesale_location_sales_costs = Hash.new(0)
+    # wholesale_sales_totals_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
+    # wholesale_costs_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
+
+    # wholesale_orders.each do |order|
+    #   costs_by_location = Hash.new(0)
+
+    #   next if Time.parse(order['closed_at']) < min_date || Time.parse(order['closed_at']) > max_date
+    #   order_name = order['name']
+    #   order_tax = order['tax_lines'].reduce(0) { |sum, tax_line| sum + tax_line['price'].to_f }
+
+    #   wholesale_sales_totals_by_order[order_name][:order_id] = order['id']
+    #   wholesale_sales_totals_by_order[order_name][:closed_at] = order['closed_at']
+    #   wholesale_sales_totals_by_order[order_name][:sales_tax] = order_tax
+    #   wholesale_sales_totals_by_order[order_name][:discount] = order['total_discounts'].to_f
+
+    #   wholesale_shopify_sales_receipt[:discount] += order['total_discounts'].to_f
+    #   wholesale_shopify_sales_receipt[:sales_tax] += order_tax
+
+    #   fulfillments = ShopifyClient.fulfillments(order['id'])
+
+    #   order['line_items'].each do |line_item|
+    #     variant_id = line_item['variant_id']
+    #     fulfillment = fulfillments.detect { |fulfillment| fulfillment['line_items'].detect { |fulfillment_line_item| fulfillment_line_item['variant_id'] == variant_id } }
+    #     location_id = fulfillment.present? && fulfillment['location_id'].present? ? fulfillment['location_id'] : 'no_location'
+
+    #     shopify_product = ShopifyDatum.find_by(variant_id: variant_id)
+
+    #     if shopify_product.present?
+    #       cost = shopify_product.get_cost * line_item['quantity'].to_f
+
+    #       wholesale_costs_by_order[order_name][:cost] += cost
+    #       wholesale_costs_report[:cost] += cost
+    #       costs_by_location[location_id] += cost
+    #       wholesale_location_sales_costs[location_id] += cost
+    #     else
+    #       Airbrake.notify("Item sold but missing from app as shopify product by variant id: { variant_id: #{variant_id}, product_id: #{line_item['product_id']} }")
+    #     end
+
+    #     if line_item['gift_card'] || line_item['product_id'] == 1045344714837 # mollusk money
+    #       wholesale_shopify_sales_receipt[:gift_card_sales] += line_item['price'].to_f * line_item['quantity'].to_f
+    #       wholesale_sales_totals_by_order[order_name][:gift_card_sales] += line_item['price'].to_f * line_item['quantity'].to_f
+    #     else
+    #       wholesale_shopify_sales_receipt[:product_sales] += line_item['price'].to_f * line_item['quantity'].to_f
+    #       wholesale_sales_totals_by_order[order_name][:product_sales] += line_item['price'].to_f * line_item['quantity'].to_f
+    #     end
+    #   end
+
+    #   wholesale_costs_by_order[order_name][:order_id] = order['id']
+    #   wholesale_costs_by_order[order_name][:closed_at] = order['closed_at']
+    #   wholesale_costs_by_order[order_name][:location_costs] = costs_by_location
+
+    #   order_shipping = order['shipping_lines'].reduce(0) { |sum, shipping_line| sum + shipping_line['price'].to_f }
+
+    #   wholesale_sales_totals_by_order[order_name][:shipping] = order_shipping
+    #   wholesale_shopify_sales_receipt[:shipping] += order_shipping
+
+    #   transactions = ShopifyClient.transactions(order['id'])
+
+    #   transactions.each do |transaction|
+    #     next unless %w(capture sale refund).include?(transaction['kind']) && transaction['status'] == 'success'
+
+    #     if %w(capture sale).include?(transaction['kind'])
+    #       case transaction['gateway']
+    #       when 'gift_card'
+    #         wholesale_sales_totals_by_order[order_name][:gift_card_payments] += transaction['amount'].to_f
+    #         wholesale_shopify_sales_receipt[:gift_card_payments] += transaction['amount'].to_f
+    #       when 'paypal'
+    #         wholesale_sales_totals_by_order[order_name][:paypal_payments] += transaction['amount'].to_f
+    #         wholesale_shopify_sales_receipt[:paypal_payments] += transaction['amount'].to_f
+    #       when 'shopify_payments'
+    #         wholesale_sales_totals_by_order[order_name][:shopify_payments] += transaction['amount'].to_f
+    #         wholesale_shopify_sales_receipt[:shopify_payments] += transaction['amount'].to_f
+    #       end
+    #     elsif transaction['kind'] == 'refund' && transaction['gateway'] == 'gift_card'
+    #       if transaction['message'] == 'Another transaction failed so the gift card was rolled back'
+    #         wholesale_sales_totals_by_order[order_name][:gift_card_payments] -= transaction['amount'].to_f
+    #         wholesale_shopify_sales_receipt[:gift_card_payments] -= transaction['amount'].to_f
+    #       end
+    #     end
+    #   end
+    # end
+
+    #######################
     ########  VEND ########
-    ##########################
+    #######################
 
     vend_sales = VendClient.sales(day)
 

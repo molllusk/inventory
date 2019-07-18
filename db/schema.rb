@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_28_194314) do
+ActiveRecord::Schema.define(version: 2019_07_18_220825) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -142,6 +142,7 @@ ActiveRecord::Schema.define(version: 2019_06_28_194314) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.float "refunded_shipping", default: 0.0
+    t.float "arbitrary_discount", default: 0.0
   end
 
   create_table "shopify_sales_cost_orders", force: :cascade do |t|
@@ -153,6 +154,7 @@ ActiveRecord::Schema.define(version: 2019_06_28_194314) do
     t.integer "shopify_sales_cost_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "store", default: 0
   end
 
   create_table "shopify_sales_costs", force: :cascade do |t|
@@ -161,6 +163,7 @@ ActiveRecord::Schema.define(version: 2019_06_28_194314) do
     t.datetime "date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "store", default: 0
   end
 
   create_table "shopify_sales_receipt_orders", force: :cascade do |t|
@@ -178,6 +181,7 @@ ActiveRecord::Schema.define(version: 2019_06_28_194314) do
     t.integer "shopify_sales_receipt_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "store", default: 0
   end
 
   create_table "shopify_sales_receipts", force: :cascade do |t|
@@ -192,6 +196,7 @@ ActiveRecord::Schema.define(version: 2019_06_28_194314) do
     t.datetime "date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "store", default: 0
   end
 
   create_table "users", force: :cascade do |t|

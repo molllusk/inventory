@@ -1,6 +1,19 @@
 class ShopifySalesReceipt < ApplicationRecord
   has_many :shopify_sales_receipt_orders, dependent: :destroy
 
+  enum store: {
+    retail: 0,
+    wholesale: 1
+  }
+
+  scope :retail, lambda {
+    where(store: :retail)
+  }
+
+  scope :wholesale, lambda {
+    where(store: :wholesale)
+  }
+
   def sum_check
     product_sales.round(2) + gift_card_sales.round(2) + sales_tax.round(2) + shipping.round(2) - discount.round(2) - shopify_payments.round(2) - paypal_payments.round(2) - gift_card_payments.round(2)
   end
@@ -106,6 +119,7 @@ end
 #  sales_tax          :float            default(0.0)
 #  shipping           :float            default(0.0)
 #  shopify_payments   :float            default(0.0)
+#  store              :integer          default("retail")
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #

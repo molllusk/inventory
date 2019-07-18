@@ -14,6 +14,7 @@ end
 #  cost           :float            default(0.0)
 #  date           :datetime
 #  location_costs :json
+#  store          :integer          default("retail")
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #

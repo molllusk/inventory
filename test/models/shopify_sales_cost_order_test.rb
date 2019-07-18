@@ -15,6 +15,7 @@ end
 #  cost                  :float            default(0.0)
 #  location_costs        :json
 #  name                  :string
+#  store                 :integer          default("retail")
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
 #  order_id              :bigint(8)

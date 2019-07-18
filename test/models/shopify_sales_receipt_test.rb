@@ -12,6 +12,7 @@
 #  sales_tax          :float            default(0.0)
 #  shipping           :float            default(0.0)
 #  shopify_payments   :float            default(0.0)
+#  store              :integer          default("retail")
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #

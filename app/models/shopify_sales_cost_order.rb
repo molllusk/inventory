@@ -1,5 +1,18 @@
 class ShopifySalesCostOrder < ApplicationRecord
   belongs_to :shopify_sales_cost, optional: true
+
+  enum store: {
+    retail: 0,
+    wholesale: 1
+  }
+
+  scope :retail, lambda {
+    where(store: :retail)
+  }
+
+  scope :wholesale, lambda {
+    where(store: :wholesale)
+  }
 end
 
 # == Schema Information
@@ -11,6 +24,7 @@ end
 #  cost                  :float            default(0.0)
 #  location_costs        :json
 #  name                  :string
+#  store                 :integer          default("retail")
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
 #  order_id              :bigint(8)
