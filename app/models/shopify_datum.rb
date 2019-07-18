@@ -21,6 +21,10 @@ class ShopifyDatum < ApplicationRecord
     shopify_inventories.find_by(location: location)&.inventory
   end
 
+  def inventory_item
+    ShopifyClient.get_inventory_item(inventory_item_id)
+  end
+
   def full_title
     "#{title} - #{variant_title}"
   end
@@ -37,12 +41,15 @@ class ShopifyDatum < ApplicationRecord
     tags.detect { |tag| %w[3rdparty sale].include?(tag.strip.downcase) }.present?
   end
 
-  def get_cost_from_vend
+  def get_cost
     vend_product = product.vend_datum
     if vend_product.present?
       vend_product.supply_price.to_f
     else
-      Airbrake.notify("Item in shopify order but missing from app as vend product via barcode: { barcode: #{barcode}, product_id: #{shopify_product_id}, variant_id: #{variant_id} }")
+      cost = inventory_item['cost']
+      return cost unless cost.blank?
+
+      Airbrake.notify("COST MISSING: Item in shopify order, but Vend Product and Shopify Cost are missing: { barcode: #{barcode}, product_id: #{shopify_product_id}, variant_id: #{variant_id} }")
       0.0
     end
   end

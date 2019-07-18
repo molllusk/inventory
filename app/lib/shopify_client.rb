@@ -126,6 +126,11 @@ module ShopifyClient
     inventory_items.flatten
   end
 
+  def self.get_inventory_item(inventory_item_id, store = :RETAIL)
+    response = connection(store).get "#{API_VERSION}/inventory_items/#{inventory_item_id}.json"
+    response.body['inventory_item'] || {}
+  end
+
   def self.get_variant(variant_id, store = :RETAIL)
     response = connection(store).get "#{API_VERSION}/variants/#{variant_id}.json"
     response.body['variant']

@@ -71,7 +71,7 @@ namespace :daily_sales_receipts do
         shopify_product = ShopifyDatum.find_by(variant_id: variant_id)
 
         if shopify_product.present?
-          cost = shopify_product.get_cost_from_vend * line_item['quantity'].to_f
+          cost = shopify_product.get_cost * line_item['quantity'].to_f
 
           costs_by_order[order_name][:cost] += cost
           costs_report[:cost] += cost
@@ -138,7 +138,7 @@ namespace :daily_sales_receipts do
         shopify_product = ShopifyDatum.find_by(variant_id: variant_id)
 
         if shopify_product.present?
-          refund_cost = shopify_product.get_cost_from_vend * line_item['quantity'].to_f
+          refund_cost = shopify_product.get_cost * line_item['quantity'].to_f
           refund_totals_by_order[order_name][:cost] += refund_cost
           refunded_amounts[:cost] += refund_cost
           costs_by_location[location_id] += refund_cost

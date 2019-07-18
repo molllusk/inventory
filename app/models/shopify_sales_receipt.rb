@@ -73,7 +73,7 @@ class ShopifySalesReceipt < ApplicationRecord
     sales_receipt_line_item_details.each do |details|
       line_item_params = {
         amount: details[:amount],
-        # description: details[:description]
+        description: details[:description]
       }
 
       sales_receipt_line_detail = {
