@@ -7,6 +7,7 @@
     <th>Day</th>
     <th>Product Sales</th>
     <th>Discounts</th>
+    <th>Arbitrary Discounts</th>
     <th>Sales Tax</th>
     <th>Refunded Shipping</th>
     <th>Return Shipping Fees</th>
@@ -20,6 +21,7 @@
     <td><%= @shopify_refund.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %></td>
     <td><%= number_to_currency(@shopify_refund.product_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
     <td><%= number_to_currency(@shopify_refund.discount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+    <td><%= number_to_currency(@shopify_refund.arbitrary_discount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
     <td><%= number_to_currency(@shopify_refund.sales_tax, :unit => "$", :separator => ".", :delimiter => ",") %></td>
     <td><%= number_to_currency(@shopify_refund.refunded_shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
     <td><%= number_to_currency(@shopify_refund.shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
@@ -43,6 +45,7 @@
     <th>Order Name</th>
     <th>Product Sales</th>
     <th>Discounts</th>
+    <th>Arbitrary Discounts</th>
     <th>Sales Tax</th>
     <th>Refunded Shipping</th>
     <th>Return Shipping Fees</th>
@@ -58,6 +61,7 @@
       <td><a href='https://mollusksurf.myshopify.com/admin/orders/<%= order.order_id %>' target='_blank'><%= order.name %> <i class='fa fa-external-link-alt'></i></a></td>
       <td><%= number_to_currency(order.product_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= number_to_currency(order.discount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+      <td><%= number_to_currency(order.arbitrary_discount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= number_to_currency(order.sales_tax, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= number_to_currency(order.refunded_shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= number_to_currency(order.shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
