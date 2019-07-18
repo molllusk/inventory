@@ -130,7 +130,9 @@ namespace :daily_sales_receipts do
       fulfillments = ShopifyClient.fulfillments(refund['order_id'])
       costs_by_location = Hash.new(0)
 
-      refund['refund_line_items'].each do |line_item|
+      refund_line_items = refund['refund_line_items']
+
+      refund_line_items.each do |line_item|
         variant_id = line_item['line_item']['variant_id']
         fulfillment = fulfillments.detect { |fulfillment| fulfillment['line_items'].detect { |fulfillment_line_item| fulfillment_line_item['variant_id'] == variant_id } }
         location_id = fulfillment.present? && fulfillment['location_id'].present? ? fulfillment['location_id'] : 'no_location'
@@ -186,6 +188,11 @@ namespace :daily_sales_receipts do
           refund_totals_by_order[order_name][:total_payments] += transaction['amount'].to_f
           refunded_amounts[:total_payments] += transaction['amount'].to_f
         end
+      end
+
+      if refund_line_items.blank?
+        refunded_amounts[:discount] += refund_totals_by_order[order_name][:total_payments]
+        refund_totals_by_order[order_name][:discount] += refund_totals_by_order[order_name][:total_payments]
       end
     end
 
