@@ -64,6 +64,7 @@ namespace :daily_sales_receipts do
       fulfillments = ShopifyClient.fulfillments(order['id'])
 
       order['line_items'].each do |line_item|
+        # why is variant id coming up blank?
         variant_id = line_item['variant_id']
         fulfillment = fulfillments.detect { |fulfillment| fulfillment['line_items'].detect { |fulfillment_line_item| fulfillment_line_item['variant_id'] == variant_id } }
         location_id = fulfillment.present? && fulfillment['location_id'].present? ? fulfillment['location_id'] : 'no_location'
@@ -75,7 +76,7 @@ namespace :daily_sales_receipts do
         if raw_cost.present?
           cost = raw_cost * line_item['quantity'].to_f
         else
-          Airbrake.notify("Item sold is missing COST in both systems { variant_id: #{variant_id}, product_id: #{line_item['product_id']} }")
+          Airbrake.notify("Item sold is missing COST in both systems { order_name: #{order_name}, variant_id: #{variant_id}, product_id: #{line_item['product_id']} }")
         end
 
         costs_by_order[order_name][:cost] += cost

@@ -34,10 +34,16 @@ class ShopifyRefund < ApplicationRecord
       },
       {
         account_id: '3454', # 43000 Sales Discounts
-        amount: discount + arbitrary_discount,
+        amount: discount,
         description: 'Discounts',
         posting_type: 'Credit'
       },
+      # {
+      #   account_id: '', #
+      #   amount: arbitrary_discount,
+      #   description: 'Arbitrary Discounts',
+      #   posting_type: 'Credit'
+      # },
       {
         account_id: '3611', # 12010 Credit Card Clearing
         amount: shopify_payments,
