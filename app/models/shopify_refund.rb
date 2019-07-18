@@ -34,7 +34,7 @@ class ShopifyRefund < ApplicationRecord
       },
       {
         account_id: '3454', # 43000 Sales Discounts
-        amount: discount,
+        amount: discount + arbitrary_discount,
         description: 'Discounts',
         posting_type: 'Credit'
       },
