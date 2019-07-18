@@ -68,18 +68,20 @@ namespace :daily_sales_receipts do
         fulfillment = fulfillments.detect { |fulfillment| fulfillment['line_items'].detect { |fulfillment_line_item| fulfillment_line_item['variant_id'] == variant_id } }
         location_id = fulfillment.present? && fulfillment['location_id'].present? ? fulfillment['location_id'] : 'no_location'
 
+        cost = 0.0
         shopify_product = ShopifyDatum.find_by(variant_id: variant_id)
+        raw_cost = shopify_product.present? ? shopify_product.get_cost : ShopifyClient.get_cost(variant_id)
 
-        if shopify_product.present?
-          cost = shopify_product.get_cost * line_item['quantity'].to_f
-
-          costs_by_order[order_name][:cost] += cost
-          costs_report[:cost] += cost
-          costs_by_location[location_id] += cost
-          location_sales_costs[location_id] += cost
+        if raw_cost.present?
+          cost = raw_cost * line_item['quantity'].to_f
         else
-          Airbrake.notify("Item sold but missing from app as shopify product by variant id: { variant_id: #{variant_id}, product_id: #{line_item['product_id']} }")
+          Airbrake.notify("Item sold is missing COST in both systems { variant_id: #{variant_id}, product_id: #{line_item['product_id']} }")
         end
+
+        costs_by_order[order_name][:cost] += cost
+        costs_report[:cost] += cost
+        costs_by_location[location_id] += cost
+        location_sales_costs[location_id] += cost
 
         if line_item['gift_card'] || line_item['product_id'] == 1045344714837 # mollusk money
           shopify_sales_receipt[:gift_card_sales] += line_item['price'].to_f * line_item['quantity'].to_f
