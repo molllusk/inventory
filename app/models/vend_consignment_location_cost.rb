@@ -10,6 +10,10 @@ class VendConsignmentLocationCost < ApplicationRecord
     where(role: :receiver)
   }
 
+  scope :supplying, lambda {
+    where(role: :supplier)
+  }
+
   def outlet_name
     VendClient::OUTLET_NAMES_BY_ID[outlet_id]
   end
