@@ -24,5 +24,15 @@ Rails.application.routes.draw do
     get '/quickbooks/oauth_callback', to: 'quickbooks#oauth_callback'
   end
 
-  get '/daily_reports', to: 'daily_reports#index'
+  resources :daily_reports do
+    collection do
+      get :shopify_sales_receipts
+      get :shopify_costs
+      get :shopify_refunds
+      get :wholesale_shopify_sales_receipts
+      get :wholesale_shopify_costs
+      get :vend_sales_receipt
+      get :vend_costs
+    end
+  end
 end

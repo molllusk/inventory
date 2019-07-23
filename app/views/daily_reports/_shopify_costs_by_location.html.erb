@@ -1,3 +1,5 @@
+<%= render partial: 'nav' %>
+
 <% location_costs.each do |location, cost| %>
   <div class='py-1'>
     <strong><%= ShopifyInventory::locations.key(location.to_i) %></strong>: <%= number_to_currency(cost, :unit => "$", :separator => ".", :delimiter => ",") %>
