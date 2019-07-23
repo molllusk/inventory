@@ -445,30 +445,89 @@ namespace :daily_sales_receipts do
     ########  Consignments ########
     ###############################
 
-    # consignments = VendClient.consignments
-    # consignments_received_report = Hash.new { |hash, key| hash[key] = Hash.new(0) }
+    consignments = VendClient.consignments
+    consignments_received_report = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
-    # consignments_received = Hash.new { |hash, key| hash[key] = Hash.new(0) }
+    consignments_received = Hash.new { |hash, key| hash[key] = Hash.new }
 
-    # consignments.each do |consignment|
-    #   next unless consignment['source_outlet_id'].present?
-    #   received_at = Time.parse(consignment['received_at'])
-    #   next if received_at < min_date || received_at > max_date
+    consignments.each do |consignment|
+      next unless consignment['source_outlet_id'].present?
+      received_at = Time.parse(consignment['received_at'])
+      next if received_at < min_date || received_at > max_date
 
-    #   consignments_received_report[:received][consignment['outlet_id']] += 
-    #   consignments_received_report[:supplied][consignment['supplier_id']] += 
-    # end
+      products = VendClient.consignment_products(consignment['id'])
+      cost = products.reduce(0) { |product, sum| sum += product['cost'].to_f * product['received'].to_f }
 
-    # Redis.current.set('min_consignment_version', consignments.last["version"]) if consignments.present?
+      consignments_received_report[:received][consignment['outlet_id']] += cost
+      consignments_received_report[:supplied][consignment['supplier_id']] += cost
+      consignments_received[consignment['id']][:receiving_id] = consignment['outlet_id']
+      consignments_received[consignment['id']][:supplying_id] = consignment['supplier_id']
+      consignments_received[consignment['id']][:cost] = cost
+    end
+
+    Redis.current.set('min_consignment_version', consignments.last['version']) if consignments.present?
+
+    daily_vend_consignment = DailyVendConsignment.create!(date: min_date)
+
+    if consignments.present?
+      consignments_received_report[:received].each do |outlet, cost|
+        daily_vend_consignment.vend_consignment_location_costs << VendConsignmentLocationCost.create!(role: :receiver, outlet_id: outlet, cost: cost)
+      end
+
+      consignments_received_report[:supplied].each do |outlet, cost|
+        daily_vend_consignment.vend_consignment_location_costs << VendConsignmentLocationCost.create!(role: :supplier, outlet_id: outlet, cost: cost)
+      end
+
+      consignments_received.each do |id, consignment|
+        consignment['vend_consignment_id'] = id
+        daily_vend_consignment.vend_consignments << VendConsignment.create!(consignment)
+      end
+    end
 
     #############################
     ######## send to QBO ########
     #############################
 
-    shopify_sales_cost.post_to_qbo
-    shopify_refund.post_to_qbo
-    shopify_sales_receipt.post_to_qbo
-    vend_costs.post_to_qbo
-    vend_sales.post_to_qbo
+    begin
+      shopify_sales_cost.post_to_qbo
+    rescue
+      Airbrake.notify($!)
+    end
+
+    begin
+      shopify_refund.post_to_qbo
+    rescue
+      Airbrake.notify($!)
+    end
+
+    begin
+      shopify_sales_receipt.post_to_qbo
+    rescue
+      Airbrake.notify($!)
+    end
+
+    begin
+      wholesale_shopify_sales_cost.post_to_qbo
+    rescue
+      Airbrake.notify($!)
+    end
+
+    begin
+      wholesale_shopify_sales_receipt.post_to_qbo
+    rescue
+      Airbrake.notify($!)
+    end
+
+    begin
+      vend_costs.post_to_qbo
+    rescue
+      Airbrake.notify($!)
+    end
+
+    begin
+      vend_sales.post_to_qbo
+    rescue
+      Airbrake.notify($!)
+    end
   end
 end

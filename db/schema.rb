@@ -10,10 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_18_222305) do
+ActiveRecord::Schema.define(version: 2019_07_23_214520) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "daily_vend_consignments", force: :cascade do |t|
+    t.datetime "date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "daily_vend_costs", force: :cascade do |t|
     t.datetime "date"
@@ -208,6 +214,25 @@ ActiveRecord::Schema.define(version: 2019_07_18_222305) do
     t.string "password_digest"
     t.string "remember_digest"
     t.boolean "admin", default: false
+  end
+
+  create_table "vend_consignment_location_costs", force: :cascade do |t|
+    t.integer "daily_vend_consignment_id"
+    t.float "cost", default: 0.0
+    t.string "outlet_id"
+    t.integer "role", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "vend_consignments", force: :cascade do |t|
+    t.integer "daily_vend_consignment_id"
+    t.float "cost", default: 0.0
+    t.string "receiving_id"
+    t.string "supplying_id"
+    t.string "vend_consignment_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "vend_data", force: :cascade do |t|
