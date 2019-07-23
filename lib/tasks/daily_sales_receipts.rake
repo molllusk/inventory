@@ -441,6 +441,30 @@ namespace :daily_sales_receipts do
       vend_costs.vend_sales_cost_sales << VendSalesCostSale.create!(cost)
     end
 
+    ###############################
+    ########  Consignments ########
+    ###############################
+
+    # consignments = VendClient.consignments
+    # consignments_received_report = Hash.new { |hash, key| hash[key] = Hash.new(0) }
+
+    # consignments_received = Hash.new { |hash, key| hash[key] = Hash.new(0) }
+
+    # consignments.each do |consignment|
+    #   next unless consignment['source_outlet_id'].present?
+    #   received_at = Time.parse(consignment['received_at'])
+    #   next if received_at < min_date || received_at > max_date
+
+    #   consignments_received_report[:received][consignment['outlet_id']] += 
+    #   consignments_received_report[:supplied][consignment['supplier_id']] += 
+    # end
+
+    # Redis.current.set('min_consignment_version', consignments.last["version"]) if consignments.present?
+
+    #############################
+    ######## send to QBO ########
+    #############################
+
     shopify_sales_cost.post_to_qbo
     shopify_refund.post_to_qbo
     shopify_sales_receipt.post_to_qbo
