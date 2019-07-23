@@ -31,7 +31,7 @@ Rails.application.routes.draw do
       get :shopify_refunds
       get :wholesale_shopify_sales_receipts
       get :wholesale_shopify_costs
-      get :vend_sales_receipt
+      get :vend_sales_receipts
       get :vend_costs
     end
   end
