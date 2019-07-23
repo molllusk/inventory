@@ -445,7 +445,7 @@ namespace :daily_sales_receipts do
     ########  Consignments ########
     ###############################
 
-    consignments = VendClient.consignments
+    consignments = VendClient.consignments;nil
     consignments_received_report = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
     consignments_received = Hash.new { |hash, key| hash[key] = Hash.new }
@@ -459,9 +459,9 @@ namespace :daily_sales_receipts do
       cost = products.sum { |product| product['cost'].to_f * product['received'].to_f }
 
       consignments_received_report[:received][consignment['outlet_id']] += cost
-      consignments_received_report[:supplied][consignment['supplier_id']] += cost
+      consignments_received_report[:supplied][consignment['source_outlet_id']] += cost
       consignments_received[consignment['id']][:receiving_id] = consignment['outlet_id']
-      consignments_received[consignment['id']][:supplying_id] = consignment['supplier_id']
+      consignments_received[consignment['id']][:supplying_id] = consignment['source_outlet_id']
       consignments_received[consignment['id']][:cost] = cost
     end
 

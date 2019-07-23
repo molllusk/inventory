@@ -1,5 +1,5 @@
 class VendConsignment < ApplicationRecord
-  belongs_to :daily_vend_consignment
+  belongs_to :daily_vend_consignment, optional: true
 end
 
 # == Schema Information

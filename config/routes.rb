@@ -33,6 +33,7 @@ Rails.application.routes.draw do
       get :wholesale_shopify_costs
       get :vend_sales_receipts
       get :vend_costs
+      get :vend_inventory_transfers
     end
   end
 end

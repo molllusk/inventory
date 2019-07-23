@@ -1,10 +1,18 @@
 class VendConsignmentLocationCost < ApplicationRecord
-  belongs_to :daily_vend_consignment
+  belongs_to :daily_vend_consignment, optional: true
 
   enum role: {
     receiver: 0,
     supplier: 1
   }
+
+  scope :receiving, lambda {
+    where(role: :receiver)
+  }
+
+  def outlet_name
+    VendClient::OUTLET_NAMES_BY_ID[outlet_id]
+  end
 end
 
 # == Schema Information
