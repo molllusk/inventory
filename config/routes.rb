@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   resources :shopify_sales_receipts
   resources :shopify_refunds
   resources :shopify_sales_costs
+  resources :daily_vend_consignments
   resources :daily_vend_costs
   resources :daily_vend_sales
 
