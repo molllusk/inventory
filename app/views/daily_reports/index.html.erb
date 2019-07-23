@@ -20,6 +20,16 @@
       </a>
     </li>
     <li role="presentation">
+      <a href="#wholesale_shopify_sales_receipt" aria-controls="wholesale shopify sales receipts" role="tab" data-toggle="tab">
+        Wholesale Shopify Daily Sales
+      </a>
+    </li>
+    <li role="presentation">
+      <a href="#wholesale_shopify_cogs" aria-controls="wholesale_shopify cogs" role="tab" data-toggle="tab">
+        Wholesale Shopify COGS
+      </a>
+    </li>
+    <li role="presentation">
       <a href="#vend_sales_receipt" aria-controls="vend sales receipts" role="tab" data-toggle="tab">
         Vend Daily Sales
       </a>
@@ -41,6 +51,12 @@
     </div>
     <div role="tabpanel" class="tab-pane fade px-3 pt-5" id="shopify_refunds">
       <%= render partial: 'shopify_refunds' %>
+    </div>
+    <div role="tabpanel" class="tab-pane fade in active px-3 pt-5" id="wholesale_shopify_sales_receipt">
+      <%= render partial: 'wholesale_shopify_sales_receipts' %>
+    </div>
+    <div role="tabpanel" class="tab-pane fade px-3 pt-5" id="wholesale_shopify_cogs">
+      <%= render partial: 'wholesale_shopify_costs' %>
     </div>
     <div role="tabpanel" class="tab-pane fade px-3 pt-5" id="vend_sales_receipt">
       <%= render partial: 'vend_daily_sales' %>
