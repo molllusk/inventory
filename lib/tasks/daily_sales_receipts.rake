@@ -456,7 +456,7 @@ namespace :daily_sales_receipts do
       next if received_at < min_date || received_at > max_date
 
       products = VendClient.consignment_products(consignment['id'])
-      cost = products.reduce(0) { |product, sum| sum += product['cost'].to_f * product['received'].to_f }
+      cost = products.sum { |product| product['cost'].to_f * product['received'].to_f }
 
       consignments_received_report[:received][consignment['outlet_id']] += cost
       consignments_received_report[:supplied][consignment['supplier_id']] += cost
