@@ -70,7 +70,7 @@ class VendClient
   end
 
   def self.consignments
-    min_version = Redis.current.get('min_consignment_version') || 0
+    min_version = Redis.current.get('min_consignment_version').to_i
 
     response = connection.get 'consignments', { page_size: 10000, status: 'RECEIVED', after: min_version }
     response.body['data']
