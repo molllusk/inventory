@@ -6,12 +6,10 @@ class DailyReportsController < ApplicationController
   end
 
   def shopify_sales_receipts
-    p params
     @shopify_sales_receipts = ShopifySalesReceipt.retail.order('date DESC').paginate(page: params[:page], per_page: 10)
   end
 
   def shopify_costs
-    p params
     @shopify_costs = ShopifySalesCost.retail.order('date DESC').paginate(page: params[:page], per_page: 10)
   end
 
