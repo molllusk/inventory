@@ -69,6 +69,13 @@ class VendClient
     response.body['data']
   end
 
+  def self.consignments
+    min_version = Redis.current.get('min_consignment_version') || 0
+
+    response = connection.get 'consignments', { page_size: 10000, status: 'RECEIVED', after: min_version }
+    response.body['data']
+  end
+
   def self.get_inventory
     paginator('inventory')
   end
