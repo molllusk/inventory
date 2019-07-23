@@ -26,6 +26,27 @@ class ShopifySalesCost < ApplicationRecord
   end
 
   def journal_line_item_details
+    send("#{store}_journal_line_item_details".to_sym)
+  end
+
+  def wholesale_journal_line_item_details
+    [
+      {
+        account_id: '3562', # 51000 – Wholesale
+        amount: cost,
+        description: 'Total Cost of Sales Wholesale Shopify',
+        posting_type: 'Debit'
+      },
+      {
+        account_id: '3652', # 11137 Finished Goods - Shopify
+        amount: location_cost('Jam Warehouse Retail').to_f,
+        description: 'Total Cost of Sales Wholesale Shopify - Jam Warehouse',
+        posting_type: 'Credit'
+      }
+    ]
+  end
+
+  def retail_journal_line_item_details
     [
       {
         account_id: '3476', # 50000 Cost of Goods Sold

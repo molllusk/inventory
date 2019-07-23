@@ -36,7 +36,7 @@ class ShopifySalesReceipt < ApplicationRecord
     else
       {
         txn_date: date,
-        customer_ref: Qbo.base_ref(Qbo::SHOPIFY_CUSTOMER_ID),
+        customer_ref: Qbo.base_ref(Qbo::WHOLESALE_SHOPIFY_CUSTOMER_ID),
         deposit_to_account_ref: Qbo.base_ref(3544) # 12001 Undeposited Funds
       }
     end
