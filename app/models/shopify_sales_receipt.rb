@@ -18,12 +18,28 @@ class ShopifySalesReceipt < ApplicationRecord
     product_sales.round(2) + gift_card_sales.round(2) + sales_tax.round(2) + shipping.round(2) - discount.round(2) - shopify_payments.round(2) - paypal_payments.round(2) - gift_card_payments.round(2)
   end
 
+  def retail?
+    store == :retail
+  end
+
+  def wholesale?
+    store == :wholesale
+  end
+
   def sales_receipt_params
-    {
-      txn_date: date,
-      customer_ref: Qbo.base_ref(Qbo::SHOPIFY_CUSTOMER_ID),
-      deposit_to_account_ref: Qbo.base_ref(3544) # 12001 Undeposited Funds
-    }
+    if retail?
+      {
+        txn_date: date,
+        customer_ref: Qbo.base_ref(Qbo::SHOPIFY_CUSTOMER_ID),
+        deposit_to_account_ref: Qbo.base_ref(3544) # 12001 Undeposited Funds
+      }
+    else
+      {
+        txn_date: date,
+        customer_ref: Qbo.base_ref(Qbo::SHOPIFY_CUSTOMER_ID),
+        deposit_to_account_ref: Qbo.base_ref(3544) # 12001 Undeposited Funds
+      }
+    end
   end
 
   def sales_receipt_line_item_details

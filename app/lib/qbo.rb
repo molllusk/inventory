@@ -38,6 +38,10 @@ module Qbo
     Quickbooks::Service::Class.new(service_params).all
   end
 
+  def self.list_customers
+    Quickbooks::Service::Customer.new(service_params).all
+  end
+
   def self.sales_receipt_line_item(params, receipt_details)
     line = Quickbooks::Model::Line.new(params)
 
