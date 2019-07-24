@@ -13,7 +13,7 @@
       <td class='border-bottom' rowspan='<%= has_consignments ? inventory_transfer.vend_consignment_location_costs.receiving.count : 1 %>' style='background-color: #FFFFFF'>
         <a href='<%= daily_vend_consignment_path(inventory_transfer) %>' target='_blank'><%= inventory_transfer.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y") %> <i class='fa fa-external-link-alt'></i></a>
       </td>
-      <td class='border-bottom' rowspan='<%= costs.vend_sales_costs.count %>' style='background-color: #FFFFFF'>
+      <td class='border-bottom' rowspan='<%= has_consignments ? inventory_transfer.vend_consignment_location_costs.receiving.count : 1 %>' style='background-color: #FFFFFF'>
         <% if inventory_transfer.qbo_id.present? %><a href='https://c3.qbo.intuit.com/app/journal?txnId=<%= inventory_transfer.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a><% end %>
       </td>
 
