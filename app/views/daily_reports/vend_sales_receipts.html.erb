@@ -43,7 +43,7 @@
               <p style='color: blue'><%= number_to_currency(receipt.sum_check, :unit => "$", :separator => ".", :delimiter => ",") %></p>
             <% end %>
           </td>
-          <td>
+          <td class='<%= 'border-bottom' if last_row %>'>
             <% if receipt.qbo_id.present? %><a href='https://c3.qbo.intuit.com/app/salesreceipt?txnId=<%= receipt.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a><% end %>
           </td>
         </tr>
