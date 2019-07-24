@@ -37,7 +37,10 @@ class DailyVendConsignment < ApplicationRecord
   end
 
   def post_to_qbo
-    Qbo.create_journal_entry(journal_entry) unless vend_consignment_location_costs.blank?
+    if vend_consignment_location_costs.present?
+      qbo = Qbo.create_journal_entry(journal_entry)
+      update_attribute(:qbo_id, qbo.id) unless qbo.blank?
+    end
   end
 
   def journal_entry

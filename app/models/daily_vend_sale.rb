@@ -85,8 +85,9 @@ class DailyVendSale < ApplicationRecord
   end
 
   def post_to_qbo
-    sales_receipts.each do |sales_receipt|
-      Qbo.create_sales_receipt(sales_receipt)
+    sales_receipts.each do |receipt_pair|
+      qbo = Qbo.create_sales_receipt(receipt_pair.last)
+      receipt_pair.first.update_attribute(:qbo_id, qbo.id) unless qbo.blank?
     end
   end
 
@@ -114,7 +115,7 @@ class DailyVendSale < ApplicationRecord
         sales_receipt.line_items << line_item
       end
 
-      receipts << sales_receipt
+      receipts << [receipt, sales_receipt]
     end
     receipts
   end

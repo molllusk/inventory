@@ -82,7 +82,8 @@ class ShopifySalesCost < ApplicationRecord
   end
 
   def post_to_qbo
-    Qbo.create_journal_entry(journal_entry)
+    qbo = Qbo.create_journal_entry(journal_entry)
+    update_attribute(:qbo_id, qbo.id) unless qbo.blank?
   end
 
   def journal_entry
