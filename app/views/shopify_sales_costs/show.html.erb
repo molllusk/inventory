@@ -37,7 +37,7 @@
       <td>
         <%= order.closed_at.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %>
       </td>
-      <td><a href='https://<%= @shopify_sales_receipt.retail? ? 'mollusksurf' : 'molluskats' %>.myshopify.com/admin/orders/<%= order.order_id %>' target='_blank'><%= order.name %> <i class='fa fa-external-link-alt'></i></a></td>
+      <td><a href='https://<%= @shopify_sales_cost.retail? ? 'mollusksurf' : 'molluskats' %>.myshopify.com/admin/orders/<%= order.order_id %>' target='_blank'><%= order.name %> <i class='fa fa-external-link-alt'></i></a></td>
       <td>
         <%= number_to_currency(order.cost, :unit => "$", :separator => ".", :delimiter => ",") %>
       </td>
