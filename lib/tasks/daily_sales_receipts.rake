@@ -489,23 +489,23 @@ namespace :daily_sales_receipts do
     ######## send to QBO ########
     #############################
 
-    begin
-      shopify_sales_cost.post_to_qbo
-    rescue
-      Airbrake.notify($!)
-    end
+    # begin
+    #   shopify_sales_cost.post_to_qbo
+    # rescue
+    #   Airbrake.notify($!)
+    # end
 
-    begin
-      shopify_refund.post_to_qbo
-    rescue
-      Airbrake.notify($!)
-    end
+    # begin
+    #   shopify_refund.post_to_qbo
+    # rescue
+    #   Airbrake.notify($!)
+    # end
 
-    begin
-      shopify_sales_receipt.post_to_qbo
-    rescue
-      Airbrake.notify($!)
-    end
+    # begin
+    #   shopify_sales_receipt.post_to_qbo
+    # rescue
+    #   Airbrake.notify($!)
+    # end
 
     begin
       wholesale_shopify_sales_cost.post_to_qbo
@@ -519,17 +519,17 @@ namespace :daily_sales_receipts do
       Airbrake.notify($!)
     end
 
-    begin
-      vend_costs.post_to_qbo
-    rescue
-      Airbrake.notify($!)
-    end
+    # begin
+    #   vend_costs.post_to_qbo
+    # rescue
+    #   Airbrake.notify($!)
+    # end
 
-    begin
-      vend_sales.post_to_qbo
-    rescue
-      Airbrake.notify($!)
-    end
+    # begin
+    #   vend_sales.post_to_qbo
+    # rescue
+    #   Airbrake.notify($!)
+    # end
 
     begin
       daily_vend_consignment.post_to_qbo
