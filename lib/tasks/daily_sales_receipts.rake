@@ -463,6 +463,7 @@ namespace :daily_sales_receipts do
       consignments_received[consignment['id']][:receiving_id] = consignment['outlet_id']
       consignments_received[consignment['id']][:supplying_id] = consignment['source_outlet_id']
       consignments_received[consignment['id']][:cost] = cost
+      consignments_received[consignment['id']][:received_at] = consignment['received_at']
     end
 
     Redis.current.set('min_consignment_version', consignments.last['version']) if consignments.present?

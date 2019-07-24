@@ -12,6 +12,7 @@ end
 #
 #  id                        :bigint(8)        not null, primary key
 #  cost                      :float            default(0.0)
+#  received_at               :datetime
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
 #  daily_vend_consignment_id :integer

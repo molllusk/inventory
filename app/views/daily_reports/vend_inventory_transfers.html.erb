@@ -7,23 +7,35 @@
     <th>Supplying</th>
   </tr>
   <% @vend_inventory_transfers.each do |inventory_transfer| %>
+    <% has_consignments = inventory_transfer.vend_consignment_location_costs.present? %>
     <tr>
-      <td class='border-bottom' rowspan='<%= inventory_transfer.vend_consignment_location_costs.receiving.count %>' style='background-color: #FFFFFF'>
+      <td class='border-bottom' rowspan='<%= has_consignments ? inventory_transfer.vend_consignment_location_costs.receiving.count : 1 %>' style='background-color: #FFFFFF'>
         <a href='<%= daily_vend_consignment_path(inventory_transfer) %>' target='_blank'><%= inventory_transfer.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y") %> <i class='fa fa-external-link-alt'></i></a>
       </td>
-      <% receiving_location_costs = inventory_transfer.vend_consignment_location_costs.receiving.sort_by(&:cost) %>
-      <% supplying_location_costs = inventory_transfer.vend_consignment_location_costs.supplying.sort_by(&:cost) %>
 
-      <% receiving_location_costs.each_with_index do |receiving_location_cost, index| %>
-        <% last_row = (index == (receiving_location_costs.count - 1)) %>
-        <% if index.positive? %>
-          <tr>
+      <% if has_consignments %>
+        <% receiving_location_costs = inventory_transfer.vend_consignment_location_costs.receiving.sort_by(&:cost) %>
+        <% supplying_location_costs = inventory_transfer.vend_consignment_location_costs.supplying.sort_by(&:cost) %>
+
+        <% receiving_location_costs.each_with_index do |receiving_location_cost, index| %>
+          <% last_row = (index == (receiving_location_costs.count - 1)) %>
+          <% if index.positive? %>
+            <tr>
+          <% end %>
+            <td class='<%= 'border-bottom' if last_row %>'>
+              <strong><%= receiving_location_cost.outlet_name %>:</strong> <%= number_to_currency(receiving_location_cost.cost, :unit => "$", :separator => ".", :delimiter => ",") %>
+            </td>
+            <td class='<%= 'border-bottom' if last_row %>'>
+              <strong><%= supplying_location_costs[index].outlet_name %>:</strong> <%= number_to_currency(supplying_location_costs[index].cost, :unit => "$", :separator => ".", :delimiter => ",") %>
+            </td>
+          </tr>
         <% end %>
-          <td class='<%= 'border-bottom' if last_row %>'>
-            <strong><%= receiving_location_cost.outlet_name %>:</strong> <%= number_to_currency(receiving_location_cost.cost, :unit => "$", :separator => ".", :delimiter => ",") %>
+      <% else %>
+          <td class='border-bottom'>
+            n/a
           </td>
-          <td class='<%= 'border-bottom' if last_row %>'>
-            <strong><%= supplying_location_costs[index].outlet_name %>:</strong> <%= number_to_currency(supplying_location_costs[index].cost, :unit => "$", :separator => ".", :delimiter => ",") %>
+          <td class='border-bottom'>
+            n/a
           </td>
         </tr>
       <% end %>
