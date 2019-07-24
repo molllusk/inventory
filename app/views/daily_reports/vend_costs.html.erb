@@ -3,6 +3,7 @@
 <table class="products full_width">
   <tr>
     <th>Date</th>
+    <th>QBO</th>
     <th>Outlet</th>
     <th>Cost</th>
   </tr>
@@ -10,8 +11,9 @@
     <tr>
       <td class='border-bottom' rowspan='<%= costs.vend_sales_costs.count %>' style='background-color: #FFFFFF'>
         <a href='<%= daily_vend_cost_path(costs) %>' target='_blank'><%= costs.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y") %> <i class='fa fa-external-link-alt'></i></a>
-        <br />
-        <% if costs.qbo_id.present? %>(<a href='https://c3.qbo.intuit.com/app/journal?txnId=<%= costs.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a>)<% end %>
+      </td>
+      <td class='border-bottom' rowspan='<%= costs.vend_sales_costs.count %>' style='background-color: #FFFFFF'>
+        <% if costs.qbo_id.present? %><a href='https://c3.qbo.intuit.com/app/journal?txnId=<%= costs.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a><% end %>
       </td>
       <% costs.vend_sales_costs.sort_by(&:outlet_id).each_with_index do |sales_cost, index| %>
         <% last_row = (index == (costs.vend_sales_costs.count - 1)) %>
