@@ -1,5 +1,5 @@
 <div class='center'>
-  <h2><%= @shopify_sales_receipt.store.humanize %> Shopify Sales Receipt for <%= @shopify_sales_receipt.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%Y") %></h2>
+  <h2><%= @shopify_sales_receipt.store.humanize %> Shopify Sales Receipt for <%= @shopify_sales_receipt.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%Y") %> <% if @shopify_sales_receipt.qbo_id.present? %>(<a href='https://c3.qbo.intuit.com/app/salesreceipt?txnId=<%= @shopify_sales_receipt.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a>)<% end %></h2>
 </div>
 
 <table class="products full_width">

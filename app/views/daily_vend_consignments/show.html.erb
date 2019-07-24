@@ -1,5 +1,5 @@
 <div class='center'>
-  <h2>Vend Inventory Transfers for <%= @daily_vend_consignment.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%Y") %></h2>
+  <h2>Vend Inventory Transfers for <%= @daily_vend_consignment.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%Y") %> <% if @daily_vend_consignment.qbo_id.present? %>(<a href='https://c3.qbo.intuit.com/app/journal?txnId=<%= @daily_vend_consignment.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a>)<% end %></h2></h2>
 </div>
 
 <% has_consignments = @daily_vend_consignment.vend_consignment_location_costs.present? %>

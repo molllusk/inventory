@@ -1,5 +1,5 @@
 <div class='center'>
-  <h2>Vend Sales Costs for <%= @daily_vend_costs.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%Y") %></h2>
+  <h2>Vend Sales Costs for <%= @daily_vend_costs.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%Y") %> <% if @daily_vend_costs.qbo_id.present? %>(<a href='https://c3.qbo.intuit.com/app/journal?txnId=<%= @daily_vend_costs.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a>)<% end %></h2>
 </div>
 
 <table class="products full_width">
