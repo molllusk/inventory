@@ -17,4 +17,5 @@ end
 #  store          :integer          default("retail")
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
+#  qbo_id         :bigint(8)
 #

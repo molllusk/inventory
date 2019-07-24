@@ -26,4 +26,5 @@ end
 #  total_payments     :float            default(0.0)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  qbo_id             :bigint(8)
 #

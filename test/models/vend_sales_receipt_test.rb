@@ -24,4 +24,5 @@ end
 #  updated_at             :datetime         not null
 #  daily_vend_sale_id     :integer
 #  outlet_id              :string
+#  qbo_id                 :bigint(8)
 #

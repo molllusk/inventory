@@ -16,7 +16,8 @@ class DailyVendConsignment < ApplicationRecord
 
   def journal_entry_params
     {
-      txn_date: date
+      txn_date: date,
+      doc_number: "APP-VIT-#{id}"
     }
   end
 
@@ -75,4 +76,5 @@ end
 #  date       :datetime
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  qbo_id     :bigint(8)
 #
