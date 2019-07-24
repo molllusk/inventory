@@ -19,11 +19,11 @@ class ShopifySalesReceipt < ApplicationRecord
   end
 
   def retail?
-    store == :retail
+    store == "retail"
   end
 
   def wholesale?
-    store == :wholesale
+    store == "wholesale"
   end
 
   def sales_receipt_params
