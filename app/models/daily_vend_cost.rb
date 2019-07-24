@@ -3,9 +3,9 @@ class DailyVendCost < ApplicationRecord
   has_many :vend_sales_cost_sales, dependent: :destroy
 
   ACCOUNT_ID_BY_OUTLET = {
-    'San Francisco' => '3617',
-    'Silver Lake' => '3618',
-    'Venice Beach' => '3626'
+    'San Francisco' => '3617', # 11001 Inventory Asset - San Francisco
+    'Silver Lake' => '3618', # 11002 Inventory Asset - Silver Lake
+    'Venice Beach' => '3626' # 11003 Inventory Asset - Venice Beach
   }
 
   CLASS_ID_BY_OUTLET = {

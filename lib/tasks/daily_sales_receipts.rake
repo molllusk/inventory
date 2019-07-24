@@ -530,5 +530,11 @@ namespace :daily_sales_receipts do
     rescue
       Airbrake.notify($!)
     end
+
+    begin
+      # daily_vend_consignment.post_to_qbo
+    rescue
+      Airbrake.notify($!)
+    end
   end
 end
