@@ -1,5 +1,13 @@
 class VendConsignment < ApplicationRecord
   belongs_to :daily_vend_consignment, optional: true
+
+  def receiving_location_name
+    VendClient::OUTLET_NAMES_BY_ID[receiving_id]
+  end
+
+  def supplying_location_name
+    VendClient::OUTLET_NAMES_BY_ID[supplying_id]
+  end
 end
 
 # == Schema Information

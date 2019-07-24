@@ -43,15 +43,17 @@
       <th>Supplier</th>
       <th>Cost</th>
     </tr>
-    <% @daily_vend_consignment.vend_consignments.sort_by { |consignment| [ consignment.outlet_id, consignment.received_at ] }.each do |sale| %>
+    <% @daily_vend_consignment.vend_consignments.sort_by(&:received_at).each do |consignment| %>
       <tr>
-        <td><%= sale.sale_at.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %></td>
-        <td><a href='https://mollusksurf.vendhq.com/api/2.0/sales/<%= sale.sale_id %>' target='_blank'><%= sale.receipt_number %> <i class='fa fa-external-link-alt'></i></a></td>
+        <td><a href='https://mollusksurf.vendhq.com/api/2.0/consignments/<%= consignment.vend_consignment_id %>' target='_blank'><%= consignment.received_at.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %> <i class='fa fa-external-link-alt'></i></a></td>
         <td>
-          <%= sale.outlet_name %>
+          <%= consignment.receiving_location_name %>
         </td>
         <td>
-          <%= number_to_currency(sale.cost, :unit => "$", :separator => ".", :delimiter => ",") %>
+          <%= consignment.supplying_location_name %>
+        </td>
+        <td>
+          <%= number_to_currency(consignment.cost, :unit => "$", :separator => ".", :delimiter => ",") %>
         </td>
       </tr>
     <% end %>
