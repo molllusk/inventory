@@ -14,6 +14,7 @@
     <th>Gift Card Payments</th>
     <th>Costs</th>
     <th>Costs by Location</th>
+    <th>QBO</th>
   </tr>
   <% @shopify_refunds.each do |refund| %>
     <tr>
@@ -30,6 +31,9 @@
       <td><%= number_to_currency(refund.cost, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td>
         <%= render partial: 'shopify_costs_by_location', locals: { location_costs: refund.location_costs } %>
+      </td>
+      <td>
+        <% if refund.qbo_id.present? %><a href='https://c3.qbo.intuit.com/app/journal?txnId=<%= refund.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a><% end %>
       </td>
     </tr>
   <% end %>

@@ -5,6 +5,7 @@
     <th>Date</th>
     <th>Total</th>
     <th>Costs by Location</th>
+    <th>QBO</th>
   </tr>
   <% @shopify_costs.each do |cost| %>
     <tr>
@@ -16,6 +17,9 @@
       </td>
       <td>
         <%= render partial: 'shopify_costs_by_location', locals: { location_costs: cost.location_costs } %>
+      </td>
+      <td>
+        <% if cost.qbo_id.present? %><a href='https://c3.qbo.intuit.com/app/journal?txnId=<%= cost.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a><% end %>
       </td>
     </tr>
   <% end %>

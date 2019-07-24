@@ -14,6 +14,7 @@
     <th>Cash or Check Payments</th>
     <th>Gift Card Payments</th>
     <th>Sum Check</th>
+    <th>QBO</th>
   </tr>
   <% @vend_sales.each do |day| %>
     <tr>
@@ -41,6 +42,9 @@
             <% else %>
               <p style='color: blue'><%= number_to_currency(receipt.sum_check, :unit => "$", :separator => ".", :delimiter => ",") %></p>
             <% end %>
+          </td>
+          <td>
+            <% if receipt.qbo_id.present? %><a href='https://c3.qbo.intuit.com/app/salesreceipt?txnId=<%= receipt.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a><% end %>
           </td>
         </tr>
       <% end %>
