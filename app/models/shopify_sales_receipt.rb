@@ -14,8 +14,16 @@ class ShopifySalesReceipt < ApplicationRecord
     where(store: :wholesale)
   }
 
+  def credits
+    discount.round(2) + shopify_payments.round(2) + paypal_payments.round(2) + gift_card_payments.round(2)
+  end
+
+  def debits
+    product_sales.round(2) + gift_card_sales.round(2) + sales_tax.round(2) + shipping.round(2)
+  end
+
   def sum_check
-    product_sales.round(2) + gift_card_sales.round(2) + sales_tax.round(2) + shipping.round(2) - discount.round(2) - shopify_payments.round(2) - paypal_payments.round(2) - gift_card_payments.round(2)
+    credits - debits
   end
 
   def retail?
@@ -86,7 +94,7 @@ class ShopifySalesReceipt < ApplicationRecord
       },
       {
         item_id: '177181', # Over/Short
-        amount: sum_check.abs,
+        amount: sum_check,
         description: 'Over/Short'
       }
     ]

@@ -78,7 +78,7 @@ class DailyVendSale < ApplicationRecord
       },
       {
         item_id: '177181', # Over/Short
-        amount: receipt.sum_check.abs,
+        amount: receipt.sum_check,
         description: 'Over/Short'
       }
     ]
