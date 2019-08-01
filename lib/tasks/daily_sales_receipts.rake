@@ -147,7 +147,7 @@ namespace :daily_sales_receipts do
         if raw_cost.present?
           refund_cost = raw_cost * line_item['quantity'].to_f
         else
-          Airbrake.notify("Refunded missing COST in both systems variant id: { product_id: #{line_item['line_item']['product_id']}, variant_id: #{variant_id} }")
+          Airbrake.notify("Refund missing COST in both systems variant id: { product_id: #{line_item['line_item']['product_id']}, variant_id: #{variant_id} }")
         end
 
         refund_totals_by_order[order_name][:cost] += refund_cost
@@ -234,7 +234,7 @@ namespace :daily_sales_receipts do
     wholesale_orders = ShopifyClient.closed_orders_since(day, :WHOLESALE)
     wholesale_expected_order_count = ShopifyClient.closed_orders_since_count(day, :WHOLESALE)
 
-    Airbrake.notify("Expected #{wholesale_expected_order_count} RETAIL orders, but got #{wholesale_orders.count} while running daily reports") unless wholesale_orders.count == wholesale_expected_order_count
+    Airbrake.notify("Expected #{wholesale_expected_order_count} WHOLESALE orders, but got #{wholesale_orders.count} while running daily reports") unless wholesale_orders.count == wholesale_expected_order_count
 
     wholesale_shopify_sales_receipt = Hash.new(0)
     wholesale_costs_report = Hash.new(0)

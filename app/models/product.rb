@@ -121,7 +121,7 @@ class Product < ApplicationRecord
     end
   end
 
-  def adjust_inventory_fluid(quantity)
+  def adjust_inventory_fluid(quantity, expected_wholesale_inventory)
     begin
       retail_response = ShopifyClient.adjust_inventory(
         retail_shopify.inventory_item_id,
@@ -139,7 +139,10 @@ class Product < ApplicationRecord
           )
 
           if ShopifyClient.inventory_item_updated?(wholesale_response)
-            save_inventory_adjustment_fluid(quantity, retail_response['inventory_level']['available'], wholesale_response['inventory_level']['available'])
+            updated_wholesale_inventory = wholesale_response['inventory_level']['available']
+            save_inventory_adjustment_fluid(quantity, retail_response['inventory_level']['available'], updated_wholesale_inventory)
+
+            Airbrake.notify("Fluid Inventory: expected Wholesale qty #{expected_wholesale_inventory} but got #{updated_wholesale_inventory}") unless expected_wholesale_inventory == updated_wholesale_inventory
           else
             Airbrake.notify("Could not UPDATE Wholesale Jam Warehouse inventory after already adjusting Retail inventory for Product: #{id}, Adjustment: #{-quantity}")
           end
@@ -217,7 +220,7 @@ class Product < ApplicationRecord
               sufficient_wholesale = (fluid_inventory_threshold - retail_inventory) <= wholesale_inventory
               adjustment = sufficient_wholesale ? fluid_inventory_threshold - retail_inventory : wholesale_inventory
               # bails on zero adjustments and negative wholesale inventories
-              adjust_inventory_fluid(adjustment) unless adjustment < 1
+              adjust_inventory_fluid(adjustment, wholesale_inventory - adjustment) unless adjustment < 1
             end
           else
             Airbrake.notify("Missing fluid inventory threshold for Product Type: #{retail_shopify.product_type} Product: #{id}")
