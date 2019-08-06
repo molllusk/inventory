@@ -27,6 +27,7 @@ gem 'rails', '~> 5.2.2'
 gem 'rails_12factor'
 gem 'redis'
 gem 'sendgrid-ruby'
+gem 'taxjar-ruby', require: 'taxjar'
 gem 'turbolinks', '~> 5'
 gem 'uglifier', '>= 1.3.0'
 
