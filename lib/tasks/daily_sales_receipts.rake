@@ -423,23 +423,25 @@ namespace :daily_sales_receipts do
     end
 
     vend_sales = DailyVendSale.create!(date: min_date)
-    vend_costs = DailyVendCost.create!(date: min_date)
-    vend_sales_tax = vend_sales.create_vend_sales_tax
-    vend_sales_tax.create_location_taxes
 
     vend_sales_receipt.each do |location, receipt|
       receipt[:outlet_id] = location
       vend_sales.vend_sales_receipts << VendSalesReceipt.create!(receipt)
     end
 
-    vend_sales_costs.each do |location, cost|
-      cost[:outlet_id] = location
-      vend_costs.vend_sales_costs << VendSalesCost.create!(cost)
-    end
-
     vend_sales_receipt_by_sale.each do |sale_id, receipt|
       receipt[:sale_id] = sale_id
       vend_sales.vend_sales_receipt_sales << VendSalesReceiptSale.create!(receipt)
+    end
+
+    vend_sales_tax = vend_sales.create_vend_sales_tax
+    vend_sales_tax.create_location_taxes
+
+    vend_costs = DailyVendCost.create!(date: min_date)
+
+    vend_sales_costs.each do |location, cost|
+      cost[:outlet_id] = location
+      vend_costs.vend_sales_costs << VendSalesCost.create!(cost)
     end
 
     vend_sales_costs_by_sale.each do |sale_id, cost|

@@ -7,6 +7,7 @@ class VendSalesTax < ApplicationRecord
     31eb0866-e73e-11e5-e556-0c7a3a5958c3
     6991652c-16f4-11e2-b195-4040782fde00
     0adfd74a-153e-11e9-fa42-51ae7eb59c62
+    0adfd74a-153e-11e9-fa42-51ae7ec84c09
   ]
 
   def sales
