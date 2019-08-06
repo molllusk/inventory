@@ -10,19 +10,30 @@
     <th>Tax Jar</th>
   </tr>
   <% @vend_sales_taxes.each do |day| %>
-    <tr>
-      <td class='border-bottom' rowspan='<%= day.vend_sales_tax.vend_location_sales_taxes.count %>' style='background-color: #FFFFFF'><a href='<%= daily_vend_sale_path(day) %>' target='_blank'><%= day.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %> <i class='fa fa-external-link-alt'></i></a></td>
-      <% day.vend_sales_tax.vend_location_sales_taxes.sort_by(&:outlet_id).each_with_index do |tax, index| %>
-        <% last_row = (index == (day.vend_sales_tax.vend_location_sales_taxes.count - 1)) %>
-        <% if index.positive? %>
-          <tr>
+    <% if day.vend_sales_tax.present? %>
+      <tr>
+        <td class='border-bottom' rowspan='<%= day.vend_sales_tax.vend_location_sales_taxes.count %>' style='background-color: #FFFFFF'><a href='<%= daily_vend_sale_path(day) %>' target='_blank'><%= day.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %> <i class='fa fa-external-link-alt'></i></a></td>
+        <% day.vend_sales_tax.vend_location_sales_taxes.sort_by(&:outlet_id).each_with_index do |tax, index| %>
+          <% last_row = (index == (day.vend_sales_tax.vend_location_sales_taxes.count - 1)) %>
+          <% if index.positive? %>
+            <tr>
+          <% end %>
+            <td class='<%= 'border-bottom' if last_row %>'><%= tax.outlet_name %></td>
+            <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(tax.amount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+            <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(tax.sales_tax, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+            <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(tax.shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+            <td class='<%= 'border-bottom' if last_row %>'>
+            </td>
+          </tr>
         <% end %>
-          <td class='<%= 'border-bottom' if last_row %>'><%= tax.outlet_name %></td>
-          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(tax.amount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(tax.sales_tax, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(tax.shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-          <td class='<%= 'border-bottom' if last_row %>'>
-          </td>
+      <% else %>
+        <tr>
+          <td class='border-bottom'><a href='<%= daily_vend_sale_path(day) %>' target='_blank'><%= day.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %> <i class='fa fa-external-link-alt'></i></a></td>
+          <td class='border-bottom'> - </td>
+          <td class='border-bottom'> - </td>
+          <td class='border-bottom'> - </td>
+          <td class='border-bottom'> - </td>
+          <td class='border-bottom'> - </td>
         </tr>
       <% end %>
   <% end %>
