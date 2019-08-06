@@ -1,0 +1,33 @@
+<%= render partial: 'nav' %>
+
+<table class="products full_width">
+  <tr>
+    <th>Day</th>
+    <th>Outlet</th>
+    <th>Amount</th>
+    <th>Sales Tax</th>
+    <th>Shipping</th>
+    <th>Tax Jar</th>
+  </tr>
+  <% @vend_sales_taxes.each do |day| %>
+    <tr>
+      <td class='border-bottom' rowspan='<%= day.vend_sales_tax.vend_location_sales_taxes.count %>' style='background-color: #FFFFFF'><a href='<%= daily_vend_sale_path(day) %>' target='_blank'><%= day.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %> <i class='fa fa-external-link-alt'></i></a></td>
+      <% day.vend_sales_tax.vend_location_sales_taxes.sort_by(&:outlet_id).each_with_index do |tax, index| %>
+        <% last_row = (index == (day.vend_sales_tax.vend_location_sales_taxes.count - 1)) %>
+        <% if index.positive? %>
+          <tr>
+        <% end %>
+          <td class='<%= 'border-bottom' if last_row %>'><%= tax.outlet_name %></td>
+          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(tax.amount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(tax.sales_tax, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(tax.shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+          <td class='<%= 'border-bottom' if last_row %>'>
+          </td>
+        </tr>
+      <% end %>
+  <% end %>
+</table>
+
+<div class='center'>
+<%= will_paginate @vend_sales_taxes %>
+</div>
