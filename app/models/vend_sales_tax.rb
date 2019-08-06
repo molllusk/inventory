@@ -21,7 +21,7 @@ class VendSalesTax < ApplicationRecord
     taxes = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
     sales.each do |sale|
-      taxes[sale.outlet_id][:amount] += sale.product_sales + sale.shipping - sale.rentals
+      taxes[sale.outlet_id][:amount] += sale.product_sales + sale.shipping - sale.rentals - sale.discounts
       taxes[sale.outlet_id][:shipping] += sale.shipping
       taxes[sale.outlet_id][:sales_tax] += sale.sales_tax
     end
