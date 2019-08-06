@@ -32,7 +32,7 @@ class VendSalesTax < ApplicationRecord
   def create_location_taxes
     taxes_by_location.each do |outlet_id, location_tax|
       location_tax[:outlet_id] = outlet_id
-      VendSalesTax.vend_location_sales_taxes << VendLocationSalesTax.build(location_tax)
+      vend_location_sales_taxes << VendLocationSalesTax.build(location_tax)
     end
   end
 end
