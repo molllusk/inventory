@@ -26,7 +26,7 @@ class VendSalesTax < ApplicationRecord
       taxes[sale.outlet_id][:sales_tax] += sale.sales_tax
     end
 
-    texes
+    taxes
   end
 
   def create_location_taxes
