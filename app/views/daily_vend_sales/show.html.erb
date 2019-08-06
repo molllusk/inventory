@@ -49,25 +49,27 @@
   <h2>Taxes</h2>
 </div>
 
-<table class="products full_width">
-  <tr>
-    <th>Outlet</th>
-    <th>Amount</th>
-    <th>Sales Tax</th>
-    <th>Shipping</th>
-    <th>Tax Jar</th>
-  </tr>
-  <% @daily_vend_sale.vend_sales_tax.vend_location_sales_taxes.sort_by(&:outlet_id).each do |tax| %>
+<% if @daily_vend_sale.vend_sales_tax.present? %>
+  <table class="products full_width">
     <tr>
-      <td><%= tax.outlet_name %></td>
-      <td><%= number_to_currency(tax.amount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-      <td><%= number_to_currency(tax.sales_tax, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-      <td><%= number_to_currency(tax.shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-      <td>
-      </td>
+      <th>Outlet</th>
+      <th>Amount</th>
+      <th>Sales Tax</th>
+      <th>Shipping</th>
+      <th>Tax Jar</th>
     </tr>
-  <% end %>
-</table>
+    <% @daily_vend_sale.vend_sales_tax.vend_location_sales_taxes.sort_by(&:outlet_id).each do |tax| %>
+      <tr>
+        <td><%= tax.outlet_name %></td>
+        <td><%= number_to_currency(tax.amount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+        <td><%= number_to_currency(tax.sales_tax, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+        <td><%= number_to_currency(tax.shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+        <td>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+<% end %>
 
 <div class='center mt-3'>
   <h2>Sales</h2>
