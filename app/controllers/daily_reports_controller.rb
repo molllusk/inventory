@@ -36,4 +36,8 @@ class DailyReportsController < ApplicationController
   def vend_inventory_transfers
     @vend_inventory_transfers = DailyVendConsignment.order('date DESC').paginate(page: params[:page], per_page: 20)
   end
+
+  def vend_sales_taxes
+    @vend_sales_taxes = DailyVendSale.order('date DESC').paginate(page: params[:page], per_page: 20)
+  end
 end

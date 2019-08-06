@@ -35,6 +35,7 @@ Rails.application.routes.draw do
       get :vend_sales_receipts
       get :vend_costs
       get :vend_inventory_transfers
+      get :vend_sales_taxes
     end
   end
 end
