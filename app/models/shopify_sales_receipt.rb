@@ -101,8 +101,10 @@ class ShopifySalesReceipt < ApplicationRecord
   end
 
   def post_to_qbo
-    qbo = Qbo.create_sales_receipt(sales_receipt)
-    update_attribute(:qbo_id, qbo.id) unless qbo.blank?
+    if shopify_sales_receipt_orders.present?
+      qbo = Qbo.create_sales_receipt(sales_receipt)
+      update_attribute(:qbo_id, qbo.id) unless qbo.blank?
+    end
   end
 
   def sales_receipt

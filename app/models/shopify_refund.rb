@@ -91,8 +91,10 @@ class ShopifyRefund < ApplicationRecord
   end
 
   def post_to_qbo
-    qbo = Qbo.create_journal_entry(journal_entry)
-    update_attribute(:qbo_id, qbo.id) unless qbo.blank?
+    if shopify_refund_orders.present?
+      qbo = Qbo.create_journal_entry(journal_entry)
+      update_attribute(:qbo_id, qbo.id) unless qbo.blank?
+    end
   end
 
   def journal_entry

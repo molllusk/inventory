@@ -86,9 +86,11 @@ class DailyVendSale < ApplicationRecord
   end
 
   def post_to_qbo
-    sales_receipts.each do |receipt_pair|
-      qbo = Qbo.create_sales_receipt(receipt_pair.last)
-      receipt_pair.first.update_attribute(:qbo_id, qbo.id) unless qbo.blank?
+    if vend_sales_receipt_sales.present?
+      sales_receipts.each do |receipt_pair|
+        qbo = Qbo.create_sales_receipt(receipt_pair.last)
+        receipt_pair.first.update_attribute(:qbo_id, qbo.id) unless qbo.blank?
+      end
     end
   end
 
