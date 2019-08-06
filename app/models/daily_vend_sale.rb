@@ -1,6 +1,7 @@
 class DailyVendSale < ApplicationRecord
   has_many :vend_sales_receipts, dependent: :destroy
   has_many :vend_sales_receipt_sales, dependent: :destroy
+  has_one :vend_sales_tax, dependent: :destroy
 
   TAX_ITEM_ID_BY_OUTLET = {
     'San Francisco' => '172116',

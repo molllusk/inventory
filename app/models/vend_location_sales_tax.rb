@@ -1,5 +1,6 @@
 class VendLocationSalesTax < ApplicationRecord
   belongs_to :vend_sales_tax
+
   TRANSACTION_ID_PREFIX = {
     'San Francisco' => 'sf',
     'Venice Beach' => 'vb',

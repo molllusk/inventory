@@ -1,6 +1,6 @@
 class VendSalesTax < ApplicationRecord
   belongs_to :daily_vend_sale
-  has_many :vend_location_sales_taxes
+  has_many :vend_location_sales_taxes, dependent: :destroy
 
   RENTAL_IDS = %w[
     b8ca3a6e-723e-11e4-efc6-64565067889f
