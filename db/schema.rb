@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_06_070047) do
+ActiveRecord::Schema.define(version: 2019_08_06_075541) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -271,6 +271,16 @@ ActiveRecord::Schema.define(version: 2019_08_06_070047) do
     t.integer "inventory"
   end
 
+  create_table "vend_location_sales_taxes", force: :cascade do |t|
+    t.integer "vend_sales_tax_id"
+    t.float "sales_tax", default: 0.0
+    t.float "shipping", default: 0.0
+    t.float "amount", default: 0.0
+    t.string "outlet_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "vend_sales_cost_sales", force: :cascade do |t|
     t.float "cost", default: 0.0
     t.string "outlet_id"
@@ -325,6 +335,12 @@ ActiveRecord::Schema.define(version: 2019_08_06_070047) do
     t.datetime "updated_at", null: false
     t.float "discount_sales", default: 0.0
     t.bigint "qbo_id"
+  end
+
+  create_table "vend_sales_taxes", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "daily_vend_sale_id"
   end
 
 end

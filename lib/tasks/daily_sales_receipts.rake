@@ -424,6 +424,7 @@ namespace :daily_sales_receipts do
 
     vend_sales = DailyVendSale.create!(date: min_date)
     vend_costs = DailyVendCost.create!(date: min_date)
+    vend_sales.create_vend_sales_tax
 
     vend_sales_receipt.each do |location, receipt|
       receipt[:outlet_id] = location

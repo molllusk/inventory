@@ -56,6 +56,7 @@
     <th>Outlet</th>
     <th>Product Sales</th>
     <th>Gift Card Sales</th>
+    <th>Rentals</th>
     <th>Discount Sales</th>
     <th>Discounts</th>
     <th>Sales Tax</th>
@@ -72,6 +73,7 @@
       <td><%= sale.outlet_name %></td>
       <td><%= number_to_currency(sale.product_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= number_to_currency(sale.gift_card_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+      <td><%= number_to_currency(sale.rentals, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= number_to_currency(sale.discount_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= number_to_currency(sale.discount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= number_to_currency(sale.sales_tax, :unit => "$", :separator => ".", :delimiter => ",") %></td>
