@@ -392,7 +392,7 @@ namespace :daily_sales_receipts do
           vend_sales_receipt[outlet][:product_sales] += item['price_total'] + discount
           vend_sales_receipt_by_sale[sale_id][:product_sales] += item['price_total'] + discount
 
-          if VendSalesTax::RENTAL_IDS.include?(line_item['product_id'])
+          if VendSalesTax::RENTAL_IDS.include?(item['product_id'])
             vend_sales_receipt_by_sale[sale_id][:rentals] += item['price_total'] + discount
           end
         end
