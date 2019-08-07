@@ -181,14 +181,14 @@ tr:hover {
   background-color: rgba(244, 177, 160, 0.2);
 }
 
+tr:hover td.inventory_failure{
+  background-color: white;
+}
+
 td.inventory_failure {
   border: 2px dashed red;
   color: red;
   background-color: rgba(244, 177, 160, 0.2);
-}
-
-td.inventory_failure:hover {
-  background-color: white;
 }
 
 .highlighted a {
