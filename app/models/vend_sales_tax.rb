@@ -40,8 +40,7 @@ class VendSalesTax < ApplicationRecord
   def post_to_taxjar
     if sales.present?
       vend_location_sales_taxes.each do |location_tax|
-        order = location_tax.post_to_taxjar
-        location_tax.update_attribute(:taxjar_id, order.transaction_id)
+        location_tax.post_to_taxjar
       end
     end
   end

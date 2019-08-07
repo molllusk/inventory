@@ -57,7 +57,8 @@ class VendLocationSalesTax < ApplicationRecord
 
   def post_to_taxjar
     begin
-      TaxjarClient.connection.create_order(taxjar_params)
+      order = TaxjarClient.connection.create_order(taxjar_params)
+      update_attribute(:taxjar_id, order.transaction_id)
     rescue
       Airbrake.notify($!)
     end
