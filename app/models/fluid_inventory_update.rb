@@ -56,6 +56,10 @@ class FluidInventoryUpdate < ApplicationRecord
   def wholesale_success?
     new_wholesale_qty == (prior_wholesale_qty - adjustment)
   end
+
+  def success?
+    retail_success? && wholesale_success?
+  end
 end
 
 # == Schema Information
