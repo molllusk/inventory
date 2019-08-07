@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_06_075541) do
+ActiveRecord::Schema.define(version: 2019_08_07_071917) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -279,6 +279,7 @@ ActiveRecord::Schema.define(version: 2019_08_06_075541) do
     t.string "outlet_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "taxjar_id"
   end
 
   create_table "vend_sales_cost_sales", force: :cascade do |t|

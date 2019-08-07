@@ -36,17 +36,16 @@ class VendSalesTax < ApplicationRecord
       vend_location_sales_taxes.create(location_tax)
     end
   end
-end
 
-# transaction_id = sf{+1}
-# transaction_date  = “{2015-05-14T00:00:00Z}"
-# provider = “San Francisco Store”
-# to_country =  “US”
-# to_zip = “94122”
-# to_state = “CA”
-# amount = total “Product Sales” of daily orders + “Shipping”, excluding sales tax and rentals (see section below)
-# shipping = total amount of “Shipping” for daily orders
-# Sales_tax = total amount of “Sales Tax” collected for orders
+  def post_to_taxjar
+    if sales.present?
+      vend_location_sales_taxes.each do |location_tax|
+        order = location_tax.post_to_taxjar
+        location_tax.update_attribute(taxjar_id: order.transaction_id)
+      end
+    end
+  end
+end
 
 # == Schema Information
 #

@@ -40,6 +40,24 @@ class VendLocationSalesTax < ApplicationRecord
   def to_country
     'US'
   end
+
+  def taxjar_params
+    {
+      amount: amount,
+      shipping: shipping,
+      sales_tax: sales_tax,
+      transaction_id: transaction_id,
+      provider: provider,
+      to_zip: to_zip,
+      to_state: to_state,
+      to_country: to_country,
+      transaction_date: date
+    }
+  end
+
+  def post_to_taxjar
+    TaxjarClient.connection.create_order(taxjar_params)
+  end
 end
 
 # == Schema Information
@@ -53,5 +71,6 @@ end
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  outlet_id         :string
+#  taxjar_id         :string
 #  vend_sales_tax_id :integer
 #
