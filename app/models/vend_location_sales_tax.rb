@@ -56,7 +56,11 @@ class VendLocationSalesTax < ApplicationRecord
   end
 
   def post_to_taxjar
-    TaxjarClient.connection.create_order(taxjar_params)
+    begin
+      TaxjarClient.connection.create_order(taxjar_params)
+    rescue
+      Airbrake.notify($!)
+    end
   end
 end
 
