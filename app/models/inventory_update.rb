@@ -48,6 +48,10 @@ class InventoryUpdate < ApplicationRecord
       raise(ArgumentError, "Invalid sort option: #{ sort_option.inspect }")
     end
   }
+
+  def success?
+    new_qty == (prior_qty + adjustment)
+  end
 end
 
 # == Schema Information

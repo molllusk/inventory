@@ -19,8 +19,8 @@
         <td><%= update.prior_retail_qty %></td>
         <td><%= update.prior_wholesale_qty %></td>
         <td><%= update.adjustment %></td>
-        <td><%= update.new_retail_qty %></td>
-        <td><%= update.new_wholesale_qty %></td>
+        <td class='<%= 'inventory_failure' unless update.retail_success? %>'><%= update.new_retail_qty %></td>
+        <td class='<%= 'inventory_failure' unless update.wholesale_success? %>'><%= update.new_wholesale_qty %></td>
       </tr>
     <% end %>
   <table>

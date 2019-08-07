@@ -48,6 +48,14 @@ class FluidInventoryUpdate < ApplicationRecord
       raise(ArgumentError, "Invalid sort option: #{ sort_option.inspect }")
     end
   }
+
+  def retail_success?
+    new_retail_qty == (prior_retail_qty + adjustment)
+  end
+
+  def wholesale_success?
+    new_wholesale_qty == (prior_wholesale_qty - adjustment)
+  end
 end
 
 # == Schema Information
