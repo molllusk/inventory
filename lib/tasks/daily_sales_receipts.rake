@@ -544,5 +544,7 @@ namespace :daily_sales_receipts do
     rescue
       Airbrake.notify($!)
     end
+
+    vend_sales_tax.post_to_taxjar
   end
 end
