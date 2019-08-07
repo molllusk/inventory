@@ -51,7 +51,7 @@ class VendLocationSalesTax < ApplicationRecord
       to_zip: to_zip,
       to_state: to_state,
       to_country: to_country,
-      transaction_date: transaction_date
+      transaction_date: transaction_date.strftime("%Y/%m/%d")
     }
   end
 

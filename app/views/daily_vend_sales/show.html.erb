@@ -64,8 +64,7 @@
         <td><%= number_to_currency(tax.amount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
         <td><%= number_to_currency(tax.sales_tax, :unit => "$", :separator => ".", :delimiter => ",") %></td>
         <td><%= number_to_currency(tax.shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-        <td>
-        </td>
+        <td><%= tax.transaction_id %></td>
       </tr>
     <% end %>
   </table>
