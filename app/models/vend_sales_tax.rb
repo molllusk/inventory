@@ -2,6 +2,10 @@ class VendSalesTax < ApplicationRecord
   belongs_to :daily_vend_sale
   has_many :vend_location_sales_taxes, dependent: :destroy
 
+  scope :last_month, lambda {
+    joins.daily_vend_sale.where(date: Date.new(1.month.ago.beginning_of_month..1.month.ago.end_of_month))
+  }
+
   RENTAL_IDS = %w[
     b8ca3a6e-723e-11e4-efc6-64565067889f
     31eb0866-e73e-11e5-e556-0c7a3a5958c3
@@ -9,6 +13,17 @@ class VendSalesTax < ApplicationRecord
     0adfd74a-153e-11e9-fa42-51ae7eb59c62
     0adfd74a-153e-11e9-fa42-51ae7ec84c09
   ]
+
+  def self.csv
+    dates = last_month
+    CSV.open(new_file, 'w', headers: [:date] + VendLocationSalesTaxes::CSV_HEADERS, write_headers: true) do |new_csv|
+      dates.each do |day|
+        date.vend_location_sales_taxes.each do |location|
+          new_csv << [day.date] + VendLocationSalesTaxes::CSV_HEADERS.map { |header| location.taxjar_params[header] }
+        end
+      end
+    end
+  end
 
   def sales
     daily_vend_sale.vend_sales_receipt_sales

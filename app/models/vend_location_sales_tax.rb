@@ -1,6 +1,18 @@
 class VendLocationSalesTax < ApplicationRecord
   belongs_to :vend_sales_tax
 
+  CSV_HEADERS = [
+    :amount,
+    :shipping,
+    :sales_tax,
+    :transaction_id,
+    :provider,
+    :to_zip,
+    :to_state,
+    :to_country,
+    :transaction_date
+  ]
+
   TRANSACTION_ID_PREFIX = {
     'San Francisco' => 'sf',
     'Venice Beach' => 'vb',
