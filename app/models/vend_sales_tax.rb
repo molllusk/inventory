@@ -20,10 +20,10 @@ class VendSalesTax < ApplicationRecord
 
   def self.csv
     dates = last_month
-    CSV.open(csv_file_name, 'w', headers: [:date] + VendLocationSalesTaxes::CSV_HEADERS, write_headers: true) do |new_csv|
+    CSV.open(csv_file_name, 'w', headers: [:date] + VendLocationSalesTax::CSV_HEADERS, write_headers: true) do |new_csv|
       dates.each do |day|
         date.vend_location_sales_taxes.each do |location|
-          new_csv << [day.date] + VendLocationSalesTaxes::CSV_HEADERS.map { |header| location.taxjar_params[header] }
+          new_csv << [day.date] + VendLocationSalesTax::CSV_HEADERS.map { |header| location.taxjar_params[header] }
         end
       end
     end
