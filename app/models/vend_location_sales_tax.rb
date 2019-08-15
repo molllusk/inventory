@@ -67,6 +67,11 @@ class VendLocationSalesTax < ApplicationRecord
     }
   end
 
+  def to_csv_row
+    params = taxjar_params
+    CSV_HEADERS.map { |header| params[header] }
+  end
+
   def post_to_taxjar
     begin
       order = TaxjarClient.connection.create_order(taxjar_params)
