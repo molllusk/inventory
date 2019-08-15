@@ -19,7 +19,7 @@ class VendSalesTax < ApplicationRecord
   end
 
   def self.csv
-    CSV.generate(VendSalesTax.csv_file_name, 'w', headers: [:date] + VendLocationSalesTax::CSV_HEADERS, write_headers: true) do |new_csv|
+    CSV.generate(VendSalesTax.csv_file_name, { headers: [:date] + VendLocationSalesTax::CSV_HEADERS, write_headers: true }) do |new_csv|
       VendSalesTax.last_month.each do |day|
         day.vend_location_sales_taxes.each do |location|
           new_csv << VendLocationSalesTax::CSV_HEADERS.map { |header| location.taxjar_params[header] }
