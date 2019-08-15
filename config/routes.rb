@@ -14,7 +14,11 @@ Rails.application.routes.draw do
   resources :shopify_sales_costs
   resources :daily_vend_consignments
   resources :daily_vend_costs
-  resources :daily_vend_sales
+  resources :daily_vend_sales do
+    collection do
+      get :sales_tax_csv
+    end
+  end
 
   namespace :admin do
     root to: '#index'
