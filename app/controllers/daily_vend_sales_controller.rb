@@ -8,7 +8,7 @@ class DailyVendSalesController < ApplicationController
   def sales_tax_csv
     send_data(
       VendSalesTax.csv,
-      filename: "Vend_sales_tax_#{1.month.ago.strftime("%B")}.csv",
+      filename: VendSalesTax.csv_file_name,
       type: 'text/csv; charset=utf-8; header=present'
     )
   end

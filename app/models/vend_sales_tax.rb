@@ -14,9 +14,13 @@ class VendSalesTax < ApplicationRecord
     0adfd74a-153e-11e9-fa42-51ae7ec84c09
   ]
 
+  def self.csv_file_name
+    "Vend_sales_tax_#{1.month.ago.strftime("%B")}.csv"
+  end
+
   def self.csv
     dates = last_month
-    CSV.open(new_file, 'w', headers: [:date] + VendLocationSalesTaxes::CSV_HEADERS, write_headers: true) do |new_csv|
+    CSV.open(csv_file_name, 'w', headers: [:date] + VendLocationSalesTaxes::CSV_HEADERS, write_headers: true) do |new_csv|
       dates.each do |day|
         date.vend_location_sales_taxes.each do |location|
           new_csv << [day.date] + VendLocationSalesTaxes::CSV_HEADERS.map { |header| location.taxjar_params[header] }
