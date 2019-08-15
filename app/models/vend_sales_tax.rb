@@ -3,7 +3,7 @@ class VendSalesTax < ApplicationRecord
   has_many :vend_location_sales_taxes, dependent: :destroy
 
   scope :last_month, lambda {
-    joins.daily_vend_sale.where(date: Date.new(1.month.ago.beginning_of_month..1.month.ago.end_of_month))
+    joins(:daily_vend_sale).where(daily_vend_sale.date: Date.new(1.month.ago.beginning_of_month..1.month.ago.end_of_month))
   }
 
   RENTAL_IDS = %w[
