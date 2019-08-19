@@ -24,8 +24,6 @@ class DailyVendConsignment < ApplicationRecord
   def journal_line_item_details
     details = []
     vend_consignment_location_costs.each do |location_cost|
-      outlet = sales_cost.outlet_id
-
       details << {
         account_id: ACCOUNT_ID_BY_OUTLET[location_cost.outlet_name],
         amount: location_cost.cost,
