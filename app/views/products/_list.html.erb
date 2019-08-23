@@ -27,8 +27,12 @@
         <td><%= vend.sku %></td>
         <td><%= vend.inventory || 'none' %></td>
         <td>
-          <% vend.vend_inventories.each do |inventory| %>
-            <strong><%= inventory.location %></strong>: <%= inventory.inventory %><br />
+          <% if vend.vend_inventories.present? %>
+            <% vend.vend_inventories.each do |inventory| %>
+              <strong><%= inventory.location %></strong>: <%= inventory.inventory %><br />
+            <% end %>
+          <% else %>
+            none
           <% end %>
         </td>
         <td>
