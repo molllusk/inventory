@@ -7,6 +7,7 @@ class VendDatum < ApplicationRecord
   serialize :categories, Array
 
   belongs_to :product
+  has_many :vend_inventories, dependent: :destroy
 
   def sf_inventory
     inventory.to_i < 0 ? 0 : inventory.to_i

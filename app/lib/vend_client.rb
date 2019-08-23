@@ -43,7 +43,7 @@ class VendClient
     page = 0
     data = []
     loop do
-      response = connection.get path, { outlet_id: OUTLET_NAMES_BY_ID.key("San Francisco"), after: page }
+      response = connection.get path, { after: page }
       break if response.body['data'].blank?
       data += response.body['data']
       page = response.body['version']['max']
@@ -90,7 +90,23 @@ class VendClient
   end
 
   def self.update_inventories
+    all_inventory_levels = get_inventory
+
+    all_inventory_levels.each do |inventory_level|
+      vd = VendDatum.find_by(vend_id: inventory_level['product_id'])
+
+      if vd.present?
+        existing_inventory_item = vd.vend_inventories.find_by(outlet_id: inventory_level['outlet_id'])
+        if existing_inventory_item.present?
+          existing_inventory_item.update_attribute(:inventory, inventory_level['inventory_level']) unless existing_inventory_item.inventory == inventory_level['inventory_level']
+        else
+          vd.vend_inventories << VendInventory.create(outlet_id: inventory_level['outlet_id'], inventory: inventory_level['inventory_level'])
+        end
+      end
+    end
+
     inventories = get_sf_inventory
+
     VendDatum.find_each do |vd|
       vend_inventory = inventories.find { |inv| inv['product_id'] == vd.vend_id }
       if vend_inventory.present?
