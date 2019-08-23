@@ -9,7 +9,6 @@
       <th>Product (vend name)</th>
       <th>Added (Pacific Time)</th>
       <th>SKU</th>
-      <th>OLD Vend SF Qty</th>
       <th>Vend Inventories</th>
       <th>Shopify Retail Inventories</th>
       <th>Shopify Wholesale Inventories</th>
@@ -25,7 +24,6 @@
         <td><%= link_to product do %><%= vend.name %> <i class='fa fa-external-link-alt'></i><% end %></td>
         <td><%= product.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
         <td><%= vend.sku %></td>
-        <td><%= vend.inventory || 'none' %></td>
         <td>
           <% if vend.vend_inventories.present? %>
             <% vend.vend_inventories.each do |inventory| %>
