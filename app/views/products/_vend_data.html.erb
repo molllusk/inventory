@@ -20,5 +20,15 @@
         </tr>
       <% end %>
     <% end %>
+    <tr>
+      <td>
+        <strong>Inventory</strong>
+      </td>
+      <td>
+        <% vd.vend_inventories.each do |inventory| %>
+          <strong><%= inventory.location %></strong>: <%= inventory.inventory %><br />
+        <% end %>
+      </td>
+    </tr>
   </table>
 <% end %>

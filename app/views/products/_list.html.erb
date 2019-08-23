@@ -9,7 +9,8 @@
       <th>Product (vend name)</th>
       <th>Added (Pacific Time)</th>
       <th>SKU</th>
-      <th>Vend SF Qty</th>
+      <th>OLD Vend SF Qty</th>
+      <th>Vend Inventories</th>
       <th>Shopify Retail Inventories</th>
       <th>Shopify Wholesale Inventories</th>
       <th>3rdParty?</th>
@@ -25,6 +26,11 @@
         <td><%= product.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
         <td><%= vend.sku %></td>
         <td><%= vend.inventory || 'none' %></td>
+        <td>
+          <% vend.vend_inventories.each do |inventory| %>
+            <strong><%= inventory.location %></strong>: <%= inventory.inventory %><br />
+          <% end %>
+        </td>
         <td>
           <% if retail_shopify.present? %>
             <% if retail_shopify.shopify_inventories.present? %>
