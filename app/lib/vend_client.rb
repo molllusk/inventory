@@ -2,9 +2,9 @@ class VendClient
   BASE_URL = 'https://mollusksurf.vendhq.com/api/2.0'.freeze
 
   OUTLET_NAMES_BY_ID = {
-    "5e234f4e-8eed-11e0-8e09-4040f540b50a" => "San Francisco",
-    "8d27bed3-060b-11e4-a0f5-b8ca3a64f8f4" => "Silver Lake",
-    "0adfd74a-153e-11e9-fa42-67b5781ba1fb" => "Venice Beach"
+    '5e234f4e-8eed-11e0-8e09-4040f540b50a' => 'San Francisco',
+    '8d27bed3-060b-11e4-a0f5-b8ca3a64f8f4' => 'Silver Lake',
+    '0adfd74a-153e-11e9-fa42-67b5781ba1fb' => 'Venice Beach'
   }.freeze
 
   SAVED_ATTRIBUTES = %i[
@@ -102,15 +102,6 @@ class VendClient
         else
           vd.vend_inventories << VendInventory.create(outlet_id: inventory_level['outlet_id'], inventory: inventory_level['inventory_level'])
         end
-      end
-    end
-
-    inventories = get_sf_inventory
-
-    VendDatum.find_each do |vd|
-      vend_inventory = inventories.find { |inv| inv['product_id'] == vd.vend_id }
-      if vend_inventory.present?
-        vd.update_attribute(:inventory, vend_inventory['inventory_level']) unless vd.inventory == vend_inventory['inventory_level']
       end
     end
   end

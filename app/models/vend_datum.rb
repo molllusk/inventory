@@ -10,7 +10,12 @@ class VendDatum < ApplicationRecord
   has_many :vend_inventories, dependent: :destroy
 
   def sf_inventory
-    inventory.to_i < 0 ? 0 : inventory.to_i
+    san_francisco_inventory = vend_inventories.find { |inv| inv.location == 'San Francisco' }
+    if san_francisco_inventory&.inventory.to_i > 0
+      san_francisco_inventory.inventory
+    else
+      0
+    end
   end
 end
 
