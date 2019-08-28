@@ -5,19 +5,13 @@ class VendLocationSalesTax < ApplicationRecord
     :amount,
     :shipping,
     :sales_tax,
-    :transaction_id,
+    :id,
     :provider,
     :to_zip,
     :to_state,
     :to_country,
     :transaction_date
   ]
-
-  TRANSACTION_ID_PREFIX = {
-    'San Francisco' => 'sf',
-    'Venice Beach' => 'vb',
-    'Silver Lake' => 'sl'
-  }
 
   ZIPS_BY_LOCATION = {
     'San Francisco' => '94122',
@@ -53,12 +47,12 @@ class VendLocationSalesTax < ApplicationRecord
     'US'
   end
 
-  def taxjar_params
+  def csv_row
     {
       amount: amount,
       shipping: shipping,
       sales_tax: sales_tax,
-      transaction_id: transaction_id,
+      id: id,
       provider: provider,
       to_zip: to_zip,
       to_state: to_state,
@@ -68,17 +62,8 @@ class VendLocationSalesTax < ApplicationRecord
   end
 
   def to_csv_row
-    params = taxjar_params
-    CSV_HEADERS.map { |header| params[header] }
-  end
-
-  def post_to_taxjar
-    begin
-      order = TaxjarClient.connection.create_order(taxjar_params)
-      update_attribute(:taxjar_id, order.transaction_id)
-    rescue
-      Airbrake.notify($!)
-    end
+    row = csv_row
+    CSV_HEADERS.map { |header| row[header] }
   end
 end
 
@@ -93,6 +78,5 @@ end
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  outlet_id         :string
-#  taxjar_id         :string
 #  vend_sales_tax_id :integer
 #

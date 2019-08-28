@@ -26,29 +26,28 @@ end
 #  id                :bigint(8)        not null, primary key
 #  active            :boolean
 #  brand             :string
-#  brand_id          :string
 #  categories        :text
-#  vend_created_at   :datetime
-#  vend_deleted_at   :datetime
 #  handle            :string
 #  has_inventory     :boolean
 #  has_variants      :boolean
-#  vend_id           :string
 #  is_active         :boolean
 #  name              :string
-#  product_type_id   :string
 #  sku               :string
 #  supplier          :string
-#  supplier_id       :string
 #  supply_price      :string
 #  tag_ids           :text
-#  vend_type         :text
 #  variant_count     :string
 #  variant_name      :string
 #  variant_options   :text
-#  variant_parent_id :string
-#  product_id        :integer
+#  vend_created_at   :datetime
+#  vend_deleted_at   :datetime
+#  vend_type         :text
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
-#  inventory         :integer
+#  brand_id          :string
+#  product_id        :integer
+#  product_type_id   :string
+#  supplier_id       :string
+#  variant_parent_id :string
+#  vend_id           :string
 #
