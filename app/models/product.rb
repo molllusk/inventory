@@ -124,7 +124,7 @@ class Product < ApplicationRecord
 
     data = { 
       product: vend_datum&.name || retail_shopify&.title,
-      variant: vend_datum&.variant_name || retail_shopify&.variant_title,
+      variant: retail_shopify&.variant_title || vend_datum&.variant_name,
       type: vend_datum&.vend_type&.[]('name') || retail_shopify&.product_type,
       vend: vend_datum&.link,
       retail_shopify: retail_shopify&.link,
@@ -135,7 +135,7 @@ class Product < ApplicationRecord
     shopify_data.each do |shopify|
       shopify.shopify_inventories.each do |inventory|
         data[inventory.location] = inventory.inventory
-        total_inventory += inventory.inventory
+        total_inventory += inventory.inventory if ['Jam Warehouse Retail', 'Jam Warehouse Wholesale'].includes?(inventory.location)
       end
     end
 

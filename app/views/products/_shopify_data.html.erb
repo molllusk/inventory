@@ -12,7 +12,7 @@
         <% if retail_shopify.present? %>
           <td>
             <% if header == 'store' %>
-              <a href='https://mollusksurf.myshopify.com/admin/products/<%= retail_shopify.shopify_product_id %>/variants/<%= retail_shopify.variant_id %>' target='_blank'>RETAIL <i class='fa fa-external-link-alt'></i></a>
+              <a href='<%= retail_shopify.link %>' target='_blank'>RETAIL <i class='fa fa-external-link-alt'></i></a>
             <% elsif retail_shopify.send(header).is_a? Array %>
               <%= retail_shopify.send(header).join(', ') %>
             <% elsif retail_shopify.send(header).is_a? String %>
@@ -25,7 +25,7 @@
         <% if wholesale_shopify.present? %>
           <td>
             <% if header == 'store' %>
-              <a href='https://molluskats.myshopify.com/admin/products/<%= wholesale_shopify.shopify_product_id %>/variants/<%= wholesale_shopify.variant_id %>' target='_blank'>WHOLESALE <i class='fa fa-external-link-alt'></i></a>
+              <a href='<%= wholesale_shopify.link %>' target='_blank'>WHOLESALE <i class='fa fa-external-link-alt'></i></a>
             <% elsif wholesale_shopify.send(header).is_a? Array %>
               <%= wholesale_shopify.send(header).join(', ') %>
             <% elsif wholesale_shopify.send(header).is_a? String %>
