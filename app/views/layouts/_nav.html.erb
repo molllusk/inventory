@@ -11,7 +11,36 @@
   <li class="<%= "highlighted" if params[:controller] == "fluid_inventory_thresholds" %> nav-item">
     <a class="nav-link" href="/fluid_inventory_thresholds">Fluid Inventory Thresholds</a>
   </li>
-  <li class="<%= "highlighted" if params[:controller] == "daily_reports" %> nav-item">
-    <a class="nav-link" href="/daily_reports">Daily QBO Reports</a>
+  <li class="dropdown <%= "highlighted" if params[:controller] == "daily_reports" %> nav-item">
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Daily QBO Reports <b class="caret"></b></a>
+    <ul class="dropdown-menu">
+      <li>
+        <a href="/daily_reports/shopify_sales_receipts">Shopify Daily Sales</a>
+      </li>
+      <li>
+        <a href="/daily_reports/shopify_costs">Shopify COGS</a>
+      </li>
+      <li>
+        <a href="/daily_reports/shopify_refunds">Shopify Refunds</a>
+      </li>
+      <li>
+        <a href="/daily_reports/wholesale_shopify_sales_receipts">Wholesale Shopify Daily Sales</a>
+      </li>
+      <li>
+        <a href="/daily_reports/wholesale_shopify_costs">Wholesale Shopify COGS</a>
+      </li>
+      <li>
+        <a href="/daily_reports/vend_sales_receipts">Vend Daily Sales</a>
+      </li>
+      <li>
+        <a href="/daily_reports/vend_costs">Vend COGS</a>
+      </li>
+      <li>
+        <a href="/daily_reports/vend_inventory_transfers">Vend Inventory Transfers</a>
+      </li>
+      <li>
+        <a href="/daily_reports/vend_sales_taxes">Vend Sales Taxes</a>
+      </li>
+    </ul>
   </li>
 </ul>
