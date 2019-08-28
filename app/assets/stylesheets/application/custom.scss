@@ -59,6 +59,11 @@ p {
     color: #fff;
 }
 
+.nav .open>a, .nav .open>a:hover, .nav .open>a:focus {
+  border: none;
+  color: #F4B1A0;
+}
+
 .dropdown-menu > li > a {
   color: #777777;
 }
