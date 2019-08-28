@@ -23,10 +23,6 @@ class VendLocationSalesTax < ApplicationRecord
     VendClient::OUTLET_NAMES_BY_ID[outlet_id]
   end
 
-  def transaction_id
-    "#{TRANSACTION_ID_PREFIX[outlet_name]}#{id}"
-  end
-
   def transaction_date
     vend_sales_tax.date
   end
