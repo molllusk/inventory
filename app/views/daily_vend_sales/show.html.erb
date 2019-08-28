@@ -56,7 +56,7 @@
       <th>Amount</th>
       <th>Sales Tax</th>
       <th>Shipping</th>
-      <th>Tax Jar</th>
+      <th>id</th>
     </tr>
     <% @daily_vend_sale.vend_sales_tax.vend_location_sales_taxes.sort_by(&:outlet_id).each do |tax| %>
       <tr>
@@ -64,7 +64,7 @@
         <td><%= number_to_currency(tax.amount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
         <td><%= number_to_currency(tax.sales_tax, :unit => "$", :separator => ".", :delimiter => ",") %></td>
         <td><%= number_to_currency(tax.shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-        <td><%= tax.transaction_id %></td>
+        <td><%= tax.id %></td>
       </tr>
     <% end %>
   </table>

@@ -17,6 +17,5 @@ end
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  outlet_id         :string
-#  taxjar_id         :string
 #  vend_sales_tax_id :integer
 #

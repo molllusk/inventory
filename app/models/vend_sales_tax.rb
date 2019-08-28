@@ -54,14 +54,6 @@ class VendSalesTax < ApplicationRecord
       vend_location_sales_taxes.create(location_tax)
     end
   end
-
-  def post_to_taxjar
-    if sales.present?
-      vend_location_sales_taxes.each do |location_tax|
-        location_tax.post_to_taxjar
-      end
-    end
-  end
 end
 
 # == Schema Information
