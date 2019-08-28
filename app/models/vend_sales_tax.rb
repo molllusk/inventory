@@ -22,7 +22,7 @@ class VendSalesTax < ApplicationRecord
     CSV.generate(headers: VendLocationSalesTax::CSV_HEADERS, write_headers: true) do |new_csv|
       VendSalesTax.last_month.each do |day|
         day.vend_location_sales_taxes.each do |location|
-          new_csv << location.to_csv_row
+          new_csv << location.csv_row
         end
       end
     end

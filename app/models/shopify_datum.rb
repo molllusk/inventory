@@ -53,6 +53,10 @@ class ShopifyDatum < ApplicationRecord
       0.0
     end
   end
+
+  def link
+    "https://mollusksurf.myshopify.com/admin/products/#{shopify_product_id}/variants/#{variant_id}"
+  end
 end
 
 # == Schema Information

@@ -44,7 +44,7 @@ class VendLocationSalesTax < ApplicationRecord
   end
 
   def csv_row
-    {
+    data = {
       amount: amount,
       shipping: shipping,
       sales_tax: sales_tax,
@@ -55,11 +55,8 @@ class VendLocationSalesTax < ApplicationRecord
       to_country: to_country,
       transaction_date: transaction_date.strftime("%Y/%m/%d")
     }
-  end
 
-  def to_csv_row
-    row = csv_row
-    CSV_HEADERS.map { |header| row[header] }
+    CSV_HEADERS.map { |header| data[header] }
   end
 end
 

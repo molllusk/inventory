@@ -90,6 +90,14 @@ class Product < ApplicationRecord
     end
   end
 
+  def self.inventory_csv
+    CSV.generate(headers: inventory_csv_headers + ['total_inventory'], write_headers: true) do |new_csv|
+      find_each do |product|
+        new_csv << product.inventory_csv_row
+      end
+    end
+  end
+
   def has_retail_and_wholesale_shopify?
     retail_shopify.present? && wholesale_shopify.present?
   end
@@ -104,6 +112,41 @@ class Product < ApplicationRecord
 
   def adjust_sf_retail_inventory
     adjust_inventory_vend('Mollusk SF', retail_inventory_adjustment)
+  end
+
+  def self.inventory_csv_headers
+    stem = %i(product variant type vend retail_shopify wholesale_shopify app)
+    stem + ShopifyInventory::locations.keys + VendClient::OUTLET_NAMES_BY_ID.values
+  end
+
+  def inventory_csv_row
+    total_inventory = 0
+
+    data = { 
+      product: vend_datum&.name || retail_shopify&.title,
+      variant: vend_datum&.variant_name || retail_shopify&.variant_title,
+      type: vend_datum&.vend_type&.[]('name') || retail_shopify&.product_type,
+      vend: vend_datum&.link,
+      retail_shopify: retail_shopify&.link,
+      wholesale_shopify: wholesale_shopify&.link,
+      app: "https://mollusk.herokuapp.com/products/#{id}",
+    }
+    
+    shopify_data.each do |shopify|
+      shopify.shopify_inventories.each do |inventory|
+        data[inventory.location] = inventory.inventory
+        total_inventory += inventory.inventory
+      end
+    end
+
+    if vend_datum.present?
+      vend_datum.vend_inventories.each do |inventory|
+        data[inventory.location] = inventory.inventory
+        total_inventory += inventory.inventory
+      end
+    end
+
+    Product.inventory_csv_headers.map { |header| data[header] } + [total_inventory]
   end
 
   def adjust_inventory_vend(location_name, quantity)

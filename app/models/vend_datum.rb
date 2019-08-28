@@ -17,6 +17,10 @@ class VendDatum < ApplicationRecord
       0
     end
   end
+
+  def link
+    "https://mollusksurf.vendhq.com/product/#{vend_id}"
+  end
 end
 
 # == Schema Information
