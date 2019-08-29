@@ -135,7 +135,7 @@ class Product < ApplicationRecord
     shopify_data.each do |shopify|
       shopify.shopify_inventories.each do |inventory|
         data[inventory.location] = inventory.inventory
-        total_inventory += inventory.inventory if ['Jam Warehouse Retail', 'Jam Warehouse Wholesale'].includes?(inventory.location)
+        total_inventory += inventory.inventory if ['Jam Warehouse Retail', 'Jam Warehouse Wholesale'].include?(inventory.location)
       end
     end
 
