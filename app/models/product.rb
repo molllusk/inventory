@@ -115,7 +115,7 @@ class Product < ApplicationRecord
   end
 
   def self.inventory_csv_headers
-    stem = %i(product variant type vend retail_shopify wholesale_shopify app)
+    stem = %i(product variant type sku vend retail_shopify wholesale_shopify app)
     stem + ShopifyInventory::locations.keys + VendClient::OUTLET_NAMES_BY_ID.values
   end
 
@@ -123,9 +123,10 @@ class Product < ApplicationRecord
     total_inventory = 0
 
     data = { 
-      product: vend_datum&.name || retail_shopify&.title,
-      variant: retail_shopify&.variant_title || vend_datum&.variant_name,
-      type: vend_datum&.vend_type&.[]('name') || retail_shopify&.product_type,
+      product: vend_datum&.name || retail_shopify&.title || wholesale_shopify&.title,
+      variant: (retail_shopify&.variant_title || wholesale_shopify&.variant_title || vend_datum&.variant_name).to_s.gsub(/Default(\s+Title)?/i, ''),
+      type: vend_datum&.vend_type&.[]('name') || retail_shopify&.product_type || wholesale_shopify&.product_type,
+      sku: vend_dataum&.sku || retail_shopify&.barcode || wholesale_shopify&.barcode,
       vend: vend_datum&.link,
       retail_shopify: retail_shopify&.link,
       wholesale_shopify: wholesale_shopify&.link,
