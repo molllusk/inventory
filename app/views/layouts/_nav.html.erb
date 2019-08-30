@@ -2,7 +2,7 @@
   <li class="<%= "highlighted" if params[:controller] == "inventory_updates" %> nav-item">
     <a class="nav-link" href="/inventory_updates">Vend Inventory Updates</a>
   </li>
-  <li class="dropdown <%= "highlighted" if ['fluid_inventory_thresholds', 'fluid_inventory_updates'].includes?(params[:controller]) %> nav-item">
+  <li class="dropdown <%= "highlighted" if ['fluid_inventory_thresholds', 'fluid_inventory_updates'].include?(params[:controller]) %> nav-item">
     <a class="dropdown-toggle" data-toggle="dropdown" href="#">Fluid Inventory <b class="caret"></b></a>
     <ul class="dropdown-menu">
       <li>
