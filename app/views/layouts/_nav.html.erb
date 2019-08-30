@@ -2,14 +2,19 @@
   <li class="<%= "highlighted" if params[:controller] == "inventory_updates" %> nav-item">
     <a class="nav-link" href="/inventory_updates">Vend Inventory Updates</a>
   </li>
-  <li class="<%= "highlighted" if params[:controller] == "fluid_inventory_updates" %> nav-item">
-    <a class="nav-link" href="/fluid_inventory_updates">Fluid Inventory Updates</a>
+  <li class="dropdown <%= "highlighted" if params[:controller] == "fluid_inventory_updates" %> nav-item">
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Fluid Inventory</a>
+    <ul class="dropdown-menu">
+      <li>
+        <a href="/fluid_inventory_thresholds">Thresholds</a>
+      </li>
+      <li>
+        <a href="/fluid_inventory_updates">Updates</a>
+      </li>
+    </ul>
   </li>
   <li class="<%= "highlighted" if params[:controller] == "products" %> nav-item">
     <a class="nav-link" href="/products">Products</a>
-  </li>
-  <li class="<%= "highlighted" if params[:controller] == "fluid_inventory_thresholds" %> nav-item">
-    <a class="nav-link" href="/fluid_inventory_thresholds">Fluid Inventory Thresholds</a>
   </li>
   <li class="dropdown <%= "highlighted" if params[:controller] == "daily_reports" %> nav-item">
     <a class="dropdown-toggle" data-toggle="dropdown" href="#">Daily Reports <b class="caret"></b></a>
