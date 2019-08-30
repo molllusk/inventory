@@ -6,7 +6,7 @@
 
   <table class="products full_width">
     <tr>
-      <th>Product (vend name)</th>
+      <th>Product</th>
       <th>Added (Pacific Time)</th>
       <th>SKU</th>
       <th>Vend Inventories</th>
@@ -21,7 +21,7 @@
       <% retail_shopify = product.retail_shopify %>
       <% wholesale_shopify = product.wholesale_shopify %>
       <tr>
-        <td><%= link_to product do %><%= vend.name %> <i class='fa fa-external-link-alt'></i><% end %></td>
+        <td><%= link_to product do %><%= vend.variant_name %> <i class='fa fa-external-link-alt'></i><% end %></td>
         <td><%= product.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
         <td><%= vend.sku %></td>
         <td>
