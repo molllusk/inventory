@@ -10,7 +10,7 @@ class ApplicationMailer < ActionMailer::Base
   end
 
   def sku_report(bad_retail_products, bad_wholesale_products)
-    body = "See below for the latest products with mismatched SKUs:#{ ('<br /><br /><b>Retail Products:</b><br /><br />' + bad_retail_products.map { |prod| "<a href='https://mollusk.herokuapp.com/#{prod.id}'>#{prod.vend_datum.variant_name}</a><br />" }.join) if bad_retail_products.present? }#{ ('<br /><br /><b>Wholesale Products:</b><br /><br />' + bad_wholesale_products.map { |prod| "<a href='https://mollusk.herokuapp.com/#{prod.id}'>#{prod.vend_datum.variant_name}</a><br />" }.join) if  bad_wholesale_products.present? }"
+    body = "One or more mismatched skus were detected between previously matched Vend and Shopify products:#{ ('<br /><br /><b>Retail Mismatches:</b><br /><ul>' + bad_retail_products.map { |prod| "<li><a href='https://mollusk.herokuapp.com/#{prod.id}'>#{prod.vend_datum.variant_name}</a></li>" }.join + '</ul>') if bad_retail_products.present? }#{ ('<br /><br /><b>Wholesale Mismatches:</b><br /><ul>' + bad_wholesale_products.map { |prod| "<li><a href='https://mollusk.herokuapp.com/#{prod.id}'>#{prod.vend_datum.variant_name}</a></li>" }.join + '</ul>') if  bad_wholesale_products.present? }"
     mail to: 'joseph@mollusksurfshop.com, arvelhernandez@gmail.com', subject: 'Mismatched SKU Report', content_type: 'text/html', body: body
   end
 end
