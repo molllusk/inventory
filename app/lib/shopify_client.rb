@@ -3,7 +3,7 @@ module ShopifyClient
   WHOLESALE_BASE_URL = "https://#{ENV['WHOLESALE_SHOPIFY_USER']}:#{ENV['WHOLESALE_SHOPIFY_PASSWORD']}@molluskats.myshopify.com".freeze
   SF_RETAIL_INVENTORY_LOCATION = 49481991.freeze
   JAM_WHOLESALE_INVENTORY_LOCATION = 29887823936.freeze
-  API_VERSION = '/admin/api/2019-04'.freeze
+  API_VERSION = '/admin/api/2019-07'.freeze
 
   SAVED_PRODUCT_ATTRIBUTES = %i[
     handle
@@ -48,7 +48,7 @@ module ShopifyClient
   end
 
   def self.all_products(store = :RETAIL)
-    all_resource('products', store)
+    all_resource_cursor('products', store)
   end
 
   def self.all_resource(resource, store = :RETAIL)
@@ -58,6 +58,26 @@ module ShopifyClient
       response = connection(store).get "#{API_VERSION}/#{resource}.json", { limit: 250, page: page + 1 }
       resources += response.body[resource]
     end
+    resources
+  end
+
+  def self.all_resource_cursor(resource, store = :RETAIL)
+    response = connection(store).get "#{API_VERSION}/#{resource}.json", { limit: 250 }
+    resources = response.body[resource]
+
+    loop do
+      links = response.headers['link']
+      break unless links.present?
+
+      next_link = links.split(', ').find { |link| link.include?("rel=\"next\"") }
+      break unless next_link.present?
+
+      next_url = next_link.split(';').first.gsub(/\<|\>/, '')
+
+      response = connection(store).get next_url
+      resources += response.body[resource]
+    end
+
     resources
   end
 
