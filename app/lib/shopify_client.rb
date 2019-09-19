@@ -78,7 +78,7 @@ module ShopifyClient
       resources += response.body[resource]
     end
 
-    resources
+    resources || []
   end
 
   def self.all_orders(store = :RETAIL)
