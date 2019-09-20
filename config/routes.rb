@@ -24,6 +24,16 @@ Rails.application.routes.draw do
     root to: '#index'
   end
 
+  namespace :api do
+    namespace :v1 do
+      resources :products do
+        collection do
+          get :jammers
+        end
+      end
+    end
+  end
+
   namespace :callbacks do
     get '/quickbooks/authenticate', to: 'quickbooks#authenticate'
     get '/quickbooks/oauth_callback', to: 'quickbooks#oauth_callback'
