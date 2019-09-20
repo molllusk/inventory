@@ -15,6 +15,6 @@ class Api::V1::ProductsController < ApplicationController
       }
     end
 
-    render json: products.as_json
+    render json: { jammers: products.as_json }
   end
 end
