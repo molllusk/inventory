@@ -65,7 +65,7 @@ class ShopifyRefund < ApplicationRecord
       },
       {
         account_id: '3557', # 43000 Freight Income
-        amount: shipping,
+        amount: shipping_clean,
         description: 'Return Shipping Fees',
         posting_type: 'Credit'
       },
@@ -88,6 +88,10 @@ class ShopifyRefund < ApplicationRecord
         posting_type: 'Credit'
       }
     ]
+  end
+
+  def shipping_clean
+    (-0.01 < shipping < 0) ? 0 : shipping
   end
 
   def post_to_qbo
