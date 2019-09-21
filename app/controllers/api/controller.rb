@@ -6,7 +6,7 @@ module Api
 
     private
     def authenticate
-      return true if params[:k] == Digest::SHA1.hexdigest('jammalammadingdong')
+      return true if params[:key] == Digest::SHA1.hexdigest('jammalammadingdong')
       redirect_to :root, flash: { error: 'We were unable to find what you are looking for.' }
     end
   end
