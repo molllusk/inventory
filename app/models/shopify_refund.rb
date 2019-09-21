@@ -90,8 +90,9 @@ class ShopifyRefund < ApplicationRecord
     ]
   end
 
+  # kind of hacky workaround for an edgecase where the shipping calc is just shy of 0 due to some significant digit thing
   def shipping_clean
-    (-0.01 < shipping < 0) ? 0 : shipping
+    (-0.01 < shipping && shipping < 0) ? 0 : shipping
   end
 
   def post_to_qbo
