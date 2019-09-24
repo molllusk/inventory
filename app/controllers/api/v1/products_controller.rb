@@ -30,10 +30,10 @@ module Api
         products << product_data
       end
 
-      render json: { jammers: products.as_json }
+      render json: { shopify_jammers: products.as_json }
     end
 
-    def vend_inventories
+    def vend_jammers
       products = []
 
       VendDatum.where(product_id: ShopifyDatum.with_jam.pluck(:product_id)).find_each do |product|
@@ -60,7 +60,7 @@ module Api
         products << product_data
       end
 
-      render json: { vend_inventories: products.as_json }
+      render json: { vend_jammers: products.as_json }
     end
   end
 end

@@ -29,7 +29,7 @@ Rails.application.routes.draw do
       resources :products do
         collection do
           get :shopify_jammers
-          get :vend_inventories
+          get :vend_jammers
         end
       end
     end
