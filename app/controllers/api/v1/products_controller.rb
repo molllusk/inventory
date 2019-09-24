@@ -45,9 +45,9 @@ module Api
         }
 
         product.vend_inventories.where(outlet_id: [
-              VendClient::OUTLET_NAMES_BY_ID.key['San Francisco'],
-              VendClient::OUTLET_NAMES_BY_ID.key['Silver Lake'],
-              VendClient::OUTLET_NAMES_BY_ID.key['Venice Beach']
+              VendClient::OUTLET_NAMES_BY_ID.key('San Francisco'),
+              VendClient::OUTLET_NAMES_BY_ID.key('Silver Lake'),
+              VendClient::OUTLET_NAMES_BY_ID.key('Venice Beach')
             ]).each do |inventory|
           case inventory.location
           when 'San Francisco'
