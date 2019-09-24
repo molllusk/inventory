@@ -1,13 +1,14 @@
 module Api
   class V1::ProductsController < Api::Controller
-    def jammers
+    def shopify_jammers
       inventories = ShopifyInventory.where('location = ? AND inventory > 0', ShopifyInventory::locations['Jam Warehouse Retail'])
       products = []
 
-      ShopifyDatum.joins(:shopify_inventories).merge(inventories).find_each do |product|
+      ShopifyDatum.retail.joins(:shopify_inventories).merge(inventories).find_each do |product|
         product_data = {
           name: product.full_title,
-          sku: product.barcode
+          sku: product.barcode,
+          type: product.product_type
         }
 
         product.shopify_inventories.where(location: [
@@ -31,6 +32,36 @@ module Api
       end
 
       render json: { jammers: products.as_json }
+    end
+
+    def vend_inventories
+      products = []
+
+      VendDatum.find_each do |product|
+        product_data = {
+          name: product.variant_name,
+          sku: product.sku,
+          product_type: product.vend_type&.[]('name')
+        }
+
+        product.vend_inventories.where(outlet_id: [
+              VendClient::OUTLET_NAMES_BY_ID.key['San Francisco'],
+              VendClient::OUTLET_NAMES_BY_ID.key['Silver Lake'],
+              VendClient::OUTLET_NAMES_BY_ID.key['Venice Beach']
+            ]).each do |inventory|
+          case inventory.location
+          when 'San Francisco'
+            product_data[:sf_inv] = inventory.inventory
+          when 'Silver Lake'
+            product_data[:sl_inv] = inventory.inventory
+          when 'Venice Beach'
+            product_data[:vb_inv] = inventory.inventory
+          end
+        end
+        products << product_data
+      end
+
+      render json: { vend_inventories: products.as_json }
     end
   end
 end
