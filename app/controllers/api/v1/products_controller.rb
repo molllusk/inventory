@@ -40,7 +40,7 @@ module Api
         product_data = {
           name: product.variant_name,
           sku: product.sku,
-          product_type: product.vend_type&.[]('name')
+          type: product.vend_type&.[]('name')
         }
 
         product.vend_inventories.where(outlet_id: [
