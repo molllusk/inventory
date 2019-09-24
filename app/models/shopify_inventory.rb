@@ -1,6 +1,8 @@
 class ShopifyInventory < ApplicationRecord
   belongs_to :shopify_datum
 
+  scope :with_jam, -> { where('location = ? AND inventory > 0', ShopifyInventory::locations['Jam Warehouse Retail']) }
+
   enum location: {
     # retail site
     '4500 Irving St' => 1939009,

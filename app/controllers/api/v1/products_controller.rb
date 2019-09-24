@@ -1,10 +1,9 @@
 module Api
   class V1::ProductsController < Api::Controller
     def shopify_jammers
-      inventories = ShopifyInventory.where('location = ? AND inventory > 0', ShopifyInventory::locations['Jam Warehouse Retail'])
       products = []
 
-      ShopifyDatum.retail.joins(:shopify_inventories).merge(inventories).find_each do |product|
+      ShopifyDatum.with_jam.find_each do |product|
         product_data = {
           name: product.full_title,
           sku: product.barcode,
@@ -37,7 +36,7 @@ module Api
     def vend_inventories
       products = []
 
-      VendDatum.find_each do |product|
+      VendDatum.where(product_id: ShopifyDatum.with_jam.pluck(:product_id)).find_each do |product|
         product_data = {
           name: product.variant_name,
           sku: product.sku,
