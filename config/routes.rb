@@ -28,7 +28,8 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :products do
         collection do
-          get :jammers
+          get :shopify_jammers
+          get :vend_inventories
         end
       end
     end
