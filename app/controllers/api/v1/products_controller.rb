@@ -37,10 +37,13 @@ module Api
       products = []
 
       VendDatum.where(product_id: ShopifyDatum.with_jam.pluck(:product_id)).find_each do |product|
+        size = product.variant_options.find { |vo| vo['name'] == 'Size' }&.[]('value')
+
         product_data = {
           name: product.variant_name,
           sku: product.sku,
-          type: product.vend_type&.[]('name')
+          type: product.vend_type&.[]('name'),
+          size: size
         }
 
         product.vend_inventories.where(outlet_id: [
