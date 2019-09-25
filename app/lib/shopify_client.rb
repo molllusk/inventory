@@ -22,6 +22,9 @@ module ShopifyClient
     inventory_policy
     inventory_quantity
     old_inventory_quantity
+    option1
+    option2
+    option3
     price
     requires_shipping
     sku

@@ -75,6 +75,9 @@ end
 #  inventory_policy       :string
 #  inventory_quantity     :integer
 #  old_inventory_quantity :integer
+#  option1                :string
+#  option2                :string
+#  option3                :string
 #  price                  :string
 #  product_type           :string
 #  requires_shipping      :string

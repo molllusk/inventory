@@ -6,6 +6,7 @@ module Api
       ShopifyDatum.with_jam.find_each do |product|
         product_data = {
           name: product.full_title,
+          size: product.option1,
           sku: product.barcode,
           type: product.product_type
         }
@@ -41,9 +42,9 @@ module Api
 
         product_data = {
           name: product.variant_name,
+          size: size,
           sku: product.sku,
-          type: product.vend_type&.[]('name'),
-          size: size
+          type: product.vend_type&.[]('name')
         }
 
         product.vend_inventories.where(outlet_id: [
