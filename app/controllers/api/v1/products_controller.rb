@@ -44,7 +44,8 @@ module Api
           name: product.variant_name,
           size: size,
           sku: product.sku,
-          type: product.vend_type&.[]('name')
+          type: product.vend_type&.[]('name'),
+          id: product.vend_id
         }
 
         product.vend_inventories.where(outlet_id: [
