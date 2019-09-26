@@ -41,11 +41,12 @@ module Api
         size = product.variant_options.find { |vo| vo['name'] == 'Size' }&.[]('value')
 
         product_data = {
+          id: product.vend_id,
           name: product.variant_name,
           size: size,
           sku: product.sku,
-          type: product.vend_type&.[]('name'),
-          id: product.vend_id
+          supply_price: product.supply_price.to_f,
+          type: product.vend_type&.[]('name')
         }
 
         product.vend_inventories.where(outlet_id: [
