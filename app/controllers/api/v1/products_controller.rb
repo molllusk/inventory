@@ -4,6 +4,8 @@ module Api
       products = []
 
       ShopifyDatum.with_jam.find_each do |product|
+        next if product.sale?
+
         product_data = {
           name: product.full_title,
           size: product.option1,
@@ -38,6 +40,8 @@ module Api
       products = []
 
       VendDatum.where(product_id: ShopifyDatum.with_jam.pluck(:product_id)).find_each do |product|
+        next if ShopifyDatum.find_by(product_id: product.product_id)&.sale?
+
         size = product.variant_options.find { |vo| vo['name'] == 'Size' }&.[]('value')
 
         product_data = {
