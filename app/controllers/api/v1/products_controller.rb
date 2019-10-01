@@ -7,6 +7,7 @@ module Api
         next if product.sale?
 
         product_data = {
+          variant_id: product.variant_id,
           name: product.full_title,
           size: product.option1,
           barcode: product.barcode,
