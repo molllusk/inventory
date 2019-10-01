@@ -9,7 +9,8 @@ module Api
         product_data = {
           name: product.full_title,
           size: product.option1,
-          sku: product.barcode,
+          barcode: product.barcode,
+          sku: product.sku,
           type: product.product_type
         }
 
