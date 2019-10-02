@@ -7,12 +7,13 @@ module Api
         next if product.sale?
 
         product_data = {
-          variant_id: product.variant_id,
+          inventory_item_id: product.inventory_item_id,
           name: product.full_title,
           size: product.option1,
           barcode: product.barcode,
           sku: product.sku,
-          type: product.product_type
+          type: product.product_type,
+          variant_id: product.variant_id
         }
 
         product.shopify_inventories.where(location: [
