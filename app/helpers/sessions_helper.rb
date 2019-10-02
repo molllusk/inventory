@@ -74,4 +74,12 @@ module SessionsHelper
       redirect_to login_url
     end
   end
+
+  def admin_required
+    unless logged_in? && current_user.admin?
+      store_location
+      flash[:danger] = "Not found."
+      redirect_to login_url
+    end
+  end
 end
