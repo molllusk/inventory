@@ -3,9 +3,24 @@
   <table class="products full_width">
     <tr>
       <th>Product Type</th>
-      <th>Threshold</th>
+      <th>Size</th>
+      <th>NEW Threshold</th>
     </tr>
     <% inventory_thresholds.each do |threshold| %>
+      <tr>
+        <td><%= threshold['Category'] %></td>
+        <td><%= threshold['Size'] %></td>
+        <td><%= threshold['Fill'] %></td>
+      </tr>
+    <% end %>
+  </table>
+  <br /><br /><br />
+  <table class="products full_width">
+    <tr>
+      <th>Product Type</th>
+      <th>OLD Threshold</th>
+    </tr>
+    <% inventory_thresholds_old.each do |threshold| %>
       <tr>
         <td><%= threshold.product_type %></td>
         <td><%= threshold.threshold %></td>
