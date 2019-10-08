@@ -158,7 +158,7 @@ namespace :daily_sales_receipts do
         purchased_quantity = line_item['line_item']['quantity'].to_f
         returned_quantity = line_item['quantity'].to_f
 
-        refund_discounts = line_item['line_item']['discount_allocations'].reduce(0) { |sum, discount_allocation| sum + (discount_allocation['amount'].to_f * (returned_quantity / purchased_quantity) }
+        refund_discounts = line_item['line_item']['discount_allocations'].reduce(0) { |sum, discount_allocation| sum + (discount_allocation['amount'].to_f * (returned_quantity / purchased_quantity)) }
         sub_total = line_item['line_item']['price'].to_f * returned_quantity
 
         refund_totals_by_order[order_name][:product_sales] += sub_total
