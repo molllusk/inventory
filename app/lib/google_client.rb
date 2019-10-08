@@ -10,6 +10,7 @@ require 'google/apis/sheets_v4'
 
 module GoogleClient
   FILL_LEVEL = '1nvT_f86GTC_9-Kcz-_Q8e_VCgV3ppqXNOPC0xtC_iX8'
+  RELEASE_SCHEDULE = '1LIW6Fa4VFpP9pFYrHGy_Hv4RbHB8dRYPdjLfKLLqRQ8'
 
   def self.auth
     Google::Auth::ServiceAccountCredentials.make_creds(scope: 'https://www.googleapis.com/auth/drive')
@@ -36,7 +37,7 @@ module GoogleClient
   end
 
   def self.sheet_values(id, range = 'Sheet1')
-    values = get_sheet(id, range = 'Sheet1').values
+    values = get_sheet(id, range).values
     headers = values.shift
     rows = values.map do |row|
       lookup_row = {}

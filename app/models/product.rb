@@ -94,6 +94,16 @@ class Product < ApplicationRecord
     @fluid_inventory_levels ||= get_fluid_inventory_levels
   end
 
+  def self.get_release_schedule
+    GoogleClient.sheet_values(GoogleClient::RELEASE_SCHEDULE, "John's Release Schedule")
+    # comparison ['Handle']
+    # date ['Release Date']
+  end
+
+  def self.release_schedule
+    @release_schedule ||= get_release_schedule
+  end
+
   def self.get_fluid_inventory_levels
     levels = GoogleClient.sheet_values(GoogleClient::FILL_LEVEL)
     levels_by_type_and_size = Hash.new { |hash, key| hash[key] = {} }
