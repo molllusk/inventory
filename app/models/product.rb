@@ -91,10 +91,14 @@ class Product < ApplicationRecord
   end
 
   def self.fluid_inventory_levels
+    @fluid_inventory_levels ||= get_fluid_inventory_levels
+  end
+
+  def self.get_fluid_inventory_levels
     levels = GoogleClient.sheet_values(GoogleClient::FILL_LEVEL)
     levels_by_type_and_size = Hash.new { |hash, key| hash[key] = {} }
     levels.each do |level|
-      levels_by_type_and_size[level['Category']][level['Size']] = level['Fill'].to_i
+      levels_by_type_and_size[level['Category'].to_s.strip.downcase][level['Size'].to_s.strip.downcase] = level['WH Fill'].to_i
     end
     levels_by_type_and_size
   end
@@ -258,7 +262,7 @@ class Product < ApplicationRecord
   end
 
   def fluid_inventory_threshold
-    @fluid_inventory_threshold ||= FluidInventoryThreshold.find_by(product_type: retail_shopify.product_type)&.threshold
+    @fluid_inventory_threshold ||= Product.fluid_inventory_levels[retail_shopify.product_type.to_s.strip.downcase]&.[](retail_shopify.option1.to_s.strip.downcase).to_i
   end
 
   def fluid_inventory

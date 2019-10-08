@@ -3,6 +3,5 @@ class FluidInventoryThresholdsController < ApplicationController
 
   def index
     @inventory_thresholds = GoogleClient.sheet_values(GoogleClient::FILL_LEVEL)
-    @inventory_thresholds_old = FluidInventoryThreshold.all.order(:product_type)
   end
 end
