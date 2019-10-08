@@ -90,6 +90,15 @@ class Product < ApplicationRecord
     end
   end
 
+  def self.fluid_inventory_levels
+    levels = GoogleClient.sheet_values(GoogleClient::FILL_LEVEL)
+    levels_by_type_and_size = Hash.new { |hash, key| hash[key] = {} }
+    levels.each do |level|
+      levels_by_type_and_size[level['Category']][level['Size']] = level['Fill'].to_i
+    end
+    levels_by_type_and_size
+  end
+
   def self.inventory_csv
     CSV.generate(headers: inventory_csv_headers + ['total_inventory'], write_headers: true) do |new_csv|
       find_each do |product|
