@@ -84,7 +84,7 @@ class VendClient
   end
 
   def self.consignment_products(consignment_id)
-    response = connection.get "consignments/#{consignment_id}/products"
+    response = connection.get "consignments/#{consignment_id}/products", { page_size: 500 }
     response.body['data']
   end
 
