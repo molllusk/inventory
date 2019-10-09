@@ -41,8 +41,8 @@ task daily_orders: :environment do
         ]).each do |inventory|
 
       outstanding_orders = outstanding_orders_by_outlet_id[inventory.outlet_id]
-      inventory = inventory.inventory < 0 ? 0 : inventory.inventory
-      complete_inventory = inventory + outstanding_orders
+      store_inventory = inventory.inventory < 0 ? 0 : inventory.inventory
+      complete_inventory = store_inventory + outstanding_orders
       adjustment = complete_inventory < fill_level ? fill_level - complete_inventory : 0
 
       if adjustment > 0
