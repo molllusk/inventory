@@ -456,7 +456,7 @@ namespace :daily_sales_receipts do
     ########  Consignments ########
     ###############################
 
-    consignments = VendClient.consignments;nil
+    consignments = VendClient.consignments
     consignments_received_report = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
     consignments_received = Hash.new { |hash, key| hash[key] = Hash.new }

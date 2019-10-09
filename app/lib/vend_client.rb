@@ -76,6 +76,13 @@ class VendClient
     response.body['data']
   end
 
+  def self.daily_orders
+    min_version = Redis.current.get('min_daily_order_version').to_i
+
+    response = connection.get 'consignments', { page_size: 500, type: 'SUPPLIER', status: 'SENT', after: min_version }
+    response.body['data']
+  end
+
   def self.consignment_products(consignment_id)
     response = connection.get "consignments/#{consignment_id}/products"
     response.body['data']
