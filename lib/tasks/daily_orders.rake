@@ -62,37 +62,40 @@ task daily_orders: :environment do
       end
     end
 
-    has_adjustment = (inventories[:sf_adjustment].to_i + inventories[:sl_adjustment].to_i + inventories[:vb_adjustment].to_i) > 0
+    total_adjustments = inventories[:sf_adjustment].to_i + inventories[:sl_adjustment].to_i + inventories[:vb_adjustment].to_i
+    jam_inventory = shopify_product.shopify_inventories.find_by(location: 'Jam Warehouse Retail')&.inventory.to_i
+    has_adjustment = total_adjustments > 0 && jam_inventory > 0
 
     if has_adjustment
       inventories[:product_id] = shopify_product.product_id
-
-      jam_inventory = shopify_product.shopify_inventories.find_by(location: 'Jam Warehouse Retail')&.inventory.to_i
 
       if jam_inventory > 0
         inventories[:jam_shopify] = jam_inventory
 
         adjusted_locations = []
         adjusted_locations << 'Mollusk SF' if inventories[:sf_adjustment].to_i > 0
-        adjusted_locations << 'Mollusk SL' if inventories[:sl_adjustment].to_i > 0
         adjusted_locations << 'Mollusk VB' if inventories[:vb_adjustment].to_i > 0
+        adjusted_locations << 'Mollusk SL' if inventories[:sl_adjustment].to_i > 0
 
-        shopify_product.shopify_inventories.where(location: adjusted_locations).each do |inventory|
+        adjusted_locations.each do |location|
+          break if jam_inventory < 1
+
+          inventory = shopify_product.shopify_inventories.find_by(location: adjusted_locations)
           case inventory.location
-          when 'Jam Warehouse Retail'
-            inventories[:jam_shopify] = inventory.inventory
           when 'Mollusk SF'
-            inventories[:sf_shopify] = inventory.inventory
-          when 'Mollusk SL'
-            inventories[:sl_shopify] = inventory.inventory
+            inventories[:sf_adjustment] = jam_inventory if inventories[:sf_adjustment] > jam_inventory
+            jam_inventory -= inventories[:sf_adjustment]
           when 'Mollusk VB'
-            inventories[:vb_shopify] = inventory.inventory
+            inventories[:vb_adjustment] = jam_inventory if inventories[:vb_adjustment] > jam_inventory
+            jam_inventory -= inventories[:vb_adjustment]
+          when 'Mollusk SL'
+            inventories[:sl_adjustment] = jam_inventory if inventories[:sl_adjustment] > jam_inventory
+            jam_inventory -= inventories[:sl_adjustment]
           end
         end
-
-        daily_order_data << inventories
       end
+      daily_order_data << inventories
     end
   end
-  p daily_order_data
+  daily_order_data.each { |d| p d }
 end

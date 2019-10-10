@@ -1,0 +1,2 @@
+class DailyOrder < ApplicationRecord
+end

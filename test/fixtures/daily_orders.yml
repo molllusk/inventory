@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  outlet_id: MyString
+  po_id: MyString
+  qbo_id: 1
+  date: 
+
+two:
+  outlet_id: MyString
+  po_id: MyString
+  qbo_id: 1
+  date: 

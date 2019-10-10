@@ -1,0 +1,23 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  vend_consignment_id: MyString
+  quantity: 1
+  order_inventory_adjustment_id: 1
+  product_id: 1
+  daily_order_id: 1
+  threshold: 1
+  adjustment: 1
+  prior_jam_qty: 1
+  new_jam_qty: 1
+
+two:
+  vend_consignment_id: MyString
+  quantity: 1
+  order_inventory_adjustment_id: 1
+  product_id: 1
+  daily_order_id: 1
+  threshold: 1
+  adjustment: 1
+  prior_jam_qty: 1
+  new_jam_qty: 1
