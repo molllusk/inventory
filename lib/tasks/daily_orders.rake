@@ -72,17 +72,16 @@ task daily_orders: :environment do
       if jam_inventory > 0
         inventories[:jam_shopify] = jam_inventory
 
+        # order is important here: SF -> VB -> SL
         adjusted_locations = []
         adjusted_locations << 'Mollusk SF' if inventories[:sf_adjustment].to_i > 0
         adjusted_locations << 'Mollusk VB' if inventories[:vb_adjustment].to_i > 0
         adjusted_locations << 'Mollusk SL' if inventories[:sl_adjustment].to_i > 0
-        puts "\n" * 5
-        p shopify_product.product.id
+
         adjusted_locations.each do |location|
           break if jam_inventory < 1
-          p location
-          inventory = shopify_product.shopify_inventories.find_by(location: location)
-          case inventory.location
+
+          case location
           when 'Mollusk SF'
             inventories[:sf_adjustment] = jam_inventory if inventories[:sf_adjustment] > jam_inventory
             jam_inventory -= inventories[:sf_adjustment]
