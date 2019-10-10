@@ -76,10 +76,11 @@ task daily_orders: :environment do
         adjusted_locations << 'Mollusk SF' if inventories[:sf_adjustment].to_i > 0
         adjusted_locations << 'Mollusk VB' if inventories[:vb_adjustment].to_i > 0
         adjusted_locations << 'Mollusk SL' if inventories[:sl_adjustment].to_i > 0
-
+        puts "\n" * 5
+        p shopify_product.product.id
         adjusted_locations.each do |location|
           break if jam_inventory < 1
-
+          p location
           inventory = shopify_product.shopify_inventories.find_by(location: location)
           case inventory.location
           when 'Mollusk SF'
