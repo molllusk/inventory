@@ -1,5 +1,12 @@
 task daily_orders: :environment do
+  date = Date.today
   daily_order_data = []
+
+  todays_orders = {
+    'Mollusk SF' => DailyOrder.create(date: date, outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('San Francisco')),
+    'Mollusk VB' => DailyOrder.create(date: date, outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Venice Beach')),
+    'Mollusk SL' => DailyOrder.create(date: date, outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Silver Lake'))
+  }
 
   outstanding_orders_by_product = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
@@ -36,8 +43,8 @@ task daily_orders: :environment do
 
     vend_product.vend_inventories.where(outlet_id: [
           VendClient::OUTLET_NAMES_BY_ID.key('San Francisco'),
-          VendClient::OUTLET_NAMES_BY_ID.key('Silver Lake'),
-          VendClient::OUTLET_NAMES_BY_ID.key('Venice Beach')
+          VendClient::OUTLET_NAMES_BY_ID.key('Venice Beach'),
+          VendClient::OUTLET_NAMES_BY_ID.key('Silver Lake')
         ]).each do |inventory|
 
       outstanding_orders = outstanding_orders_by_outlet_id[inventory.outlet_id]
@@ -67,8 +74,6 @@ task daily_orders: :environment do
     has_adjustment = total_adjustments > 0 && jam_inventory > 0
 
     if has_adjustment
-      inventories[:product_id] = shopify_product.product_id
-
       if jam_inventory > 0
         inventories[:jam_shopify] = jam_inventory
 
@@ -80,22 +85,26 @@ task daily_orders: :environment do
 
         adjusted_locations.each do |location|
           break if jam_inventory < 1
+          location_order = todays_orders[location]
 
           case location
           when 'Mollusk SF'
             inventories[:sf_adjustment] = jam_inventory if inventories[:sf_adjustment] > jam_inventory
+            location_order.orders.create(quantity: inventories[:sf_adjustment], product_id: shopify_product.product_id, threshold: inventories[:fill_level], vend_qty: inventories[:sf_vend])
             jam_inventory -= inventories[:sf_adjustment]
           when 'Mollusk VB'
             inventories[:vb_adjustment] = jam_inventory if inventories[:vb_adjustment] > jam_inventory
+            location_order.orders.create(quantity: inventories[:vb_adjustment], product_id: shopify_product.product_id, threshold: inventories[:fill_level], vend_qty: inventories[:vb_vend])
             jam_inventory -= inventories[:vb_adjustment]
           when 'Mollusk SL'
             inventories[:sl_adjustment] = jam_inventory if inventories[:sl_adjustment] > jam_inventory
+            location_order.orders.create(quantity: inventories[:sl_adjustment], product_id: shopify_product.product_id, threshold: inventories[:fill_level], vend_qty: inventories[:sl_vend])
             jam_inventory -= inventories[:sl_adjustment]
           end
         end
       end
-      daily_order_data << inventories
+      # daily_order_data << inventories
     end
   end
-  daily_order_data.each { |d| p d }
+  # daily_order_data.each { |d| p d }
 end
