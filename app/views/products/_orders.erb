@@ -1,0 +1,30 @@
+<% if @fluid_inventory_updates.present? %>
+  <hr/>
+  <h2 class='center'>Fluid Inventory Updates (<%= @product.retail_shopify.product_type %> current threshold <%= @product.fluid_inventory_threshold %>):</h2>
+  <div class='center'></div>
+  <table class='full_width'>
+    <tr>
+      <th>When?  (PST / PDT)</th>
+      <th>Threshold</th>
+      <th>Prior Jam RETAIL Qty</th>
+      <th>Prior Jam WHOLESALE Qty</th>
+      <th>Adjustment</th>
+      <th>New Jam RETAIL Qty</th>
+      <th>New Jam WHOLESALE Qty</th>
+    </tr>
+    <% @fluid_inventory_updates.each do |update| %>
+      <tr>
+        <td><%= update.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
+        <td><%= update.threshold %></td>
+        <td><%= update.prior_retail_qty %></td>
+        <td><%= update.prior_wholesale_qty %></td>
+        <td><%= update.adjustment %></td>
+        <td class='<%= 'inventory_failure' unless update.retail_success? %>'><%= update.new_retail_qty %></td>
+        <td class='<%= 'inventory_failure' unless update.wholesale_success? %>'><%= update.new_wholesale_qty %></td>
+      </tr>
+    <% end %>
+  <table>
+  <div class='center'>
+    <%= will_paginate @fluid_inventory_updates %>
+  </div>
+<% end %>
