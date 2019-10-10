@@ -80,7 +80,7 @@ task daily_orders: :environment do
         adjusted_locations.each do |location|
           break if jam_inventory < 1
 
-          inventory = shopify_product.shopify_inventories.find_by(location: adjusted_locations)
+          inventory = shopify_product.shopify_inventories.find_by(location: location)
           case inventory.location
           when 'Mollusk SF'
             inventories[:sf_adjustment] = jam_inventory if inventories[:sf_adjustment] > jam_inventory
