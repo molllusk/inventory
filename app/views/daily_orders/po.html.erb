@@ -1,3 +1,46 @@
-<div style='margin: 0 auto'>
-  HI! <%= @daily_order %>
-</div>
+<html>
+  <head>
+    <style>
+      #wrap {
+        margin: 20px auto;
+        width: 900px;
+      }
+
+      .center {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id='wrap'>
+      <div class='center'>
+        <h2>Orders</h2>
+      </div>
+
+      <table class="products full_width">
+        <tr>
+          <th>Product</th>
+          <th>Cost Per</th>
+          <th>Quantity</th>
+          <th>Sent Orders</th>
+          <th>Store Inventory</th>
+          <th>Threshold</th>
+          <th>Prior Jam Inventory</th>
+          <th>New Jam Inventory</th>
+        </tr>
+        <% @daily_order.orders.each do |order| %>
+          <tr>
+            <td><a href='<%= order.product.vend_datum.link %>' target='_blank'><%= order.product.vend_datum.variant_name %> <i class='fa fa-external-link-alt'></i></a></td>
+            <td><%= number_to_currency(order.cost, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+            <td><%= order.quantity %></td>
+            <td><%= order.sent_orders %></td>
+            <td><%= order.threshold %></td>
+            <td><%= order.vend_qty %></td>
+            <td class='<%= 'inventory_failure' unless order.order_inventory_update&.success? %>'><%= order.order_inventory_update&.prior_jam_qty || ' - ' %></td>
+            <td class='<%= 'inventory_failure' unless order.order_inventory_update&.success? %>'><%= order.order_inventory_update&.new_jam_qty || ' - ' %></td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+  </body>
+</html>
