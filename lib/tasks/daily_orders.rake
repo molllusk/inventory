@@ -56,12 +56,15 @@ task daily_orders: :environment do
       if adjustment > 0
         case inventory.location
         when 'San Francisco'
+          inventories[:sf_outstanding] = outstanding_orders
           inventories[:sf_vend] = inventory.inventory
           inventories[:sf_adjustment] = adjustment
         when 'Silver Lake'
+          inventories[:sl_outstanding] = outstanding_orders
           inventories[:sl_vend] = inventory.inventory
           inventories[:sl_adjustment] = adjustment
         when 'Venice Beach'
+          inventories[:vb_outstanding] = outstanding_orders
           inventories[:vb_vend] = inventory.inventory
           inventories[:vb_adjustment] = adjustment
         end
@@ -89,15 +92,15 @@ task daily_orders: :environment do
           case location
           when 'Mollusk SF'
             inventories[:sf_adjustment] = jam_inventory if inventories[:sf_adjustment] > jam_inventory
-            location_order.orders.create(quantity: inventories[:sf_adjustment], product_id: shopify_product.product_id, threshold: fill_level, vend_qty: inventories[:sf_vend], cost: cost)
+            location_order.orders.create(quantity: inventories[:sf_adjustment], product_id: shopify_product.product_id, threshold: fill_level, vend_qty: inventories[:sf_vend], cost: cost, sent_orders: inventories[:sf_outstanding])
             jam_inventory -= inventories[:sf_adjustment]
           when 'Mollusk VB'
             inventories[:vb_adjustment] = jam_inventory if inventories[:vb_adjustment] > jam_inventory
-            location_order.orders.create(quantity: inventories[:vb_adjustment], product_id: shopify_product.product_id, threshold: fill_level, vend_qty: inventories[:vb_vend], cost: cost)
+            location_order.orders.create(quantity: inventories[:vb_adjustment], product_id: shopify_product.product_id, threshold: fill_level, vend_qty: inventories[:vb_vend], cost: cost, sent_orders: inventories[:vb_outstanding])
             jam_inventory -= inventories[:vb_adjustment]
           when 'Mollusk SL'
             inventories[:sl_adjustment] = jam_inventory if inventories[:sl_adjustment] > jam_inventory
-            location_order.orders.create(quantity: inventories[:sl_adjustment], product_id: shopify_product.product_id, threshold: fill_level, vend_qty: inventories[:sl_vend], cost: cost)
+            location_order.orders.create(quantity: inventories[:sl_adjustment], product_id: shopify_product.product_id, threshold: fill_level, vend_qty: inventories[:sl_vend], cost: cost, sent_orders: inventories[:sl_outstanding])
             jam_inventory -= inventories[:sl_adjustment]
           end
         end

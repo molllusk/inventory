@@ -21,7 +21,7 @@
     <td>
       <%= @daily_order.orders.count %>
     </td>
-    <td></td>
+    <td><%= #"https://mollusksurf.vendhq.com/consignment/#{@daily_order.vend_consignment_id}" %></td>
     <td></td>
     <td></td>
   </tr>
@@ -34,18 +34,20 @@
 <table class="products full_width">
   <tr>
     <th>Product</th>
+    <th>Cost Per</th>
     <th>Quantity</th>
-    <th>Cost</th>
-    <th>Threshold</th>
+    <th>Sent Orders</th>
     <th>Store Inventory</th>
+    <th>Threshold</th>
     <th>Prior Jam Inventory</th>
     <th>New Jam Inventory</th>
   </tr>
   <% @daily_order.orders.each do |order| %>
     <tr>
       <td><a href='<%= order.product.vend_datum.link %>' target='_blank'><%= order.product.vend_datum.variant_name %> <i class='fa fa-external-link-alt'></i></a></td>
-      <td><%= order.quantity %></td>
       <td><%= number_to_currency(order.cost, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+      <td><%= order.quantity %></td>
+      <td><%= order.sent_orders %></td>
       <td><%= order.threshold %></td>
       <td><%= order.vend_qty %></td>
       <td><%= order.order_inventory_update&.prior_jam_qty || ' - ' %></td>
