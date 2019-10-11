@@ -10,7 +10,7 @@ class DailyOrdersController < ApplicationController
   end
 
   def po
-    @daily_order = DailyOrder.find(params[:id])
+    @daily_order = DailyOrder.find(params[:daily_order_id])
     render :layout => false
   end
 end
