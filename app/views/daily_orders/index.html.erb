@@ -4,7 +4,7 @@
 
 <%= render(
   partial: 'daily_orders/list',
-  locals: { daily_orders: @daily_orders }
+  locals: { daily_orders: @daily_orders.group_by { |order| order.date } }
 ) %>
 
 <div class='center'>
