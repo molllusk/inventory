@@ -41,7 +41,9 @@ Rails.application.routes.draw do
   end
 
   resources :daily_orders do
-    get :po
+    collection do
+      get :po
+    end
   end
 
   resources :daily_reports do
