@@ -1,6 +1,15 @@
 <html>
   <head>
     <style>
+      table {
+        width:100%;
+        margin: 25px, 10px;
+      }
+
+      table, th, td {
+        border: 1px solid black;
+      }
+
       #wrap {
         margin: 20px auto;
         width: 900px;
@@ -14,12 +23,12 @@
   <body>
     <div id='wrap'>
       <div class='center'>
-        <h2>Orders</h2>
+        <h2>PO Orders</h2>
       </div>
       <div>
         <%= @daily_order.ship_to_address.html_safe %>
       </div>
-      <table class="products full_width">
+      <table>
         <tr>
           <th>SKU</th>
           <th>Description</th>
