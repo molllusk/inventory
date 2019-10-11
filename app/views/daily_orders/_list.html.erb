@@ -1,37 +1,24 @@
 <div id="filterrific_results">
-
-  <div class='mb-5'>
-    <%= page_entries_info fluid_inventory_updates %>
-  </div>
-
   <table class="products full_width">
     <tr>
       <th>When?  (PST / PDT)</th>
-      <th>Product</th>
-      <th>SKU</th>
-      <th>Threshold</th>
-      <th>Prior Jam RETAIL Qty</th>
-      <th>Prior Jam WHOLESALE Qty</th>
-      <th>Adjustment</th>
-      <th>New Jam RETAIL Qty</th>
-      <th>New Jam WHOLESALE Qty</th>
+      <th>Location</th>
+      <th>Total Orders</th>
+      <th>PO</th>
+      <th>QBO</th>
+      <th>Actions</th>
     </tr>
-    <% fluid_inventory_updates.each do |update| %>
+    <% daily_orders.each do |date, orders| %>
       <tr>
-        <td><%= update.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
-        <td><%= link_to update.product do %><%= update.product.vend_datum.variant_name %> <i class='fa fa-external-link-alt'></i><% end %></td>
-        <td><%= update.product.vend_datum.sku %></td>
-        <td><%= update.threshold %></td>
-        <td><%= update.prior_retail_qty %></td>
-        <td><%= update.prior_wholesale_qty %></td>
-        <td><%= update.adjustment %></td>
-        <td class='<%= 'inventory_failure' unless update.retail_success? %>'><%= update.new_retail_qty %></td>
-        <td class='<%= 'inventory_failure' unless update.wholesale_success? %>'><%= update.new_wholesale_qty %></td>
+        <td class='border-bottom' rowspan='3' style='background-color: #FFFFFF'><%= date.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
+        <td class='border-bottom' rowspan='3' style='background-color: #FFFFFF'><%= VendClient::OUTLET_NAMES_BY_ID[orders.first.outlet_id] %></td>
+        <td>order.orders.count</td>
+        <% orders.each do |order| %>
+          <td></td>
+          <td></td>
+          <td></td>
+        <% end %>
       </tr>
     <% end %>
   </table>
-
-  <div class='center'>
-  <%= will_paginate %>
-  </div>
 </div>
