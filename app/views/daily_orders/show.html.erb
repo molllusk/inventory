@@ -48,8 +48,8 @@
       <td><%= number_to_currency(order.cost, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= order.threshold %></td>
       <td><%= order.vend_qty %></td>
-      <td></td>
-      <td></td>
+      <td><%= order.order_inventory_update&.prior_jam_qty || ' - ' %></td>
+      <td><%= order.order_inventory_update&.new_jam_qty || ' - ' %></td>
     </tr>
   <% end %>
 </table>
