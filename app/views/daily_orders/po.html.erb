@@ -25,6 +25,7 @@
 
       .full_width {
         width: 100%;
+        clear: both;
       }
 
       .center {
@@ -35,11 +36,15 @@
   <body>
     <div id='wrap'>
       <div class='full_width'>
+
+      </div>
+      <div class='full_width'>
         <div class='left thirds'>
           <%= @daily_order.ship_to_address.html_safe %>
         </div>
-        <div class='left thirds'>
-          
+        <div class='left thirds center'>
+          <strong>Email completed packing slip to:</strong><br />
+          <a href='mailto:johanna@mollusksurfshop.com'>Johanna@MolluskSurfShop.com</a>
         </div>
         <div class='left thirds'>
           <table>
@@ -58,7 +63,7 @@
           </table>
         </div>
       </div>
-      <div class='center'>
+      <div class='center full_width'>
         <h3>PO <%= @daily_order.display_po %></h3>
       </div>
       <table>
