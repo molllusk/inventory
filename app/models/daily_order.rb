@@ -18,11 +18,11 @@ class DailyOrder < ApplicationRecord
   end
 
   def total_items
-    orders.reduce(0) { |order, sum| sum + order.quantity }
+    orders.reduce(0) { |sum, order| sum + order.quantity }
   end
 
   def total_cost
-    orders.reduce(0) { |order, sum| sum + (order.quantity * order.cost) }
+    orders.reduce(0) { |sum, order| sum + (order.quantity * order.cost) }
   end
 
   def vend_consignment_url
