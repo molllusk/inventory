@@ -3,6 +3,7 @@ class Product < ApplicationRecord
   has_many :shopify_data, dependent: :destroy
   has_many :inventory_updates, dependent: :destroy
   has_many :fluid_inventory_updates, dependent: :destroy
+  has_many :orders, dependent: :destroy
 
   filterrific(
     default_filter_params: { sorted_by: 'created_at_desc' },
