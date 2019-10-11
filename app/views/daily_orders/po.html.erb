@@ -19,27 +19,27 @@
 
       <table class="products full_width">
         <tr>
-          <th>Product</th>
-          <th>Cost Per</th>
+          <th>SKU</th>
+          <th>Description</th>
+          <th>Color</th>
+          <th>Size</th>
           <th>Quantity</th>
-          <th>Sent Orders</th>
-          <th>Store Inventory</th>
-          <th>Threshold</th>
-          <th>Prior Jam Inventory</th>
-          <th>New Jam Inventory</th>
         </tr>
         <% @daily_order.orders.each do |order| %>
           <tr>
-            <td><a href='<%= order.product.vend_datum.link %>' target='_blank'><%= order.product.vend_datum.variant_name %> <i class='fa fa-external-link-alt'></i></a></td>
-            <td><%= number_to_currency(order.cost, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+            <% vend_product = order.product.vend_datum %>
+            <td><%= vend_product.sku %></td>
+            <td><%= vend_product.name %></td>
+            <td><%= vend_product.variant_options.find { |vo| vo['name'] == 'Color' }&.[]('value') %></td>
+            <td><%= vend_product.variant_options.find { |vo| vo['name'] == 'Size' }&.[]('value') %></td>
             <td><%= order.quantity %></td>
-            <td><%= order.sent_orders %></td>
-            <td><%= order.threshold %></td>
-            <td><%= order.vend_qty %></td>
-            <td class='<%= 'inventory_failure' unless order.order_inventory_update&.success? %>'><%= order.order_inventory_update&.prior_jam_qty || ' - ' %></td>
-            <td class='<%= 'inventory_failure' unless order.order_inventory_update&.success? %>'><%= order.order_inventory_update&.new_jam_qty || ' - ' %></td>
           </tr>
         <% end %>
+        <tr>
+          <td colspan='3'></td>
+          <td><strong>TOTAL</strong></td>
+          <td><strong><%= @daily_order.total_items %></strong></td>
+        </tr>
       </table>
     </div>
   </body>
