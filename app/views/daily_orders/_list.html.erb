@@ -19,7 +19,7 @@
             <tr>
           <% end %>
             <td class='<%= 'border-bottom' if last_row %>'>
-              <a href='<%= order.id %>' target='_blank'><%= VendClient::OUTLET_NAMES_BY_ID[order.outlet_id] %></a>
+              <a href='<%= daily_order_path(order) %>' target='_blank'><%= VendClient::OUTLET_NAMES_BY_ID[order.outlet_id] %></a>
             </td>
             <td class='<%= 'border-bottom' if last_row %>'>
               <%= order.orders.count %>
