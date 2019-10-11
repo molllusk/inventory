@@ -21,9 +21,21 @@
     <td>
       <%= @daily_order.orders.count %>
     </td>
-    <td><%= #"https://mollusksurf.vendhq.com/consignment/#{@daily_order.vend_consignment_id}" %></td>
+    <td>
+      <% if @daily_order.vend_consignment_url %>
+        <a href='<%= @daily_order.vend_consignment_url %>' target='_blank'>Vend <i class='fa fa-external-link-alt'></i></a>
+      <% else %>
+         -
+      <% end %>
+    </td>
     <td></td>
-    <td></td>
+    <td>
+      <% if @daily_order.qbo_id.present? %>
+        <a href='https://c3.qbo.intuit.com/app/salesreceipt?txnId=<%= @daily_order.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a>
+      <% else %>
+         -
+      <% end %>
+    </td>
   </tr>
 </table>
 

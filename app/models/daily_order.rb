@@ -1,6 +1,9 @@
 class DailyOrder < ApplicationRecord
   has_many :orders, dependent: :destroy
   
+  def vend_consignment_url
+    "https://mollusksurf.vendhq.com/consignment/#{@daily_order.vend_consignment_id}" if vend_consignment_id.present?
+  end
 end
 
 # == Schema Information
