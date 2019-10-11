@@ -15,7 +15,7 @@ end
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
 #  outlet_id           :string
-#  po_id               :string
+#  po_id               :integer
 #  qbo_id              :bigint(8)
 #  vend_consignment_id :string
 #

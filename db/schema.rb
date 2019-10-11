@@ -10,14 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_11_182206) do
+ActiveRecord::Schema.define(version: 2019_10_11_193701) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "daily_orders", force: :cascade do |t|
     t.string "outlet_id"
-    t.string "po_id"
+    t.integer "po_id"
     t.bigint "qbo_id"
     t.datetime "date"
     t.datetime "created_at", null: false
@@ -74,7 +74,7 @@ ActiveRecord::Schema.define(version: 2019_10_11_182206) do
     t.integer "new_qty"
   end
 
-  create_table "order_inventory_adjustments", force: :cascade do |t|
+  create_table "order_inventory_updates", force: :cascade do |t|
     t.integer "prior_jam_qty"
     t.integer "new_jam_qty"
     t.integer "order_id"
@@ -84,7 +84,6 @@ ActiveRecord::Schema.define(version: 2019_10_11_182206) do
 
   create_table "orders", force: :cascade do |t|
     t.integer "quantity"
-    t.integer "order_inventory_adjustment_id"
     t.integer "product_id"
     t.integer "daily_order_id"
     t.integer "threshold"

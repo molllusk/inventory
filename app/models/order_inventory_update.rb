@@ -1,14 +1,10 @@
-require 'test_helper'
-
-class OrderInventoryAdjustmentTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+class OrderInventoryUpdate < ApplicationRecord
+  belongs_to :order
 end
 
 # == Schema Information
 #
-# Table name: order_inventory_adjustments
+# Table name: order_inventory_updates
 #
 #  id            :bigint(8)        not null, primary key
 #  new_jam_qty   :integer

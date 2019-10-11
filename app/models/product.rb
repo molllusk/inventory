@@ -176,6 +176,35 @@ class Product < ApplicationRecord
     Product.inventory_csv_headers.map { |header| data[header] } + [total_inventory]
   end
 
+  def adjust_order_inventory(order)
+    begin
+      response = ShopifyClient.adjust_inventory(
+        retail_shopify.inventory_item_id,
+        ShopifyInventory.locations['Jam Warehouse Retail'],
+        -order.quantity
+      )
+
+      if ShopifyClient.inventory_item_updated?(response)
+        updated_jam_inventory = response['inventory_level']['available']
+        shopify_inventory = retail_shopify.shopify_inventories.find_by(location: 'Jam Warehouse Retail')
+        expected_jam_inventory = shopify_inventory.inventory - order.quantity
+
+        order.create_order_inventory_update(
+          new_jam_qty: updated_jam_inventory,
+          prior_jam_qty: shopify_inventory.inventory
+        )
+
+        shopify_inventory.update_attribute(:inventory, updated_jam_inventory)
+
+        Airbrake.notify("ORDER INVENTORY: expected jam qty #{expected_jam_inventory} but got #{updated_jam_inventory}") unless expected_jam_inventory == updated_jam_inventory
+      else
+        Airbrake.notify("Could not UPDATE Jam inventory during ORDER for Product: #{id}, Adjustment: #{-order.quantity}")
+      end
+    rescue
+      Airbrake.notify("There was an error UPDATING Jam inventory during ORDER of Product: #{id}, Adjustment: #{-order.quantity}")
+    end
+  end
+
   def adjust_inventory_vend(location_name, quantity)
     location_id = ShopifyInventory.locations[location_name]
     begin
@@ -227,7 +256,6 @@ class Product < ApplicationRecord
     end
   end
 
-  # need to change this
   def save_inventory_adjustment_vend(response, quantity)
     location_id = response['inventory_level']['location_id']
     shopify_inventory = retail_shopify.shopify_inventories.find_by(location: location_id)

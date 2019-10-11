@@ -1,18 +1,14 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+require 'test_helper'
 
-one:
-  prior_jam_qty: 1
-  new_jam_qty: 1
-  order_id: 1
-
-two:
-  prior_jam_qty: 1
-  new_jam_qty: 1
-  order_id: 1
+class OrderInventoryUpdateTest < ActiveSupport::TestCase
+  # test "the truth" do
+  #   assert true
+  # end
+end
 
 # == Schema Information
 #
-# Table name: order_inventory_adjustments
+# Table name: order_inventory_updates
 #
 #  id            :bigint(8)        not null, primary key
 #  new_jam_qty   :integer
