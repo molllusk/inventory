@@ -6,3 +6,7 @@
   partial: 'daily_orders/list',
   locals: { daily_orders: @daily_orders }
 ) %>
+
+<div class='center'>
+  <%= will_paginate @daily_orders %>
+</div>

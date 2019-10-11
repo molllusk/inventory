@@ -30,16 +30,17 @@ task daily_orders: :environment do
 
   ShopifyDatum.with_jam.find_each do |shopify_product|
     next if shopify_product.sale?
+    
     vend_product = shopify_product.product.vend_datum
     next unless vend_product.present?
+    
     clean_handle = shopify_product.handle.to_s.strip.downcase
     next if release_date_by_handle[clean_handle].present? && release_date_by_handle[clean_handle] > Date.today
 
     inventories = {}
-
     fill_level = shopify_product.product.daily_order_inventory_threshold
-
     outstanding_orders_by_outlet_id = outstanding_orders_by_product[vend_product.vend_id]
+    cost = shopify_product.get_cost
 
     vend_product.vend_inventories.where(outlet_id: [
           VendClient::OUTLET_NAMES_BY_ID.key('San Francisco'),
@@ -53,8 +54,6 @@ task daily_orders: :environment do
       adjustment = complete_inventory < fill_level ? fill_level - complete_inventory : 0
 
       if adjustment > 0
-        inventories[:fill_level] = fill_level
-        inventories[:orders] = outstanding_orders
         case inventory.location
         when 'San Francisco'
           inventories[:sf_vend] = inventory.inventory
@@ -90,15 +89,15 @@ task daily_orders: :environment do
           case location
           when 'Mollusk SF'
             inventories[:sf_adjustment] = jam_inventory if inventories[:sf_adjustment] > jam_inventory
-            location_order.orders.create(quantity: inventories[:sf_adjustment], product_id: shopify_product.product_id, threshold: inventories[:fill_level], vend_qty: inventories[:sf_vend])
+            location_order.orders.create(quantity: inventories[:sf_adjustment], product_id: shopify_product.product_id, threshold: fill_level, vend_qty: inventories[:sf_vend], cost: cost)
             jam_inventory -= inventories[:sf_adjustment]
           when 'Mollusk VB'
             inventories[:vb_adjustment] = jam_inventory if inventories[:vb_adjustment] > jam_inventory
-            location_order.orders.create(quantity: inventories[:vb_adjustment], product_id: shopify_product.product_id, threshold: inventories[:fill_level], vend_qty: inventories[:vb_vend])
+            location_order.orders.create(quantity: inventories[:vb_adjustment], product_id: shopify_product.product_id, threshold: fill_level, vend_qty: inventories[:vb_vend], cost: cost)
             jam_inventory -= inventories[:vb_adjustment]
           when 'Mollusk SL'
             inventories[:sl_adjustment] = jam_inventory if inventories[:sl_adjustment] > jam_inventory
-            location_order.orders.create(quantity: inventories[:sl_adjustment], product_id: shopify_product.product_id, threshold: inventories[:fill_level], vend_qty: inventories[:sl_vend])
+            location_order.orders.create(quantity: inventories[:sl_adjustment], product_id: shopify_product.product_id, threshold: fill_level, vend_qty: inventories[:sl_vend], cost: cost)
             jam_inventory -= inventories[:sl_adjustment]
           end
         end
