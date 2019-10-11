@@ -12,7 +12,7 @@
       <tr>
         <td class='border-bottom' rowspan='3' style='background-color: #FFFFFF'><%= date.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
         <td class='border-bottom' rowspan='3' style='background-color: #FFFFFF'><%= VendClient::OUTLET_NAMES_BY_ID[orders.first.outlet_id] %></td>
-        <td>order.orders.count</td>
+        <td class='border-bottom' rowspan='3' style='background-color: #FFFFFF'><%= order.orders.count %></td>
         <% orders.each do |order| %>
           <td></td>
           <td></td>
