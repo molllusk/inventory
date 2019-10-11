@@ -10,14 +10,20 @@
     </tr>
     <% daily_orders.each do |date, orders| %>
       <tr>
-        <td class='border-bottom' rowspan='3' style='background-color: #FFFFFF'><%= date.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
+        <td class='border-bottom' rowspan='<%= orders.count %>' style='background-color: #FFFFFF'>
+          <%= date.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %>
+        </td>
         <% orders.each_with_index do |order, index| %>
-          <% last_row = (index == 2) %>
+          <% last_row = (index == (orders.count - 1)) %>
           <% if index.positive? %>
             <tr>
           <% end %>
-            <td class='<%= 'border-bottom' if last_row %>'><a href='/<%= order.id %>'><%= VendClient::OUTLET_NAMES_BY_ID[order.outlet_id] %></a></td>
-            <td class='<%= 'border-bottom' if last_row %>'><%= order.orders.count %></td>
+            <td class='<%= 'border-bottom' if last_row %>'>
+              <a href='/<%= order.id %>' target='_blank'><%= VendClient::OUTLET_NAMES_BY_ID[order.outlet_id] %></a>
+            </td>
+            <td class='<%= 'border-bottom' if last_row %>'>
+              <%= order.orders.count %>
+            </td>
             <td class='<%= 'border-bottom' if last_row %>'></td>
             <td class='<%= 'border-bottom' if last_row %>'></td>
             <td class='<%= 'border-bottom' if last_row %>'></td>
