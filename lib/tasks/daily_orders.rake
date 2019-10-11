@@ -1,5 +1,5 @@
 task daily_orders: :environment do
-  date = Date.today
+  date = Time.now
   daily_order_data = []
 
   todays_orders = {
