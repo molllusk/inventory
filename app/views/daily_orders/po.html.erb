@@ -16,7 +16,9 @@
       <div class='center'>
         <h2>Orders</h2>
       </div>
-
+      <div>
+        <%= @daily_order.ship_to_address.html_safe %>
+      </div>
       <table class="products full_width">
         <tr>
           <th>SKU</th>
