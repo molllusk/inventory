@@ -8,4 +8,9 @@ class DailyOrdersController < ApplicationController
   def show
     @daily_order = DailyOrder.find(params[:id])
   end
+
+  def po
+    @daily_order = DailyOrder.find(params[:id])
+    render :layout => false
+  end
 end

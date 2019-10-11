@@ -40,7 +40,9 @@ Rails.application.routes.draw do
     get '/quickbooks/oauth_callback', to: 'quickbooks#oauth_callback'
   end
 
-  resources :daily_orders
+  resources :daily_orders do
+    get :po
+  end
 
   resources :daily_reports do
     collection do

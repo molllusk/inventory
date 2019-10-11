@@ -28,7 +28,9 @@
          -
       <% end %>
     </td>
-    <td><%= @daily_order.display_po %></td>
+    <td>
+      <a href='<%= daily_order_po_path(order) %>' target='_blank'><%= order.display_po %> <i class='fa fa-external-link-alt'></i></a>
+    </td>
     <td>
       <% if @daily_order.qbo_id.present? %>
         <a href='https://c3.qbo.intuit.com/app/salesreceipt?txnId=<%= @daily_order.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a>

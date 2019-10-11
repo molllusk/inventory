@@ -31,7 +31,7 @@
             <% end %>
           </td>
           <td class='<%= 'border-bottom' if last_row %>'>
-            <%= order.display_po %>
+            <a href='<%= daily_order_po_path(order) %>' target='_blank'><%= order.display_po %> <i class='fa fa-external-link-alt'></i></a>
           </td>
           <td class='<%= 'border-bottom' if last_row %>'>
             <% if order.qbo_id.present? %>
