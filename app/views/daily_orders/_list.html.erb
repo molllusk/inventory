@@ -31,7 +31,7 @@
             <% end %>
           </td>
           <td class='<%= 'border-bottom' if last_row %>'>
-            <td><%= order.display_po %></td>
+            <%= order.display_po %>
           </td>
           <td class='<%= 'border-bottom' if last_row %>'>
             <% if order.qbo_id.present? %>
