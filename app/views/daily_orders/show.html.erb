@@ -62,8 +62,8 @@
       <td><%= order.sent_orders %></td>
       <td><%= order.threshold %></td>
       <td><%= order.vend_qty %></td>
-      <td><%= order.order_inventory_update&.prior_jam_qty || ' - ' %></td>
-      <td><%= order.order_inventory_update&.new_jam_qty || ' - ' %></td>
+      <td class='<%= 'inventory_failure' unless order.order_inventory_update&.success? %>'><%= order.order_inventory_update&.prior_jam_qty || ' - ' %></td>
+      <td class='<%= 'inventory_failure' unless order.order_inventory_update&.success? %>'><%= order.order_inventory_update&.new_jam_qty || ' - ' %></td>
     </tr>
   <% end %>
 </table>

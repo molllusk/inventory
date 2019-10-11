@@ -1,5 +1,9 @@
 class OrderInventoryUpdate < ApplicationRecord
   belongs_to :order
+
+  def success?
+    new_jam_qty == (prior_jam_qty - order.quantity)
+  end
 end
 
 # == Schema Information
