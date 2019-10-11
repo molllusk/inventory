@@ -1,11 +1,11 @@
 task daily_orders: :environment do
   date = Time.now
-  daily_order_data = []
+  # daily_order_data = []
 
   todays_orders = {
-    'Mollusk SF' => DailyOrder.create(date: date, outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('San Francisco')),
-    'Mollusk VB' => DailyOrder.create(date: date, outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Venice Beach')),
-    'Mollusk SL' => DailyOrder.create(date: date, outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Silver Lake'))
+    'Mollusk SF' => DailyOrder.create(date: date, po_id: DailyOrder.last_po('San Francisco') + 1, outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('San Francisco')),
+    'Mollusk VB' => DailyOrder.create(date: date, po_id: DailyOrder.last_po('Venice Beach') + 1, outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Venice Beach')),
+    'Mollusk SL' => DailyOrder.create(date: date, po_id: DailyOrder.last_po('Silver Lake') + 1, outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Silver Lake'))
   }
 
   outstanding_orders_by_product = Hash.new { |hash, key| hash[key] = Hash.new(0) }
@@ -77,8 +77,6 @@ task daily_orders: :environment do
 
     if has_adjustment
       if jam_inventory > 0
-        inventories[:jam_shopify] = jam_inventory
-
         # order is important here: SF -> VB -> SL
         adjusted_locations = []
         adjusted_locations << 'Mollusk SF' if inventories[:sf_adjustment].to_i > 0
