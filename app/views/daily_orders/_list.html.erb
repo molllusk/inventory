@@ -7,6 +7,7 @@
     <th>Total Cost of Goods</th>
     <th>Vend Consignment</th>
     <th>PO</th>
+    <th>PDF</th>
     <th>QBO</th>
   </tr>
   <% daily_orders.each do |date, orders| %>
@@ -40,6 +41,9 @@
           </td>
           <td class='<%= 'border-bottom' if last_row %>'>
             <a href='<%= daily_order_po_path(order) %>' target='_blank'><%= order.display_po %> <i class='fa fa-external-link-alt'></i></a>
+          </td>
+          <td>
+            <a href='<%= daily_order_path(order) %>.pdf'><i class='fa fa-file-pdf'></i> <i class='fa fa-cloud-download-alt'></i></a>
           </td>
           <td class='<%= 'border-bottom' if last_row %>'>
             <% if order.qbo_id.present? %>
