@@ -18,6 +18,10 @@ class VendDatum < ApplicationRecord
     end
   end
 
+  def sort_key
+    name + variant_options.find { |vo| vo['name'] == 'Color' }&.[]('value').to_s + variant_options.find { |vo| vo['name'] == 'Size' }&.[]('value').to_s 
+  end
+
   def link
     "https://mollusksurf.vendhq.com/product/#{vend_id}"
   end
