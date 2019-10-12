@@ -15,5 +15,6 @@ class ProductsController < ApplicationController
 
     @inventory_updates = @product.inventory_updates.order('created_at DESC').paginate(page: params[:page], per_page: 8)
     @fluid_inventory_updates = @product.fluid_inventory_updates.order('created_at DESC').paginate(page: params[:page], per_page: 8)
+    @orders = @product.orders.paginate(page: params[:page], per_page: 8)
   end
 end

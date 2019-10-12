@@ -1,0 +1,31 @@
+<% if @orders.present? %>
+  <hr/>
+  <h2 class='center'>Daily Orders:</h2>
+  <table class='full_width'>
+    <tr>
+      <th>When?</th>
+      <th>Cost of Good</th>
+      <th>Quantity</th>
+      <th>Sent Orders</th>
+      <th>Store Inventory</th>
+      <th>Threshold</th>
+      <th>Prior Jam Inventory</th>
+      <th>New Jam Inventory</th>
+    </tr>
+    <% @orders.sort_by { |o| o.daily_order.date }.each do |order| %>
+      <tr>
+        <td><%= order.daily_order.date.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
+        <td><%= order.cost %></td>
+        <td><%= order.quantity %></td>
+        <td><%= order.sent_orders %></td>
+        <td><%= order.threshold %></td>
+        <td><%= order.vend_qty %></td>
+        <td class='<%= 'inventory_failure' unless order.order_inventory_update&.success? %>'><%= order.order_inventory_update&.prior_jam_qty || ' - ' %></td>
+        <td class='<%= 'inventory_failure' unless order.order_inventory_update&.success? %>'><%= order.order_inventory_update&.new_jam_qty || ' - ' %></td>
+      </tr>
+    <% end %>
+  <table>
+  <div class='center'>
+    <%= will_paginate @orders %>
+  </div>
+<% end %>
