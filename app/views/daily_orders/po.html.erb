@@ -1,7 +1,7 @@
 <% @daily_order = daily_order if @daily_order.blank? %>
 <html>
   <head>
-    <style>
+    <style type='text/css'>
       h3 {
         margin-top: 0px;
         margin-bottom: 0.5em;
@@ -11,6 +11,12 @@
         width:100%;
         margin-top: 0.5em;
         border-collapse: collapse;
+        page-break-inside: auto;
+      }
+
+      tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
       }
 
       th, td {
@@ -111,19 +117,19 @@
           <th>Quantity</th>
         </tr>
         <% @daily_order.orders.sort_by { |order| order.product.vend_datum.sort_key }.each do |order| %>
-          <tr class='no-page-break'>
+          <tr>
             <% vend_product = order.product.vend_datum %>
-            <td class='no-page-break'><%= vend_product.sku %></td>
-            <td class='no-page-break'><%= vend_product.name %></td>
-            <td class='no-page-break'><%= vend_product.variant_options.find { |vo| vo['name'] == 'Color' }&.[]('value') %></td>
-            <td class='no-page-break'><%= vend_product.variant_options.find { |vo| vo['name'] == 'Size' }&.[]('value') %></td>
-            <td class='no-page-break'><%= order.quantity %></td>
+            <td><%= vend_product.sku %></td>
+            <td><%= vend_product.name %></td>
+            <td><%= vend_product.variant_options.find { |vo| vo['name'] == 'Color' }&.[]('value') %></td>
+            <td><%= vend_product.variant_options.find { |vo| vo['name'] == 'Size' }&.[]('value') %></td>
+            <td><%= order.quantity %></td>
           </tr>
         <% end %>
-        <tr class='no-page-break'>
-          <td class='no-page-break no_border' colspan='3'></td>
-          <td class='no-page-break'><strong>TOTAL</strong></td>
-          <td class='no-page-break'><strong><%= @daily_order.total_items %></strong></td>
+        <tr>
+          <td class='no_border' colspan='3'></td>
+          <td><strong>TOTAL</strong></td>
+          <td><strong><%= @daily_order.total_items %></strong></td>
         </tr>
       </table>
       <p class='center email'>
