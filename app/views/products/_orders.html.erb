@@ -4,6 +4,7 @@
   <table class='full_width'>
     <tr>
       <th>When?</th>
+      <th>Location</th>
       <th>Cost of Good</th>
       <th>Quantity</th>
       <th>Sent Orders</th>
@@ -15,6 +16,7 @@
     <% @orders.sort_by { |o| o.daily_order.date }.each do |order| %>
       <tr>
         <td><%= order.daily_order.date.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
+        <td><%= order.daily_order.outlet_name %></td>
         <td><%= order.cost %></td>
         <td><%= order.quantity %></td>
         <td><%= order.sent_orders %></td>
