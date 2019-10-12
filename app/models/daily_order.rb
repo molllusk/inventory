@@ -7,6 +7,10 @@ class DailyOrder < ApplicationRecord
     'Silver Lake' => 'Mollusk Surf Shop (Silver Lake)<br />3511 W Sunset Blvd<br />Los Angeles, CA 90026-9998'
   }
 
+  def self.last_po(outlet)
+    where(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key(outlet)).maximum(:po_id).to_i
+  end
+
   def to_pdf
     # create an instance of ActionView, so we can use the render method outside of a controller
     av = ActionView::Base.new
@@ -27,9 +31,8 @@ class DailyOrder < ApplicationRecord
       )
   end
 
-
-  def self.last_po(outlet)
-    where(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key(outlet)).maximum(:po_id).to_i
+  def pdf_filename
+    display_po.gsub(/\s+/,'_') + '.pdf'
   end
 
   def outlet_name
@@ -53,8 +56,7 @@ class DailyOrder < ApplicationRecord
   end
 
   def send_po
-    pdf = to_pdf
-    
+    ApplicationMailer.po_pdf(self).deliver
   end
 
   def total_items

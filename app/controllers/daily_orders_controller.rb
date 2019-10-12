@@ -16,8 +16,7 @@ class DailyOrdersController < ApplicationController
         render :layout => false
       end
       format.pdf do
-        file = @daily_order.display_po.gsub(/\s+/,'_') + '.pdf'
-        send_data @daily_order.to_pdf, filename: file, type: 'application/pdf; charset=utf-8; header=present'
+        send_data @daily_order.to_pdf, filename: @daily_order.pdf_filename, type: 'application/pdf; charset=utf-8; header=present'
       end
     end
   end
