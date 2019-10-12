@@ -28,11 +28,11 @@ class DailyOrder < ApplicationRecord
         pdf_html,
         test: ENV['HYPDF_MODE'] == 'test',
         margin_top: '0.5in'
-      )
+      )[:pdf]
   end
 
   def pdf_filename
-    display_po.gsub(/\s+/,'_') + '.pdf'
+    "Mollusk_Inventory_Transfer_PO_#{display_po.gsub(/\s+/,'_')}.pdf"
   end
 
   def outlet_name
