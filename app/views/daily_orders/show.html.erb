@@ -78,7 +78,7 @@
   </tr>
   <% @daily_order.orders.sort_by { |order| order.product.vend_datum.sort_key }.each do |order| %>
     <tr>
-      <td><a href='<%= order.product.vend_datum.link %>' target='_blank'><%= order.product.vend_datum.variant_name %> <i class='fa fa-external-link-alt'></i></a></td>
+      <td><a href='<%= product_path(order.product) %>' target='_blank'><%= order.product.vend_datum.variant_name %> <i class='fa fa-external-link-alt'></i></a></td>
       <td><%= number_to_currency(order.cost, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= order.quantity %></td>
       <td><%= order.sent_orders %></td>
