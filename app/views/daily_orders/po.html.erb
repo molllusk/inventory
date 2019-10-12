@@ -102,30 +102,32 @@
           </table>
         </div>
       </div>
-      <table>
-        <tr>
-          <th>SKU</th>
-          <th>Description</th>
-          <th>Color</th>
-          <th>Size</th>
-          <th>Quantity</th>
-        </tr>
-        <% @daily_order.orders.sort_by { |order| order.product.vend_datum.sort_key }.each do |order| %>
+      <div class='no-page-break'>
+        <table>
           <tr>
-            <% vend_product = order.product.vend_datum %>
-            <td><%= vend_product.sku %></td>
-            <td><%= vend_product.name %></td>
-            <td><%= vend_product.variant_options.find { |vo| vo['name'] == 'Color' }&.[]('value') %></td>
-            <td><%= vend_product.variant_options.find { |vo| vo['name'] == 'Size' }&.[]('value') %></td>
-            <td><%= order.quantity %></td>
+            <th>SKU</th>
+            <th>Description</th>
+            <th>Color</th>
+            <th>Size</th>
+            <th>Quantity</th>
           </tr>
-        <% end %>
-        <tr>
-          <td class='no_border' colspan='3'></td>
-          <td><strong>TOTAL</strong></td>
-          <td><strong><%= @daily_order.total_items %></strong></td>
-        </tr>
-      </table>
+          <% @daily_order.orders.sort_by { |order| order.product.vend_datum.sort_key }.each do |order| %>
+            <tr>
+              <% vend_product = order.product.vend_datum %>
+              <td><%= vend_product.sku %></td>
+              <td><%= vend_product.name %></td>
+              <td><%= vend_product.variant_options.find { |vo| vo['name'] == 'Color' }&.[]('value') %></td>
+              <td><%= vend_product.variant_options.find { |vo| vo['name'] == 'Size' }&.[]('value') %></td>
+              <td><%= order.quantity %></td>
+            </tr>
+          <% end %>
+          <tr>
+            <td class='no_border' colspan='3'></td>
+            <td><strong>TOTAL</strong></td>
+            <td><strong><%= @daily_order.total_items %></strong></td>
+          </tr>
+        </table>
+      </div>
     </div>
   </body>
 </html>
