@@ -56,7 +56,7 @@
     <th>Prior Jam Inventory</th>
     <th>New Jam Inventory</th>
   </tr>
-  <% @daily_order.orders.each do |order| %>
+  <% @daily_order.orders.sort_by { |order| order.product.vend_datum.variant_name }.each do |order| %>
     <tr>
       <td><a href='<%= order.product.vend_datum.link %>' target='_blank'><%= order.product.vend_datum.variant_name %> <i class='fa fa-external-link-alt'></i></a></td>
       <td><%= number_to_currency(order.cost, :unit => "$", :separator => ".", :delimiter => ",") %></td>
