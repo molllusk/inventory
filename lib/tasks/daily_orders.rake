@@ -3,9 +3,9 @@ task daily_orders: :environment do
   # daily_order_data = []
 
   todays_orders = {
-    'Mollusk SF' => DailyOrder.create(date: date, po_id: DailyOrder.last_po('San Francisco') + 1, outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('San Francisco')),
-    'Mollusk VB' => DailyOrder.create(date: date, po_id: DailyOrder.last_po('Venice Beach') + 1, outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Venice Beach')),
-    'Mollusk SL' => DailyOrder.create(date: date, po_id: DailyOrder.last_po('Silver Lake') + 1, outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Silver Lake'))
+    'Mollusk SF' => DailyOrder.create(date: date, outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('San Francisco')),
+    'Mollusk VB' => DailyOrder.create(date: date, outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Venice Beach')),
+    'Mollusk SL' => DailyOrder.create(date: date, outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Silver Lake'))
   }
 
   outstanding_orders_by_product = Hash.new { |hash, key| hash[key] = Hash.new(0) }
@@ -106,5 +106,19 @@ task daily_orders: :environment do
       # daily_order_data << inventories
     end
   end
-  # daily_order_data.each { |d| p d }
+
+  po_numbers = {
+    'Mollusk SF' => DailyOrder.last_po('San Francisco') + 1,
+    'Mollusk VB' => DailyOrder.last_po('Venice Beach') + 1,
+    'Mollusk SL' => DailyOrder.last_po('Silver Lake') + 1
+  }
+
+  todays_orders.each do |location, daily_order|
+    if daily_order.orders.count.positive?
+      daily_order.update_attribute(po_id: po_numbers[location])
+      # daily_order.create_consignment
+      daily_order.send_po
+      # daily_order.post_to_qbo
+    end
+  end
 end
