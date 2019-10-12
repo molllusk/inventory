@@ -22,7 +22,7 @@ class DailyOrder < ApplicationRecord
       include ApplicationHelper
     end
 
-    pdf_html = av.render template: 'daily_orders/po.html.rb', layout: nil, locals: { daily_order: self }
+    pdf_html = av.render template: 'daily_orders/po.html.erb', layout: nil, locals: { daily_order: self }
 
     HyPDF.htmltopdf(
         pdf_html,
