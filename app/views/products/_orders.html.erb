@@ -16,7 +16,7 @@
     <% @orders.sort_by { |o| o.daily_order.date }.each do |order| %>
       <tr>
         <td><%= order.daily_order.date.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
-        <td><%= order.daily_order.outlet_name %></td>
+        <td<a href='<%= daily_order_path(order.daily_order) %>'><%= order.daily_order.outlet_name %> <i class='fa fa-external-link-alt'></i></a></td>
         <td><%= order.cost %></td>
         <td><%= order.quantity %></td>
         <td><%= order.sent_orders %></td>
