@@ -82,8 +82,8 @@
       <td><%= number_to_currency(order.cost, :unit => "$", :separator => ".", :delimiter => ",") %></td>
       <td><%= order.quantity %></td>
       <td><%= order.sent_orders %></td>
-      <td><%= order.threshold %></td>
       <td><%= order.vend_qty %></td>
+      <td><%= order.threshold %></td>
       <td class='<%= 'inventory_failure' unless order.order_inventory_update&.success? %>'><%= order.order_inventory_update&.prior_jam_qty || ' - ' %></td>
       <td class='<%= 'inventory_failure' unless order.order_inventory_update&.success? %>'><%= order.order_inventory_update&.new_jam_qty || ' - ' %></td>
     </tr>
