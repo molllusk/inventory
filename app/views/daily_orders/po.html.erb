@@ -23,6 +23,10 @@
         width: 900px;
       }
 
+      .email {
+        font-size: 1.5em;
+      }
+
       .no_border {
         border: none;
       }
@@ -79,13 +83,9 @@
           <h3>Ship to:</h3>
           <%= @daily_order.ship_to_address.html_safe %>
         </div>
-        <div class='left final-third'>
-          <p class='center'>
-            <strong>Email completed packing slip to:</strong><br />
-            <a href='mailto:johanna@mollusksurfshop.com'>Johanna@MolluskSurfShop.com</a>
-          </p>
-        </div>
         <div class='left thirds'>
+        </div>
+        <div class='left final-third'>
           <table>
             <tr>
               <th>PO #</th>
@@ -102,32 +102,34 @@
           </table>
         </div>
       </div>
-      <div class='no-page-break'>
-        <table>
+      <table>
+        <tr>
+          <th>SKU</th>
+          <th>Description</th>
+          <th>Color</th>
+          <th>Size</th>
+          <th>Quantity</th>
+        </tr>
+        <% @daily_order.orders.sort_by { |order| order.product.vend_datum.sort_key }.each do |order| %>
           <tr>
-            <th>SKU</th>
-            <th>Description</th>
-            <th>Color</th>
-            <th>Size</th>
-            <th>Quantity</th>
+            <% vend_product = order.product.vend_datum %>
+            <td class='no-page-break'><%= vend_product.sku %></td>
+            <td class='no-page-break'><%= vend_product.name %></td>
+            <td class='no-page-break'><%= vend_product.variant_options.find { |vo| vo['name'] == 'Color' }&.[]('value') %></td>
+            <td class='no-page-break'><%= vend_product.variant_options.find { |vo| vo['name'] == 'Size' }&.[]('value') %></td>
+            <td class='no-page-break'><%= order.quantity %></td>
           </tr>
-          <% @daily_order.orders.sort_by { |order| order.product.vend_datum.sort_key }.each do |order| %>
-            <tr>
-              <% vend_product = order.product.vend_datum %>
-              <td><%= vend_product.sku %></td>
-              <td><%= vend_product.name %></td>
-              <td><%= vend_product.variant_options.find { |vo| vo['name'] == 'Color' }&.[]('value') %></td>
-              <td><%= vend_product.variant_options.find { |vo| vo['name'] == 'Size' }&.[]('value') %></td>
-              <td><%= order.quantity %></td>
-            </tr>
-          <% end %>
-          <tr>
-            <td class='no_border' colspan='3'></td>
-            <td><strong>TOTAL</strong></td>
-            <td><strong><%= @daily_order.total_items %></strong></td>
-          </tr>
-        </table>
-      </div>
+        <% end %>
+        <tr>
+          <td class='no-page-break no_border' colspan='3'></td>
+          <td class='no-page-break'><strong>TOTAL</strong></td>
+          <td class='no-page-break'><strong><%= @daily_order.total_items %></strong></td>
+        </tr>
+      </table>
+      <p class='center email'>
+        <strong>Email completed packing slip to:</strong><br />
+        <a href='mailto:johanna@mollusksurfshop.com'>Johanna@MolluskSurfShop.com</a>
+      </p>
     </div>
   </body>
 </html>
