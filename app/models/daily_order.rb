@@ -2,9 +2,9 @@ class DailyOrder < ApplicationRecord
   has_many :orders, dependent: :destroy
 
   PO_ADDRESSES = {
-    'San Francisco' => 'Mollusk Surf Shop San Francisco<br />4500 Irving Street<br />San Francisco, CA 94122',
-    'Venice Beach' => '',
-    'Silver Lake' => ''
+    'San Francisco' => 'Mollusk Surf Shop (San Francisco)<br />4500 Irving Street<br />San Francisco, CA 94122-1132',
+    'Venice Beach' => 'Mollusk Surf Shop (Venice Beach)<br />1600 Pacific Avenue<br />Venice Beach, CA 90291-9998',
+    'Silver Lake' => 'Mollusk Surf Shop (Silver Lake)<br />3511 W Sunset Blvd<br />Los Angeles, CA 90026-9998'
   }
 
   def self.last_po(outlet)
