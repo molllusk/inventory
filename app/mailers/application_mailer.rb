@@ -16,7 +16,8 @@ class ApplicationMailer < ActionMailer::Base
 
   def po_pdf(daily_order)
     attachments[daily_order.pdf_filename] = daily_order.to_pdf
+    @daily_order = daily_order
 
-    mail to: 'joseph@mollusksurfshop.com, arvelhernandez@gmail.com', subject: "#{daily_order.outlet_name} Inventory Transfers for #{daily_order.date.strftime('%m/%d/%y')}", body: "See attached for PO #{daily_order.display_po} including inventory transfers for #{daily_order.outlet_name} ordered today: #{daily_order.date.strftime('%m/%d/%y')}.<br /><br /><strong>Please email the completed packing slip to:</strong> <a href='mailto:johanna@mollusksurfshop.com'>Johanna@MolluskSurfShop.com</a>.<br /><br />Thank you!"
+    mail to: 'joseph@mollusksurfshop.com, arvelhernandez@gmail.com', subject: "#{daily_order.outlet_name} Inventory Transfers for #{daily_order.date.strftime('%m/%d/%y')}"
   end
 end
