@@ -1,6 +1,15 @@
 <html>
   <head>
     <style>
+      h3 {
+        margin-top: 0px;
+        margin-bottom: 0.5em;
+      }
+
+      p {
+        padding-top: 1em;
+      }
+
       table {
         width:100%;
         margin: 25px, 10px;
@@ -40,8 +49,8 @@
 
       .full_width {
         width: 100%;
-        margin: 15px 0px;
-        min-height: 1px;
+        margin: 20px 0px;
+        overflow: hidden;
       }
 
       .center {
@@ -72,9 +81,11 @@
           <h3>Ship to:</h3>
           <%= @daily_order.ship_to_address.html_safe %>
         </div>
-        <div class='left thirds center'>
-          <strong>Email completed packing slip to:</strong><br />
-          <a href='mailto:johanna@mollusksurfshop.com'>Johanna@MolluskSurfShop.com</a>
+        <div class='left thirds'>
+          <p class='center'>
+            <strong>Email completed packing slip to:</strong><br />
+            <a href='mailto:johanna@mollusksurfshop.com'>Johanna@MolluskSurfShop.com</a>
+          </p>
         </div>
         <div class='left thirds'>
           <table>
