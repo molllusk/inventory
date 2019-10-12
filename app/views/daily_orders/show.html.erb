@@ -7,6 +7,8 @@
     <th>When?  (PST / PDT)</th>
     <th>Location</th>
     <th>Total Orders</th>
+    <th>Total Items</th>
+    <th>Total Cost of Goods</th>
     <th>Vend Consignment</th>
     <th>PO</th>
     <th>QBO</th>
@@ -20,6 +22,12 @@
     </td>
     <td>
       <%= @daily_order.orders.count %>
+    </td>
+    <td>
+      <%= @daily_order.total_items %>
+    </td>
+    <td>
+      <%= @daily_order.total_cost %>
     </td>
     <td>
       <% if @daily_order.vend_consignment_url %>
@@ -48,7 +56,7 @@
 <table class="products full_width">
   <tr>
     <th>Product</th>
-    <th>Cost Per</th>
+    <th>Cost of Good</th>
     <th>Quantity</th>
     <th>Sent Orders</th>
     <th>Store Inventory</th>

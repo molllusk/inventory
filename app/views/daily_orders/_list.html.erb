@@ -3,6 +3,8 @@
     <th>When?  (PST / PDT)</th>
     <th>Location</th>
     <th>Total Orders</th>
+    <th>Total Items</th>
+    <th>Total Cost of Goods</th>
     <th>Vend Consignment</th>
     <th>PO</th>
     <th>QBO</th>
@@ -22,6 +24,12 @@
           </td>
           <td class='<%= 'border-bottom' if last_row %>'>
             <%= order.orders.count %>
+          </td>
+          <td class='<%= 'border-bottom' if last_row %>'>
+            <%= order.total_items %>
+          </td>
+          <td class='<%= 'border-bottom' if last_row %>'>
+            <%= order.total_cost %>
           </td>
           <td class='<%= 'border-bottom' if last_row %>'>
             <% if order.vend_consignment_url %>
