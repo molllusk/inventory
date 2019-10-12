@@ -50,6 +50,10 @@ class DailyOrder < ApplicationRecord
 
   end
 
+  def post_to_qbo
+
+  end
+
   def ship_to_address
     PO_ADDRESSES[outlet_name]
   end
