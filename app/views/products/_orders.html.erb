@@ -28,6 +28,6 @@
     <% end %>
   <table>
   <div class='center'>
-    <%= will_paginate @orders %>
+    <%= will_paginate @orders, param_name: 'order_page' %>
   </div>
 <% end %>

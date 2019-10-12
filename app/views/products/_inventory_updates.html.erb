@@ -20,6 +20,6 @@
     <% end %>
   <table>
   <div class='center'>
-    <%= will_paginate @inventory_updates %>
+    <%= will_paginate @inventory_updates, param_name: 'inventory_updates_page' %>
   </div>
 <% end %>

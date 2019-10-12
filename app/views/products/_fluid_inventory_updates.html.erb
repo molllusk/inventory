@@ -25,6 +25,6 @@
     <% end %>
   <table>
   <div class='center'>
-    <%= will_paginate @fluid_inventory_updates %>
+    <%= will_paginate @fluid_inventory_updates, param_name: 'fluid_inventory_updates_page'  %>
   </div>
 <% end %>
