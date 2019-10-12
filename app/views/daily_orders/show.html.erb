@@ -46,7 +46,7 @@
     </td>
     <td>
       <% if @daily_order.po_id.present? %>
-        <a href='<%= daily_order_path(@daily_order) %>.pdf'><i class='fa fa-file-pdf'></i> <i class='fa fa-cloud-download-alt'></i></a>
+        <a href='<%= daily_order_po_path(@daily_order) %>.pdf'><i class='fa fa-file-pdf'></i> <i class='fa fa-cloud-download-alt'></i></a>
       <% else %>
          -
       <% end %>
