@@ -1,4 +1,4 @@
-<%= @daily_order = daily_order if @daily_order.blank? %>
+<% @daily_order = daily_order if @daily_order.blank? %>
 <html>
   <head>
     <style>
@@ -68,7 +68,7 @@
     <div id='wrap'>
       <div class='full_width'>
         <div class='left two-thirds'>
-          <img class='logo' src='/logo.jpg'>
+          <img class='logo' src='http://mollusk.herokuapp.com/logo.jpg'>
         </div>
         <div class='left final-third'>
           <h2 class='align-right'>Pick List</h2>
@@ -79,24 +79,24 @@
           <h3>Ship to:</h3>
           <%= @daily_order.ship_to_address.html_safe %>
         </div>
-        <div class='left thirds'>
+        <div class='left final-third'>
           <p class='center'>
             <strong>Email completed packing slip to:</strong><br />
             <a href='mailto:johanna@mollusksurfshop.com'>Johanna@MolluskSurfShop.com</a>
           </p>
         </div>
-        <div class='left final-third'>
+        <div class='left thirds'>
           <table>
             <tr>
-              <th>PO Number</th>
+              <th>PO #</th>
               <td><%= @daily_order.display_po %></td>
             </tr>
             <tr>
               <th>Date</th>
-              <td><%= @daily_order.date.strftime('%m/%d/%Y') %></td>
+              <td><%= @daily_order.date.strftime('%m/%d/%y') %></td>
             </tr>
             <tr>
-              <th>Shipping Method</th>
+              <th>Shipping</th>
               <td>UPS Ground</td>
             </tr>
           </table>
