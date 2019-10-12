@@ -111,7 +111,7 @@
           <th>Quantity</th>
         </tr>
         <% @daily_order.orders.sort_by { |order| order.product.vend_datum.sort_key }.each do |order| %>
-          <tr>
+          <tr class='no-page-break'>
             <% vend_product = order.product.vend_datum %>
             <td class='no-page-break'><%= vend_product.sku %></td>
             <td class='no-page-break'><%= vend_product.name %></td>
@@ -120,7 +120,7 @@
             <td class='no-page-break'><%= order.quantity %></td>
           </tr>
         <% end %>
-        <tr>
+        <tr class='no-page-break'>
           <td class='no-page-break no_border' colspan='3'></td>
           <td class='no-page-break'><strong>TOTAL</strong></td>
           <td class='no-page-break'><strong><%= @daily_order.total_items %></strong></td>
