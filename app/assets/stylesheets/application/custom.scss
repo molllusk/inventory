@@ -190,6 +190,10 @@ tr:hover td.inventory_failure{
   background-color: white;
 }
 
+th {
+  padding-right: 5px;
+}
+
 td.inventory_failure {
   border: 2px dashed red;
   color: red;

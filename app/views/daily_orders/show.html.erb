@@ -27,7 +27,7 @@
       <%= @daily_order.total_items %>
     </td>
     <td>
-      <%= @daily_order.total_cost %>
+      <%= number_to_currency(@daily_order.total_cost, :unit => "$", :separator => ".", :delimiter => ",") %>
     </td>
     <td>
       <% if @daily_order.vend_consignment_url %>
