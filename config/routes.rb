@@ -43,6 +43,7 @@ Rails.application.routes.draw do
   resources :daily_orders do
     get :po
   end
+  resources :daily_order_thresholds
 
   resources :daily_reports do
     collection do

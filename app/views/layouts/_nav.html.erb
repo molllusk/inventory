@@ -16,8 +16,16 @@
   <li class="<%= "highlighted" if params[:controller] == "products" %> nav-item">
     <a class="nav-link" href="/products">Products</a>
   </li>
-  <li class="<%= "highlighted" if params[:controller] == "daily_orders" %> nav-item">
-    <a class="nav-link" href="/daily_orders">Daily Orders</a>
+  <li class="dropdown <%= "highlighted" if ['daily_order_thresholds', 'daily_orders'].include?(params[:controller]) %> nav-item">
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Daily Orders <b class="caret"></b></a>
+    <ul class="dropdown-menu">
+      <li>
+        <a href="/daily_order_thresholds">Thresholds</a>
+      </li>
+      <li>
+        <a href="/daily_orders">Orders</a>
+      </li>
+    </ul>
   </li>
   <li class="dropdown <%= "highlighted" if params[:controller] == "daily_reports" %> nav-item">
     <a class="dropdown-toggle" data-toggle="dropdown" href="#">Daily Reports <b class="caret"></b></a>
