@@ -11,6 +11,14 @@ class DailyOrdersController < ApplicationController
 
   def po
     @daily_order = DailyOrder.find(params[:daily_order_id])
-    render :layout => false
+    respond_to do |format|
+      format.html do
+        render :layout => false
+      end
+      format.pdf do
+        file = @daily_order.display_po.gsub(/\s+/,'_') + '.pdf'
+        send_data @daily_order.to_pdf, filename: file, type: 'application/pdf; charset=utf-8; header=present'
+      end
+    end
   end
 end

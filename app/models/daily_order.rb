@@ -7,6 +7,27 @@ class DailyOrder < ApplicationRecord
     'Silver Lake' => 'Mollusk Surf Shop (Silver Lake)<br />3511 W Sunset Blvd<br />Los Angeles, CA 90026-9998'
   }
 
+  def to_pdf
+    # create an instance of ActionView, so we can use the render method outside of a controller
+    av = ActionView::Base.new
+    av.view_paths = ActionController::Base.view_paths
+
+    # need these in case your view constructs any links or references any helper methods.
+    av.class_eval do
+      include Rails.application.routes.url_helpers
+      include ApplicationHelper
+    end
+
+    pdf_html = av.render template: 'daily_orders/po.html.rb', layout: nil, locals: { daily_order: self }
+
+    HyPDF.htmltopdf(
+        pdf_html,
+        test: ENV['HYPDF_MODE'] == 'test',
+        margin_top: '0.5in'
+      )
+  end
+
+
   def self.last_po(outlet)
     where(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key(outlet)).maximum(:po_id).to_i
   end
@@ -32,8 +53,8 @@ class DailyOrder < ApplicationRecord
   end
 
   def send_po
-    # generate pdf
-    # email it in attachment
+    pdf = to_pdf
+    
   end
 
   def total_items
