@@ -130,9 +130,9 @@ task daily_orders: :environment do
   end
 
   po_numbers = {
-    'Mollusk SF' => DailyOrder.last_po('San Francisco') + 1,
-    'Mollusk VB' => DailyOrder.last_po('Venice Beach') + 1,
-    'Mollusk SL' => DailyOrder.last_po('Silver Lake') + 1
+    'Mollusk SF' => 287, # DailyOrder.last_po('San Francisco') + 1,
+    'Mollusk VB' => 287, # DailyOrder.last_po('Venice Beach') + 1,
+    'Mollusk SL' => 287 # DailyOrder.last_po('Silver Lake') + 1
   }
 
   todays_orders.each do |location, daily_order|
