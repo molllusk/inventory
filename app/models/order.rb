@@ -7,7 +7,6 @@ class Order < ApplicationRecord
 
   def reduce_jam_inventory
     product.adjust_order_inventory(self)
-    # product.fluid_inventory
   end
 
   def total_cost

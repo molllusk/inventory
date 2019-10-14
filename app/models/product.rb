@@ -82,8 +82,9 @@ class Product < ApplicationRecord
     end
   end
 
-  def self.update_fluid_inventories(retail_orders)
-    Product.find_each do |product|
+  def self.update_fluid_inventories(retail_orders, product_ids = [])
+    query = product_ids.present? ? where(id: product_ids) : all
+    query.find_each do |product|
       if product.has_retail_and_wholesale_shopify?
         # do not update inventory if any order exists for that variant in any location
         product.fluid_inventory unless product.retail_orders_present?(retail_orders)

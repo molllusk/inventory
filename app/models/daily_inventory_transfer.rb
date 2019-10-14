@@ -13,6 +13,12 @@ class DailyInventoryTransfer < ApplicationRecord
     'Venice Beach' => Qbo::VENICE_BEACH_CLASS
   }
 
+  def fluid_inventory
+    retail_shopify_orders = ShopifyClient.order_quantities_by_variant
+    product_ids = Order.where(daily_order_id: daily_orders.pluck(:id)).pluck(:product_id)
+    Product.update_fluid_inventories(retail_shopify_orders, product_ids)
+  end
+
   def journal_entry_params
     {
       txn_date: date,
