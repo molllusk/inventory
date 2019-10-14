@@ -69,7 +69,7 @@ class Product < ApplicationRecord
   def self.run_inventory_updates
     retail_orders = ShopifyClient.order_quantities_by_variant
     update_retail_inventories_sf(retail_orders)
-    # update_fluid_inventories(retail_orders)
+    update_fluid_inventories(retail_orders)
   end
 
   def self.update_retail_inventories_sf(retail_orders)
@@ -197,7 +197,7 @@ class Product < ApplicationRecord
 
         shopify_inventory.update_attribute(:inventory, updated_jam_inventory)
 
-        Airbrake.notify("ORDER INVENTORY: expected jam qty #{expected_jam_inventory} but got #{updated_jam_inventory}") unless expected_jam_inventory == updated_jam_inventory
+        Airbrake.notify("ORDER INVENTORY: Product #{id} expected jam qty #{expected_jam_inventory} but got #{updated_jam_inventory}") unless expected_jam_inventory == updated_jam_inventory
       else
         Airbrake.notify("Could not UPDATE Jam inventory during ORDER for Product: #{id}, Adjustment: #{-order.quantity}")
       end

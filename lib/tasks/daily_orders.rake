@@ -138,11 +138,11 @@ task daily_orders: :environment do
   todays_orders.each do |location, daily_order|
     if daily_order.orders.count.positive?
       daily_order.update_attribute(:po_id, po_numbers[location])
-      # daily_order.create_consignment
-      # daily_order.send_po
+      daily_order.create_consignment
+      daily_order.send_po
     end
   end
 
   daily_inventory_transfer.fluid_inventory
-  # daily_inventory_transfer.post_to_qbo
+  daily_inventory_transfer.post_to_qbo
 end
