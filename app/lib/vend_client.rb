@@ -33,6 +33,7 @@ class VendClient
     sleep(0.8)
     Faraday.new(url: BASE_URL) do |faraday|
       faraday.authorization :Bearer, ENV['VEND_TOKEN']
+      faraday.request  :url_encoded
       faraday.response :json
       faraday.adapter Faraday.default_adapter
     end
