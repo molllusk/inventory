@@ -90,24 +90,38 @@ class VendClient
   end
 
   def self.create_consignment(daily_order)
-    # https://mollusksurf.vendhq.com/api/consignment
-    {
-      "type": "SUPPLIER",
-      "status": "OPEN",
-      "name": "{order_number}",
-      "outlet_id": "{outlet_id}"
+    body = {
+      type: "SUPPLIER",
+      status: "OPEN",
+      name: daily_order.display_po,
+      outlet_id: daily_order.outlet_id
     }
+
+    response = connection.post do |req|
+      req.url "/consignments.json"
+      req.headers['Content-Type'] = 'application/json'
+      req.body = body.to_json
+    end
+
+    response.body['data']
   end
 
-  def self.add_consignment_product(consignment_id, order)
-    # https://mollusksurf.vendhq.com/api/consignment_product
-    { 
-      "consignment_id": "{consignment id}",
-      "product_id": "{id}",
-      "count": "{Order Quantity}",
-      "received": null,
-      "cost": "{supply_price}"
+  def self.add_consignment_product(order)
+    body = {
+      consignment_id: order.daily_order.vend_consignment_id,
+      product_id: order.product.vend_datum.vend_id,
+      count: order.quantity,
+      received: null,
+      cost: order.total_cost
     }
+
+    response = connection.post do |req|
+      req.url "/consignments.json"
+      req.headers['Content-Type'] = 'application/json'
+      req.body = body.to_json
+    end
+
+    response.body['data']
   end
 
   def self.get_inventory

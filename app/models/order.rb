@@ -3,10 +3,14 @@ class Order < ApplicationRecord
   belongs_to :daily_order
   has_one    :order_inventory_update, dependent: :destroy
 
-  after_create :reduce_jam_inventory
+  # after_create :reduce_jam_inventory
 
   def reduce_jam_inventory
     product.adjust_order_inventory(self)
+  end
+
+  def total_cost
+    cost * quantity
   end
 end
 

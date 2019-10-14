@@ -54,7 +54,7 @@ class DailyOrder < ApplicationRecord
       
       orders.each do |order|
         begin
-          VendClient.add_consignment_product(vend_consignment_id, order)
+          VendClient.add_consignment_product(order)
         rescue
           Airbrake.notify("Could not add product to Consignment for Daily Order: #{id} / Product: #{order.product_id}")
         end
@@ -77,7 +77,7 @@ class DailyOrder < ApplicationRecord
   end
 
   def total_cost
-    orders.reduce(0) { |sum, order| sum + (order.quantity * order.cost) }
+    orders.reduce(0) { |sum, order| sum + order.total_cost }
   end
 
   def vend_consignment_url
