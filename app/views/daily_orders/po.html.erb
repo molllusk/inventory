@@ -116,7 +116,8 @@
       <table>
         <tr>
           <th>SKU</th>
-          <th>Description</th>
+          <th>Product</th>
+          <th>Type</th>
           <th>Color</th>
           <th>Size</th>
           <th>Quantity</th>
@@ -126,6 +127,7 @@
             <% vend_product = order.product.vend_datum %>
             <td><%= order.product.retail_shopify&.sku %></td>
             <td><%= vend_product.name %></td>
+            <td><%= vend_product.vend_type&.[]('name') %></td>
             <td><%= vend_product.variant_options.find { |vo| vo['name'] == 'Color' }&.[]('value') %></td>
             <td><%= vend_product.variant_options.find { |vo| vo['name'] == 'Size' }&.[]('value') %></td>
             <td><%= order.quantity %></td>
