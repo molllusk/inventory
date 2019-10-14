@@ -143,6 +143,6 @@ task daily_orders: :environment do
     end
   end
 
-  daily_inventory_transfer.fluid_inventory
+  # daily_inventory_transfer.fluid_inventory
   daily_inventory_transfer.post_to_qbo
 end
