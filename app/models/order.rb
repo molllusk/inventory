@@ -6,8 +6,7 @@ class Order < ApplicationRecord
   after_create :reduce_jam_inventory
 
   def reduce_jam_inventory
-    puts "Reducing... haha NOT!"
-    # product.adjust_order_inventory(self)
+    product.adjust_order_inventory(self)
   end
 end
 

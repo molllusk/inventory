@@ -31,7 +31,7 @@ class DailyInventoryTransfer < ApplicationRecord
           account_id: ACCOUNT_ID_BY_OUTLET[daily_order.outlet_name],
           amount: daily_order.total_cost,
           description: "Daily Inventory Transfer Cost of Goods for PO #{daily_order.display_po}",
-          posting_type: 'Debit'
+          posting_type: 'Debit',
           class_id: CLASS_ID_BY_OUTLET[daily_order.outlet_name]
         }
         total_cost += daily_order.total_cost
@@ -44,7 +44,7 @@ class DailyInventoryTransfer < ApplicationRecord
         account_id: '3652', # 11137 Finished Goods - Shopify,
         amount: total_cost,
         description: "Daily Inventory Transfer total Cost of Goods for PO's: #{pos.join(', ')}",
-        posting_type: 'Credit'
+        posting_type: 'Credit',
         class_id: Qbo.base_ref(Qbo::MOLLUSK_WEST_CLASS)
       }
     end
