@@ -69,12 +69,6 @@ class VendClient
     response.body['data']
   end
 
-  def self.consignments
-    min_version = Redis.current.get('min_consignment_version').to_i
-
-    response = connection.get 'consignments', { page_size: 500, type: 'OUTLET', status: 'RECEIVED', after: min_version }
-    response.body['data']
-  end
 
   def self.daily_orders
     min_version = Redis.current.get('min_daily_order_version').to_i
@@ -83,9 +77,37 @@ class VendClient
     response.body['data']
   end
 
+  def self.consignments
+    min_version = Redis.current.get('min_consignment_version').to_i
+
+    response = connection.get 'consignments', { page_size: 500, type: 'OUTLET', status: 'RECEIVED', after: min_version }
+    response.body['data']
+  end
+
   def self.consignment_products(consignment_id)
     response = connection.get "consignments/#{consignment_id}/products", { page_size: 500 }
     response.body['data']
+  end
+
+  def self.create_consignment(daily_order)
+    # https://mollusksurf.vendhq.com/api/consignment
+    {
+      "type": "SUPPLIER",
+      "status": "OPEN",
+      "name": "{order_number}",
+      "outlet_id": "{outlet_id}"
+    }
+  end
+
+  def self.add_consignment_product(consignment_id, order)
+    # https://mollusksurf.vendhq.com/api/consignment_product
+    { 
+      "consignment_id": "{consignment id}",
+      "product_id": "{id}",
+      "count": "{Order Quantity}",
+      "received": null,
+      "cost": "{supply_price}"
+    }
   end
 
   def self.get_inventory

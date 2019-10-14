@@ -10,12 +10,11 @@ end
 #
 # Table name: daily_orders
 #
-#  id                  :bigint(8)        not null, primary key
-#  date                :datetime
-#  created_at          :datetime         not null
-#  updated_at          :datetime         not null
-#  outlet_id           :string
-#  po_id               :integer
-#  qbo_id              :bigint(8)
-#  vend_consignment_id :string
+#  id                          :bigint(8)        not null, primary key
+#  created_at                  :datetime         not null
+#  updated_at                  :datetime         not null
+#  daily_inventory_transfer_id :integer
+#  outlet_id                   :string
+#  po_id                       :integer
+#  vend_consignment_id         :string
 #

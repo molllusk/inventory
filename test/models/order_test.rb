@@ -13,6 +13,7 @@ end
 #  id             :bigint(8)        not null, primary key
 #  cost           :float
 #  quantity       :integer
+#  sent_orders    :integer          default(0)
 #  threshold      :integer
 #  vend_qty       :integer
 #  created_at     :datetime         not null

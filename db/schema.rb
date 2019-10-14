@@ -10,19 +10,32 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_11_201232) do
+ActiveRecord::Schema.define(version: 2019_10_14_002633) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
+  create_table "create_daily_inventory_transfers", force: :cascade do |t|
+    t.datetime "date"
+    t.integer "qbo_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "daily_inventory_transfers", force: :cascade do |t|
+    t.datetime "date"
+    t.integer "qbo_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "daily_orders", force: :cascade do |t|
     t.string "outlet_id"
     t.integer "po_id"
-    t.bigint "qbo_id"
-    t.datetime "date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "vend_consignment_id"
+    t.integer "daily_inventory_transfer_id"
   end
 
   create_table "daily_vend_consignments", force: :cascade do |t|

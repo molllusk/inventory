@@ -2,10 +2,12 @@ task daily_orders: :environment do
   date = Time.now
   # daily_order_data = []
 
+  daily_inventory_transfer = DailyInventoryTransfer.create(date: date)
+
   todays_orders = {
-    'Mollusk SF' => DailyOrder.create(date: date, outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('San Francisco')),
-    'Mollusk VB' => DailyOrder.create(date: date, outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Venice Beach')),
-    'Mollusk SL' => DailyOrder.create(date: date, outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Silver Lake'))
+    'Mollusk SF' => DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('San Francisco'), daily_inventory_transfer_id: daily_inventory_transfer.id),
+    'Mollusk VB' => DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Venice Beach'), daily_inventory_transfer_id: daily_inventory_transfer.id),
+    'Mollusk SL' => DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Silver Lake'), daily_inventory_transfer_id: daily_inventory_transfer.id)
   }
 
   outstanding_orders_by_product = Hash.new { |hash, key| hash[key] = Hash.new(0) }
@@ -118,7 +120,8 @@ task daily_orders: :environment do
       daily_order.update_attribute(po_id: po_numbers[location])
       # daily_order.create_consignment
       daily_order.send_po
-      # daily_order.post_to_qbo
     end
   end
+
+  # daily_inventory_transfer.post_to_qbo
 end

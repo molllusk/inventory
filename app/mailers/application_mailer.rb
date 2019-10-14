@@ -18,6 +18,6 @@ class ApplicationMailer < ActionMailer::Base
     attachments[daily_order.pdf_filename] = daily_order.to_pdf
     @daily_order = daily_order
 
-    mail to: 'joseph@mollusksurfshop.com, arvelhernandez@gmail.com', subject: "#{daily_order.outlet_name} Inventory Transfers for #{daily_order.date.strftime('%m/%d/%y')}"
+    mail to: 'joseph@mollusksurfshop.com, arvelhernandez@gmail.com', subject: "Mollusk #{@daily_order.po_stem} Order #{@daily_order.po_id}"
   end
 end
