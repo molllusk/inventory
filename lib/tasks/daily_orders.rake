@@ -10,6 +10,7 @@ task daily_orders: :environment do
     'Mollusk SL' => DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Silver Lake'), daily_inventory_transfer_id: daily_inventory_transfer.id)
   }
 
+  retail_shopify_orders = ShopifyClient.order_quantities_by_variant
   outstanding_orders_by_product = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
   release_schedule = Product.get_release_schedule
@@ -32,12 +33,12 @@ task daily_orders: :environment do
 
   ShopifyDatum.with_jam.find_each do |shopify_product|
     next if shopify_product.sale?
-    
+    next if retail_shopify_orders[shopify_product.variant_id].positive?
     vend_product = shopify_product.product.vend_datum
     next unless vend_product.present?
     
     clean_handle = shopify_product.handle.to_s.strip.downcase
-    next if release_date_by_handle[clean_handle].present? && release_date_by_handle[clean_handle] > Date.today
+    next if release_date_by_handle[clean_handle].present? && release_date_by_handle[clean_handle] > Date.today.to_time.in_time_zone('Pacific Time (US & Canada)').end_of_day
 
     inventories = {}
     fill_level = shopify_product.product.daily_order_inventory_threshold
