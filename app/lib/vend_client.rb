@@ -98,7 +98,7 @@ class VendClient
     }
 
     response = connection.post do |req|
-      req.url "/consignments.json"
+      req.url "consignments"
       req.headers['Content-Type'] = 'application/json'
       req.body = body.to_json
     end
@@ -108,7 +108,6 @@ class VendClient
 
   def self.add_consignment_product(order)
     body = {
-      consignment_id: order.daily_order.vend_consignment_id,
       product_id: order.product.vend_datum.vend_id,
       count: order.quantity,
       received: null,
@@ -116,7 +115,7 @@ class VendClient
     }
 
     response = connection.post do |req|
-      req.url "/consignments.json"
+      req.url "consignments/#{order.daily_order.vend_consignment_id}/products"
       req.headers['Content-Type'] = 'application/json'
       req.body = body.to_json
     end
