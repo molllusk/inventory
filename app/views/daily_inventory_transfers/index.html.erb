@@ -1,0 +1,12 @@
+<% provide(:title, 'Daily Orders') %>
+
+<h2 class='center'>Daily Orders</h2>
+
+<%= render(
+  partial: 'daily_inventory_transfers/list',
+  locals: { daily_inventory_transfers: @daily_inventory_transfers }
+) %>
+
+<div class='center'>
+  <%= will_paginate @daily_inventory_transfers %>
+</div>

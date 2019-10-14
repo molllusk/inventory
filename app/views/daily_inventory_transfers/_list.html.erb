@@ -1,0 +1,66 @@
+<table class="products full_width">
+  <tr>
+    <th>When? (PST / PDT)</th>
+    <th>QBO</th>
+    <th>Location</th>
+    <th>Total Orders</th>
+    <th>Total Items</th>
+    <th>Total Cost of Goods</th>
+    <th>Vend Consignment</th>
+    <th>PO</th>
+    <th>PDF</th>
+  </tr>
+  <% daily_inventory_transfers.each do |daily_inventory_transfer| %>
+    <tr>
+      <td class='border-bottom' rowspan='<%= daily_inventory_transfer.daily_orders.count %>' style='background-color: #FFFFFF'>
+        <%= daily_inventory_transfer.date.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %>
+      </td>
+      <td class='border-bottom' rowspan='<%= daily_inventory_transfer.daily_orders.count %>' style='background-color: #FFFFFF'>
+        <% if daily_inventory_transfer.qbo_id.present? %>
+          <a href='https://c3.qbo.intuit.com/app/salesreceipt?txnId=<%= daily_inventory_transfer.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a>
+        <% else %>
+           -
+        <% end %>
+      </td>
+    <% daily_inventory_transfer.daily_orders.each_with_index do |order, index| %>
+      <% last_row = (index == (daily_inventory_transfer.daily_orders.count - 1)) %>
+      <% if index.positive? %>
+        <tr>
+      <% end %>
+        <td class='<%= 'border-bottom' if last_row %>'>
+          <a href='<%= daily_order_path(order) %>' target='_blank'><%= VendClient::OUTLET_NAMES_BY_ID[order.outlet_id] %> <i class='fa fa-external-link-alt'></i></a>
+        </td>
+        <td class='<%= 'border-bottom' if last_row %>'>
+          <%= order.orders.count %>
+        </td>
+        <td class='<%= 'border-bottom' if last_row %>'>
+          <%= order.total_items %>
+        </td>
+        <td class='<%= 'border-bottom' if last_row %>'>
+          <%= number_to_currency(order.total_cost, :unit => "$", :separator => ".", :delimiter => ",") %>
+        </td>
+        <td class='<%= 'border-bottom' if last_row %>'>
+          <% if order.vend_consignment_url %>
+            <a href='<%= order.vend_consignment_url %>' target='_blank'>Vend <i class='fa fa-external-link-alt'></i></a>
+          <% else %>
+             -
+          <% end %>
+        </td>
+        <td class='<%= 'border-bottom' if last_row %>'>
+          <% if order.po_id.present? %>
+            <a href='<%= daily_order_po_path(order) %>' target='_blank'><%= order.display_po %> <i class='fa fa-external-link-alt'></i></a>
+          <% else %>
+             -
+          <% end %>
+        </td>
+        <td class='<%= 'border-bottom' if last_row %>'>
+          <% if order.po_id.present? %>
+            <a href='<%= daily_order_po_path(order) %>.pdf'><i class='fa fa-file-pdf'></i> <i class='fa fa-cloud-download-alt'></i></a>
+          <% else %>
+             -
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  <% end %>
+</table>
