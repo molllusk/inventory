@@ -81,7 +81,7 @@ class DailyOrder < ApplicationRecord
   end
 
   def vend_consignment_url
-    "https://mollusksurf.vendhq.com/consignment/#{@daily_order.vend_consignment_id}" if vend_consignment_id.present?
+    "https://mollusksurf.vendhq.com/consignment/#{vend_consignment_id}" if vend_consignment_id.present?
   end
 end
 

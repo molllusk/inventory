@@ -110,18 +110,18 @@ task daily_orders: :environment do
   end
 
   po_numbers = {
-    'Mollusk SF' => (DailyOrder.last_po('San Francisco') || 286) + 1,
-    'Mollusk VB' => (DailyOrder.last_po('Venice Beach') || 286) + 1,
-    'Mollusk SL' => (DailyOrder.last_po('Silver Lake') || 286) + 1
+    'Mollusk SF' => 287, #DailyOrder.last_po('San Francisco') + 1,
+    'Mollusk VB' => 287, #DailyOrder.last_po('Venice Beach') + 1,
+    'Mollusk SL' => 287 #DailyOrder.last_po('Silver Lake') + 1
   }
 
   todays_orders.each do |location, daily_order|
     if daily_order.orders.count.positive?
       daily_order.update_attribute(:po_id, po_numbers[location])
-      # daily_order.create_consignment
-      # daily_order.send_po
+      daily_order.create_consignment
+      daily_order.send_po
     end
   end
 
-  # daily_inventory_transfer.post_to_qbo
+  daily_inventory_transfer.post_to_qbo
 end
