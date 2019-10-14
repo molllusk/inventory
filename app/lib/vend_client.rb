@@ -110,7 +110,7 @@ class VendClient
     body = {
       product_id: order.product.vend_datum.vend_id,
       count: order.quantity,
-      received: null,
+      received: nil,
       cost: order.total_cost
     }
 
