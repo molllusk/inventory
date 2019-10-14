@@ -130,7 +130,7 @@
             <td><%= vend_product.vend_type&.[]('name') %></td>
             <td><%= vend_product.variant_options.find { |vo| vo['name'] == 'Color' }&.[]('value') %></td>
             <td><%= vend_product.variant_options.find { |vo| vo['name'] == 'Size' }&.[]('value') %></td>
-            <td><%= order.quantity %></td>
+            <td class='align-right'><%= order.quantity %></td>
           </tr>
         <% end %>
         <tr>
