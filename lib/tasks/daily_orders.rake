@@ -10,7 +10,7 @@ task daily_orders: :environment do
     'Mollusk SL' => DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Silver Lake'), daily_inventory_transfer_id: daily_inventory_transfer.id)
   }
 
-  retail_shopify_orders = ShopifyClient.order_quantities_by_variant
+  # retail_shopify_orders = ShopifyClient.order_quantities_by_variant
   outstanding_orders_by_product = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
   release_schedule = Product.get_release_schedule
@@ -33,7 +33,7 @@ task daily_orders: :environment do
 
   ShopifyDatum.with_jam.find_each do |shopify_product|
     next if shopify_product.sale?
-    next if retail_shopify_orders[shopify_product.variant_id].positive?
+    # next if retail_shopify_orders[shopify_product.variant_id].positive?
     vend_product = shopify_product.product.vend_datum
     next unless vend_product.present?
     
@@ -111,18 +111,18 @@ task daily_orders: :environment do
   end
 
   po_numbers = {
-    'Mollusk SF' => 287, #DailyOrder.last_po('San Francisco') + 1,
-    'Mollusk VB' => 287, #DailyOrder.last_po('Venice Beach') + 1,
-    'Mollusk SL' => 287 #DailyOrder.last_po('Silver Lake') + 1
+    'Mollusk SF' => DailyOrder.last_po('San Francisco') + 1,
+    'Mollusk VB' => DailyOrder.last_po('Venice Beach') + 1,
+    'Mollusk SL' => DailyOrder.last_po('Silver Lake') + 1
   }
 
   todays_orders.each do |location, daily_order|
     if daily_order.orders.count.positive?
       daily_order.update_attribute(:po_id, po_numbers[location])
-      daily_order.create_consignment
-      daily_order.send_po
+      # daily_order.create_consignment
+      # daily_order.send_po
     end
   end
 
-  daily_inventory_transfer.post_to_qbo
+  # daily_inventory_transfer.post_to_qbo
 end
