@@ -36,7 +36,7 @@ task daily_orders: :environment do
     next unless vend_product.present?
     
     clean_handle = shopify_product.handle.to_s.strip.downcase
-    next if release_date_by_handle[clean_handle].present? && release_date_by_handle[clean_handle] > Date.today.to_time.in_time_zone('Pacific Time (US & Canada)').end_of_day
+    next if release_date_by_handle[clean_handle].present? && release_date_by_handle[clean_handle] > Time.now.in_time_zone('Pacific Time (US & Canada)').end_of_day
 
     inventories = {}
     fill_level = shopify_product.product.daily_order_inventory_threshold
