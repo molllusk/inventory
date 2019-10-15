@@ -4,7 +4,7 @@ class DailyOrders
   include Sidekiq::Worker
   sidekiq_options queue: :orders, retry: false
 
-  def perform(project_id)
+  def perform
     date = Time.now
     # daily_order_data = []
 
