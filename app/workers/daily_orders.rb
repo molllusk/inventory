@@ -8,6 +8,8 @@ class DailyOrders
     date = Time.now
     # daily_order_data = []
 
+    next_po_number = DailyInventoryTransfer.last_po + 1
+
     daily_inventory_transfer = DailyInventoryTransfer.create(date: date)
 
     todays_orders = {
@@ -135,21 +137,17 @@ class DailyOrders
       end
     end
 
-    po_numbers = {
-      'Mollusk SF' => DailyOrder.last_po('San Francisco') + 1,
-      'Mollusk VB' => DailyOrder.last_po('Venice Beach') + 1,
-      'Mollusk SL' => DailyOrder.last_po('Silver Lake') + 1
-    }
-
     todays_orders.each do |location, daily_order|
       if daily_order.orders.count.positive?
-        daily_order.update_attribute(:po_id, po_numbers[location])
+        daily_inventory_transfer.update_attribute(po_id: next_po_number) unless daily_order.has_po?
         daily_order.create_consignment
-        daily_order.send_po
       end
     end
 
     # daily_inventory_transfer.fluid_inventory
-    daily_inventory_transfer.post_to_qbo
+    if daily_inventory_transfer.has_orders?
+      daily_inventory_transfer.send_po
+      daily_inventory_transfer.post_to_qbo
+    end
   end
 end

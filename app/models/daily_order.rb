@@ -1,16 +1,13 @@
 class DailyOrder < ApplicationRecord
   belongs_to :daily_inventory_transfer
   has_many :orders, dependent: :destroy
+  delegate :po_id, to: :daily_inventory_transfer
 
   PO_ADDRESSES = {
     'San Francisco' => 'Mollusk Surf Shop (San Francisco)<br />4500 Irving Street<br />San Francisco, CA 94122-1132',
     'Venice Beach' => 'Mollusk Surf Shop (Venice Beach)<br />1600 Pacific Avenue<br />Venice Beach, CA 90291-9998',
     'Silver Lake' => 'Mollusk Surf Shop (Silver Lake)<br />3511 W Sunset Blvd<br />Los Angeles, CA 90026-9998'
   }
-
-  def self.last_po(outlet)
-    where(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key(outlet)).maximum(:po_id).to_i
-  end
 
   def to_pdf
     # create an instance of ActionView, so we can use the render method outside of a controller
@@ -37,6 +34,10 @@ class DailyOrder < ApplicationRecord
 
   def outlet_name
     VendClient::OUTLET_NAMES_BY_ID[outlet_id]
+  end
+
+  def has_po?
+    po_id.present?
   end
 
   def po_stem
@@ -68,10 +69,6 @@ class DailyOrder < ApplicationRecord
     PO_ADDRESSES[outlet_name]
   end
 
-  def send_po
-    ApplicationMailer.po_pdf(self).deliver
-  end
-
   def total_items
     orders.reduce(0) { |sum, order| sum + order.quantity }
   end
@@ -94,6 +91,5 @@ end
 #  updated_at                  :datetime         not null
 #  daily_inventory_transfer_id :integer
 #  outlet_id                   :string
-#  po_id                       :integer
 #  vend_consignment_id         :string
 #

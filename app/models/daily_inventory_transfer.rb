@@ -13,6 +13,14 @@ class DailyInventoryTransfer < ApplicationRecord
     'Venice Beach' => Qbo::VENICE_BEACH_CLASS
   }
 
+  def self.last_po
+    maximum(:po_id).to_i
+  end
+
+  def send_po
+    ApplicationMailer.po_pdf(self).deliver
+  end
+
   def fluid_inventory
     retail_shopify_orders = ShopifyClient.order_quantities_by_variant
     product_ids = Order.where(daily_order_id: daily_orders.pluck(:id)).pluck(:product_id)
@@ -58,8 +66,12 @@ class DailyInventoryTransfer < ApplicationRecord
     details
   end
 
+  def has_orders?
+    daily_orders.find { |daily_order| daily_order.orders.count.positive? }
+  end
+
   def post_to_qbo
-    if daily_orders.find { |daily_order| daily_order.orders.count.positive? }
+    if has_orders?
       qbo = Qbo.create_journal_entry(journal_entry)
       update_attribute(:qbo_id, qbo.id) unless qbo.blank?
     end
