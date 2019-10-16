@@ -97,7 +97,7 @@ class Product < ApplicationRecord
   end
 
   def self.daily_order_inventory_levels
-    @daily_order_inventory_levels ||= get_inventory_levels('Fill')
+    @daily_order_inventory_levels ||= get_daily_order_inventory_levels
   end
 
   def self.get_release_schedule
@@ -113,6 +113,16 @@ class Product < ApplicationRecord
     levels_by_type_and_size = Hash.new { |hash, key| hash[key] = {} }
     levels.each do |level|
       levels_by_type_and_size[level['Category'].to_s.strip.downcase][level['Size'].to_s.strip.downcase] = level[fill_key].to_i
+    end
+    levels_by_type_and_size
+  end
+
+  def self.get_daily_order_inventory_levels
+    levels = GoogleClient.sheet_values(GoogleClient::FILL_LEVEL)
+    levels_by_type_and_size = Hash.new { |hash, key| hash[key] = Hash.new { |hash, key| hash[key] = {} } }
+    levels.each do |level|
+      levels_by_type_and_size[level['Category'].to_s.strip.downcase][level['Size'].to_s.strip.downcase]['fill'] = level['fill']
+      levels_by_type_and_size[level['Category'].to_s.strip.downcase][level['Size'].to_s.strip.downcase]['new_release_fill'] = level['new_release_fill']
     end
     levels_by_type_and_size
   end
@@ -307,8 +317,8 @@ class Product < ApplicationRecord
     @fluid_inventory_threshold ||= Product.fluid_inventory_levels[retail_shopify.product_type.to_s.strip.downcase]&.[](retail_shopify.option1.to_s.strip.downcase).to_i
   end
 
-  def daily_order_inventory_threshold
-    @daily_order_inventory_threshold ||= Product.daily_order_inventory_levels[retail_shopify.product_type.to_s.strip.downcase]&.[](retail_shopify.option1.to_s.strip.downcase).to_i
+  def daily_order_inventory_thresholds
+    @daily_order_inventory_thresholds ||= Product.daily_order_inventory_levels[retail_shopify.product_type.to_s.strip.downcase]&.[](retail_shopify.option1.to_s.strip.downcase)
   end
 
   def fluid_inventory

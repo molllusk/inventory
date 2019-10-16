@@ -39,16 +39,24 @@ class DailyOrders
     #  Redis.current.set('min_daily_order_version', daily_order.last['version']) if daily_orders.present?
 
     ShopifyDatum.with_jam.find_each do |shopify_product|
+      product_release_date = release_date_by_handle[clean_handle]
+
       next if shopify_product.sale?
       vend_product = shopify_product.product.vend_datum
       next unless vend_product.present?
       
       clean_handle = shopify_product.handle.to_s.strip.downcase
-      next if release_date_by_handle[clean_handle].present? && release_date_by_handle[clean_handle] > Time.now.in_time_zone('Pacific Time (US & Canada)').end_of_day
+      next if product_release_date.present? && product_release_date > Time.now.in_time_zone('Pacific Time (US & Canada)').end_of_day
 
       inventories = {}
-      fill_level = shopify_product.product.daily_order_inventory_threshold
+      fill_levels = shopify_product.product.daily_order_inventory_thresholds
+
+      days_since_release = (Date.today - product_release_date).to_i
+      new_release = product_release_date.present? && days_since_release < 30 && fill_levels['new_release_fill'].present?
+      fill_level = (new_release ? fill_levels['fill'] : fill_levels['new_release_fill']).to_i
+
       outstanding_orders_by_outlet_id = outstanding_orders_by_product[vend_product.vend_id]
+
       cost = shopify_product.get_cost
 
       vend_product.vend_inventories.where(outlet_id: [
