@@ -52,16 +52,20 @@ class DailyOrder < ApplicationRecord
     begin
       consignment = VendClient.create_consignment(self)
       update_attribute(:vend_consignment_id, consignment['id'])
-      
-      orders.each do |order|
-        begin
-          VendClient.add_consignment_product(order)
-        rescue
-          Airbrake.notify("Could not add product to Consignment for Daily Order: #{id} / Product: #{order.product_id}")
-        end
-      end
+      add_products_to_consignment
+      send_consignment
     rescue
       Airbrake.notify("Could not create Consignment for Daily Order: #{id}")
+    end
+  end
+
+  def add_products_to_consignment
+    orders.each do |order|
+      begin
+        VendClient.add_consignment_product(order)
+      rescue
+        Airbrake.notify("Could not add product to Consignment for Daily Order: #{id} / Product: #{order.product_id}")
+      end
     end
   end
 
