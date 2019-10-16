@@ -53,7 +53,7 @@ class DailyOrders
 
       days_since_release = product_release_date.present? ? (pacific_time.to_date - product_release_date).to_i : 420
       new_release = days_since_release < 30 && fill_levels['new_release_fill'].present?
-      fill_level = (new_release ? fill_levels['fill'] : fill_levels['new_release_fill']).to_i
+      fill_level = (new_release ? fill_levels['new_release_fill'] : fill_levels['fill']).to_i
 
       outstanding_orders_by_outlet_id = outstanding_orders_by_product[vend_product.vend_id]
 
