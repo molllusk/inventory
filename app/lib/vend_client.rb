@@ -92,7 +92,7 @@ class VendClient
   def self.create_consignment(daily_order)
     body = {
       type: "SUPPLIER",
-      status: "OPEN",
+      status: "SENT",
       name: daily_order.display_po,
       outlet_id: daily_order.outlet_id
     }
