@@ -69,7 +69,6 @@ class VendClient
     response.body['data']
   end
 
-
   def self.daily_orders
     min_version = Redis.current.get('min_daily_order_version').to_i
 
