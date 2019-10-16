@@ -91,7 +91,7 @@ class VendClient
   def self.create_consignment(daily_order)
     body = {
       type: "SUPPLIER",
-      status: "SENT",
+      status: "OPEN",
       name: daily_order.display_po,
       outlet_id: daily_order.outlet_id
     }
@@ -115,6 +115,18 @@ class VendClient
 
     response = connection.post do |req|
       req.url "consignments/#{order.daily_order.vend_consignment_id}/products"
+      req.headers['Content-Type'] = 'application/json'
+      req.body = body.to_json
+    end
+
+    response.body['data']
+  end
+
+  def self.send_consignment(consignment_id)
+    body = { status: "SENT" }
+
+    response = connection.put do |req|
+      req.url "consignments/#{consignment_id}"
       req.headers['Content-Type'] = 'application/json'
       req.body = body.to_json
     end

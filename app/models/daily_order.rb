@@ -65,6 +65,14 @@ class DailyOrder < ApplicationRecord
     end
   end
 
+  def send_consignment
+    begin
+      VendClient.send_consignment(vend_consignment_id)
+    rescue
+      Airbrake.notify("Could not SEND Consignment for Daily Order: #{id}")
+    end
+  end
+
   def ship_to_address
     PO_ADDRESSES[outlet_name]
   end

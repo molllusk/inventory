@@ -149,15 +149,15 @@ class DailyOrders
 
     todays_orders.each do |location, daily_order|
       if daily_order.orders.count.positive?
-        daily_inventory_transfer.update_attribute(po_id: next_po_number) unless daily_order.has_po?
+        daily_inventory_transfer.update_attribute(:po_id, next_po_number) unless daily_order.has_po?
         daily_order.create_consignment
       end
     end
 
     # daily_inventory_transfer.fluid_inventory
     if daily_inventory_transfer.has_orders?
-      daily_inventory_transfer.send_po
       daily_inventory_transfer.post_to_qbo
+      daily_inventory_transfer.send_po
     end
   end
 end
