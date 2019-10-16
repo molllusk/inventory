@@ -121,8 +121,8 @@ class Product < ApplicationRecord
     levels = GoogleClient.sheet_values(GoogleClient::FILL_LEVEL)
     levels_by_type_and_size = Hash.new { |hash, key| hash[key] = Hash.new { |hash, key| hash[key] = {} } }
     levels.each do |level|
-      levels_by_type_and_size[level['Category'].to_s.strip.downcase][level['Size'].to_s.strip.downcase]['fill'] = level['fill']
-      levels_by_type_and_size[level['Category'].to_s.strip.downcase][level['Size'].to_s.strip.downcase]['new_release_fill'] = level['new_release_fill']
+      levels_by_type_and_size[level['Category'].to_s.strip.downcase][level['Size'].to_s.strip.downcase]['fill'] = level['Fill']
+      levels_by_type_and_size[level['Category'].to_s.strip.downcase][level['Size'].to_s.strip.downcase]['new_release_fill'] = level['New Release Fill']
     end
     levels_by_type_and_size
   end
