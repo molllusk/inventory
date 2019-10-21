@@ -1,3 +1,4 @@
+---
 max_retries: 3
 :queues:
   - orders
