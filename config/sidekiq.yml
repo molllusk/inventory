@@ -2,11 +2,7 @@ max_retries: 3
 :queues:
   - orders
 :schedule:
-  daily_orders:
+  daily_ordering:
     cron: '0 11 * * 1,3,5'
-    class: 'DailyOrders'
+    class: 'DailyOrdering'
     description: 'Daily Orders for inventory transfers'
-  testerington:
-    cron: '* * * * *'
-    class: 'Testerington'
-    description: 'Please Work'

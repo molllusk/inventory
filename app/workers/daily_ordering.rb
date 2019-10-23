@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class DailyOrders
+class DailyOrdering
   include Sidekiq::Worker
   sidekiq_options queue: :orders, retry: false
 
