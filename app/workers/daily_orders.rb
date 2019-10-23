@@ -53,6 +53,7 @@ class DailyOrders
 
       days_since_release = product_release_date.present? ? (pacific_time.to_date - product_release_date).to_i : 420
       new_release = days_since_release < 30 && fill_levels['new_release_fill'].present?
+
       fill_level = (new_release ? fill_levels['new_release_fill'] : fill_levels['fill']).to_i
 
       outstanding_orders_by_outlet_id = outstanding_orders_by_product[vend_product.vend_id]
@@ -68,6 +69,8 @@ class DailyOrders
         outstanding_orders = outstanding_orders_by_outlet_id[inventory.outlet_id]
         store_inventory = inventory.inventory < 0 ? 0 : inventory.inventory
         complete_inventory = store_inventory + outstanding_orders
+
+        fill_level = fill_levels['fill'].to_i if new_release && inventory.location == 'Silver Lake'
         adjustment = complete_inventory < fill_level ? fill_level - complete_inventory : 0
 
         if adjustment > 0
