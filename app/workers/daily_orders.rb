@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'sidekiq-scheduler'
-
 class DailyOrders
   include Sidekiq::Worker
   sidekiq_options queue: :orders, retry: false
