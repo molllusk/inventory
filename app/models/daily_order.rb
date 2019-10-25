@@ -45,7 +45,7 @@ class DailyOrder < ApplicationRecord
   end
 
   def display_po
-    "#{po_stem} #{po_id}"
+    "#{po_stem} #{daily_inventory_transfer&.po_id}"
   end
 
   def create_consignment
