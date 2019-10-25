@@ -12,10 +12,18 @@ class DailyOrdering
 
     daily_inventory_transfer = DailyInventoryTransfer.create(date: date)
 
+    sf = DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('San Francisco'))
+    vb = DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Venice Beach'))
+    sl = DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Silver Lake'))
+
+    daily_inventory_transfer << sf
+    daily_inventory_transfer << vb
+    daily_inventory_transfer << sl
+
     todays_orders = {
-      'Mollusk SF' => DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('San Francisco'), daily_inventory_transfer_id: daily_inventory_transfer.id),
-      'Mollusk VB' => DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Venice Beach'), daily_inventory_transfer_id: daily_inventory_transfer.id),
-      'Mollusk SL' => DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Silver Lake'), daily_inventory_transfer_id: daily_inventory_transfer.id)
+      'Mollusk SF' => sf,
+      'Mollusk VB' => vb,
+      'Mollusk SL' => sl
     }
 
     outstanding_orders_by_product = Hash.new { |hash, key| hash[key] = Hash.new(0) }
@@ -150,7 +158,7 @@ class DailyOrdering
 
     todays_orders.each do |location, daily_order|
       if daily_order.orders.count.positive?
-        daily_inventory_transfer.update_attribute(:po_id, next_po_number) unless daily_order.has_po?
+        daily_inventory_transfer.update_attributes(po_id: next_po_number) unless daily_order.has_po?
         daily_order.create_consignment
       end
     end
