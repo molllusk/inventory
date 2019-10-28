@@ -3,6 +3,6 @@ max_retries: 3
   - orders
 :schedule:
   daily_ordering:
-    cron: '0 11 * * MON,WED,FRI'
+    cron: '10 19 * * MON,WED,FRI'
     class: 'DailyOrdering'
     description: 'Daily Orders for inventory transfers'
