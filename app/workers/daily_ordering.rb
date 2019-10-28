@@ -16,9 +16,9 @@ class DailyOrdering
     vb = DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Venice Beach'))
     sl = DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Silver Lake'))
 
-    daily_inventory_transfer << sf
-    daily_inventory_transfer << vb
-    daily_inventory_transfer << sl
+    daily_inventory_transfer.daily_orders << sf
+    daily_inventory_transfer.daily_orders << vb
+    daily_inventory_transfer.daily_orders << sl
 
     todays_orders = {
       'Mollusk SF' => sf,
