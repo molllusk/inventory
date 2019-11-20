@@ -28,6 +28,18 @@ class Product < ApplicationRecord
       .joins(:shopify_data)
   }
 
+  scope :venice_boards, lambda {
+    where('LOWER(shopify_data.product_type) = ?', 'venice surfboard').joins(:shopify_data)
+  }
+
+  scope :silverlake_boards, lambda {
+    where('LOWER(shopify_data.product_type) = ?', 'silver lake surfboards').joins(:shopify_data)
+  }
+
+  scope :boards, lambda {
+    where('LOWER(shopify_data.product_type) = ?', 'surfboard').joins(:shopify_data)
+  }
+
   scope :search_query, lambda { |query|
     # Matches using LIKE, automatically appends '%' to each term.
     # LIKE is case INsensitive with MySQL, however it is case
@@ -75,10 +87,27 @@ class Product < ApplicationRecord
   def self.update_retail_inventories_sf(retail_orders)
     third_party_or_sale.find_each do |product|
       # do not update inventory if any order exists for that variant in any location
-      if product.update_sf_shopify_inventory?
+      if product.update_shopify_inventory?(:sf)
         product.connect_sf_inventory_location if product.missing_retail_inventory_location?
         product.adjust_sf_retail_inventory unless product.retail_orders_present?(retail_orders)
       end
+    end
+  end
+
+  def self.update_board_inventories(retail_orders)
+    venice_boards.each do |board|
+    end
+
+    silverlake_boards.each do |board|
+    end
+
+    boards.each do |board|
+    end
+  end
+
+  def update_board_inventory(outlet, retail_orders)
+    if update_shopify_inventory?(outlet)
+      product.retail_orders_present?(retail_orders)
     end
   end
 
@@ -148,7 +177,7 @@ class Product < ApplicationRecord
   end
 
   def adjust_sf_retail_inventory
-    adjust_inventory_vend('Mollusk SF', retail_inventory_adjustment)
+    adjust_inventory_vend('Mollusk SF', inventory_adjustment(:sf))
   end
 
   def self.inventory_csv_headers
@@ -355,16 +384,23 @@ class Product < ApplicationRecord
     shopify_data.find_by(store: :wholesale)
   end
 
-  def shopify_inventory_sf
-    retail_shopify.shopify_inventories.find_by(location: 'Mollusk SF')&.inventory.to_i
+  def shopify_inventory(outlet, store = :retail)
+    outlet = "Mollusk #{outlet.to_s.upcase}"
+    send("#{store}_shopify").shopify_inventories.find_by(location: outlet)&.inventory.to_i
   end
 
-  def update_sf_shopify_inventory?
-    retail_shopify.third_party_or_sale? && shopify_inventory_sf != vend_datum.sf_inventory
+  def vend_inventory(outlet)
+    outlet = VendInventory::STORE_OUTLETS[outlet.to_s.downcase]
+    inventory = vend_datum.vend_inventories.find_by(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key(outlet))&.inventory.to_i
+    inventory < 0 ? 0 : inventory
   end
 
-  def retail_inventory_adjustment
-    vend_datum.sf_inventory - shopify_inventory_sf
+  def update_shopify_inventory?(outlet, store = :retail)
+    shopify_inventory(outlet, store) != vend_inventory(outlet)
+  end
+
+  def inventory_adjustment(outlet, store = :retail)
+    vend_inventory(outlet) - shopify_inventory(outlet, store)
   end
 
   def missing_retail_inventory_location?
