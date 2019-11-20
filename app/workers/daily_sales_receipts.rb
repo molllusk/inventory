@@ -1,7 +1,10 @@
-namespace :daily_sales_receipts do
-  task :pull, [:days_ago] => [:environment] do |task, args|
+# frozen_string_literal: true
 
-    days_ago = args[:days_ago].blank? ? 1 : args[:days_ago].to_i
+class DailySalesReceipts
+  include Sidekiq::Worker
+  sidekiq_options queue: :accounting, retry: false
+
+  def perform(days_ago = 1)
     day = days_ago.days.ago
 
     min_date = day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
