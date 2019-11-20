@@ -1,5 +1,6 @@
 max_retries: 3
 :queues:
+  - default
   - orders
 :schedule:
   daily_ordering:
