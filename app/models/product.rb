@@ -94,7 +94,7 @@ class Product < ApplicationRecord
     third_party_or_sale.find_each do |product|
       # do not update inventory if any order exists for that variant in any location
       if product.update_shopify_inventory?(outlet)
-        product.connect_sf_inventory_location if product.missing_retail_inventory_location?
+        product.connect_sf_inventory_location if product.missing_retail_inventory_location?(outlet)
         product.adjust_retail_inventory(outlet) unless product.retail_orders_present?(retail_orders)
       end
     end
@@ -409,8 +409,8 @@ class Product < ApplicationRecord
     vend_inventory(outlet) - shopify_inventory(outlet, store)
   end
 
-  def missing_retail_inventory_location?
-    retail_shopify.third_party_or_sale? && retail_shopify.shopify_inventories.find_by(location: 'Mollusk SF').nil?
+  def missing_retail_inventory_location?(outlet)
+    retail_shopify.shopify_inventories.find_by(location: "Mollusk #{outlet.to_s.upcase}").nil?
   end
 end
 
