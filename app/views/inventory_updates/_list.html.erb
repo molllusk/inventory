@@ -9,7 +9,8 @@
       <th>When? (PST / PDT)</th>
       <th>Product</th>
       <th>SKU</th>
-      <th>Vend SF Qty</th>
+      <th>Vend Location</th>
+      <th>Vend Qty</th>
       <th>Prior Shopify SF Qty</th>
       <th>Adjustment</th>
       <th>New Shopify SF Qty</th>
@@ -19,6 +20,7 @@
         <td><%= update.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
         <td><%= link_to update.product do %><%= update.product.vend_datum.variant_name %> <i class='fa fa-external-link-alt'></i><% end %></td>
         <td><%= update.product.vend_datum.sku %></td>
+        <td><%= ShopifyInventory::locations.key(update.location) %></td>
         <td><%= update.vend_qty %></td>
         <td><%= update.prior_qty %></td>
         <td><%= update.adjustment %></td>

@@ -88,32 +88,29 @@ class Product < ApplicationRecord
     retail_orders = ShopifyClient.order_quantities_by_variant
     update_retail_inventories(retail_orders)
     update_fluid_inventories(retail_orders)
+    update_board_inventories(retail_orders)
   end
 
   def self.update_retail_inventories(retail_orders, outlet = :sf)
     third_party_or_sale.find_each do |product|
       # do not update inventory if any order exists for that variant in any location
-      if product.update_shopify_inventory?(outlet)
-        product.connect_sf_inventory_location if product.missing_retail_inventory_location?(outlet)
-        product.adjust_retail_inventory(outlet) unless product.retail_orders_present?(retail_orders)
-      end
+      product.update_inventory(retail_orders, outlet) if retail_shopify.third_party_or_sale?
     end
   end
 
   def self.update_board_inventories(retail_orders)
     venice_boards.each do |board|
+      board.update_inventory(retail_orders, :vb)
     end
 
     silverlake_boards.each do |board|
+      board.update_inventory(retail_orders, :sl)
     end
 
     boards.each do |board|
-    end
-  end
-
-  def update_board_inventory(outlet, retail_orders)
-    if update_shopify_inventory?(outlet)
-      retail_orders_present?(retail_orders)
+      [:sf, :sl, :vb].each do |outlet|
+        board.update_inventory(retail_orders, outlet)
+      end
     end
   end
 
@@ -170,6 +167,18 @@ class Product < ApplicationRecord
     end
   end
 
+  def self.inventory_csv_headers
+    stem = %i(product variant type sku vend retail_shopify wholesale_shopify app)
+    stem + ShopifyInventory::locations.keys + VendClient::OUTLET_NAMES_BY_ID.values
+  end
+
+  def update_inventory(retail_orders, outlet)
+    if update_shopify_inventory?(outlet)
+      connect_inventory_location(outlet) if missing_retail_inventory_location?(outlet)
+      adjust_retail_inventory(outlet) unless retail_orders_present?(retail_orders)
+    end
+  end
+
   def has_retail_and_wholesale_shopify?
     retail_shopify.present? && wholesale_shopify.present?
   end
@@ -184,11 +193,6 @@ class Product < ApplicationRecord
 
   def adjust_retail_inventory(outlet)
     adjust_inventory_vend("Mollusk #{outlet.to_s.upcase}", inventory_adjustment(outlet))
-  end
-
-  def self.inventory_csv_headers
-    stem = %i(product variant type sku vend retail_shopify wholesale_shopify app)
-    stem + ShopifyInventory::locations.keys + VendClient::OUTLET_NAMES_BY_ID.values
   end
 
   def inventory_csv_row
@@ -253,6 +257,7 @@ class Product < ApplicationRecord
 
   def adjust_inventory_vend(location_name, quantity)
     location_id = ShopifyInventory.locations[location_name]
+
     begin
       response = ShopifyClient.adjust_inventory(retail_shopify.inventory_item_id, location_id, quantity)
 
@@ -312,7 +317,8 @@ class Product < ApplicationRecord
       prior_qty: shopify_inventory.inventory,
       adjustment: quantity,
       product_id: id,
-      new_qty: new_inventory
+      new_qty: new_inventory,
+      location: location_id
     )
 
     shopify_inventory.update_attribute(:inventory, new_inventory)
@@ -336,11 +342,11 @@ class Product < ApplicationRecord
     wholesale_inventory.update_attribute(:inventory, wholesale_available)
   end
 
-  def connect_sf_inventory_location
+  def connect_inventory_location(outlet = :sf)
     begin
-      sf_location = ShopifyInventory.locations['Mollusk sf']
+      location = ShopifyInventory.locations["Mollusk #{outlet.to_s.upcase}"]
 
-      response = ShopifyClient.connect_inventory_location(retail_shopify.inventory_item_id, sf_location)
+      response = ShopifyClient.connect_inventory_location(retail_shopify.inventory_item_id, location)
 
       Airbrake.notify("Could not CONNECT SF inventory location for Product: #{id}") unless ShopifyClient.inventory_item_updated?(response)
     rescue
