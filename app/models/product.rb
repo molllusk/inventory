@@ -264,10 +264,10 @@ class Product < ApplicationRecord
       if ShopifyClient.inventory_item_updated?(response)
         save_inventory_adjustment_vend(response, quantity)
       else
-        Airbrake.notify("Could not UPDATE #{location_name}:#{location_id} inventory for Product: #{id}, Adjustment: #{quantity} #{response}")
+        Airbrake.notify("Could not UPDATE #{location_name}:#{location_id} inventory for Product: #{id}, Adjustment: #{quantity} | #{response}")
       end
-    rescue
-      Airbrake.notify("There was an error UPDATING SF inventory for Product: #{id}, Adjustment: #{quantity}")
+    rescue StandardError => e
+      Airbrake.notify("There was an error UPDATING #{location_name}:#{location_id} inventory for Product: #{id}, Adjustment: #{quantity} | #{e}")
     end
   end
 
