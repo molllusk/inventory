@@ -5,6 +5,12 @@ class Product < ApplicationRecord
   has_many :fluid_inventory_updates, dependent: :destroy
   has_many :orders, dependent: :destroy
 
+  LOCATION_NAMES_BY_CODE = {
+    sf: 'San Francisco',
+    sl: 'Silver Lake',
+    vb: 'Venice Beach'
+  }
+
   filterrific(
     default_filter_params: { sorted_by: 'created_at_desc' },
     available_filters: [
@@ -390,7 +396,7 @@ class Product < ApplicationRecord
   end
 
   def vend_inventory(outlet)
-    outlet = VendInventory::STORE_OUTLETS[outlet.to_s.downcase]
+    outlet = LOCATION_NAMES_BY_CODE[outlet]
     inventory = vend_datum.vend_inventories.find_by(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key(outlet))&.inventory.to_i
     inventory < 0 ? 0 : inventory
   end

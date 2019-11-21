@@ -1,12 +1,6 @@
 class VendInventory < ApplicationRecord
   belongs_to :vend_datum
 
-  STORE_OUTLETS = {
-    sf: 'San Francisco',
-    sl: 'Silver Lake',
-    vb: 'Venice Beach'
-  }
-
   def location
     VendClient::OUTLET_NAMES_BY_ID[outlet_id]
   end
