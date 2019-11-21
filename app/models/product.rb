@@ -86,16 +86,16 @@ class Product < ApplicationRecord
 
   def self.run_inventory_updates
     retail_orders = ShopifyClient.order_quantities_by_variant
-    update_retail_inventories_sf(retail_orders)
+    update_retail_inventories(retail_orders)
     update_fluid_inventories(retail_orders)
   end
 
-  def self.update_retail_inventories_sf(retail_orders)
+  def self.update_retail_inventories(retail_orders, outlet = :sf)
     third_party_or_sale.find_each do |product|
       # do not update inventory if any order exists for that variant in any location
-      if product.update_shopify_inventory?(:sf)
+      if product.update_shopify_inventory?(outlet)
         product.connect_sf_inventory_location if product.missing_retail_inventory_location?
-        product.adjust_sf_retail_inventory unless product.retail_orders_present?(retail_orders)
+        product.adjust_retail_inventory(outlet) unless product.retail_orders_present?(retail_orders)
       end
     end
   end
@@ -113,7 +113,7 @@ class Product < ApplicationRecord
 
   def update_board_inventory(outlet, retail_orders)
     if update_shopify_inventory?(outlet)
-      product.retail_orders_present?(retail_orders)
+      retail_orders_present?(retail_orders)
     end
   end
 
@@ -182,8 +182,8 @@ class Product < ApplicationRecord
     wholesale_orders[wholesale_shopify&.variant_id].positive?
   end
 
-  def adjust_sf_retail_inventory
-    adjust_inventory_vend('Mollusk SF', inventory_adjustment(:sf))
+  def adjust_retail_inventory(outlet)
+    adjust_inventory_vend("Mollusk #{outlet.to_s.upcase}", inventory_adjustment(outlet))
   end
 
   def self.inventory_csv_headers
