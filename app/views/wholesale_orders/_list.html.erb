@@ -2,17 +2,17 @@
 
   <table class="products full_width">
     <tr>
-      <th>Product Type</th>
-      <th>Size</th>
-      <th>Fill</th>
-      <th>New Release Fill</th>
+      <th>Date</th>
+      <th>Store</th>
+      <th>Sales Order ID</th>
+      <th>Link</th>
     </tr>
-    <% inventory_thresholds.each do |threshold| %>
+    <% wholesale_orders.each do |threshold| %>
       <tr>
-        <td><%= threshold['Category'] %></td>
-        <td><%= threshold['Size'] %></td>
-        <td><%= threshold['Fill'] %></td>
-        <td><%= threshold['New Release Fill'] %></td>
+        <td><%=  %></td>
+        <td><%=  %></td>
+        <td><%=  %></td>
+        <td><%=  %></td>
       </tr>
     <% end %>
   </table>

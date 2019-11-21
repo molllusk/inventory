@@ -1,8 +1,8 @@
-<% provide(:title, 'Daily Thresholds') %>
+<% provide(:title, 'Wholesale Orders') %>
 
-<h2 class='center'>Daily Thresholds</h2>
+<h2 class='center'>Wholesale Orders</h2>
 
 <%= render(
-  partial: 'daily_order_thresholds/list',
-  locals: { inventory_thresholds: @inventory_thresholds }
+  partial: 'list',
+  locals: { wholesale_orders: @wholesale_orders }
 ) %>

@@ -65,4 +65,6 @@ Rails.application.routes.draw do
       get :vend_sales_taxes
     end
   end
+
+  resources :wholesale_orders
 end
