@@ -94,7 +94,7 @@ class Product < ApplicationRecord
   def self.update_retail_inventories(retail_orders, outlet = :sf)
     third_party_or_sale.find_each do |product|
       # do not update inventory if any order exists for that variant in any location
-      product.update_inventory(retail_orders, outlet) if retail_shopify.third_party_or_sale?
+      product.update_inventory(retail_orders, outlet) if product.retail_shopify.third_party_or_sale?
     end
   end
 
