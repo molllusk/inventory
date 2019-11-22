@@ -2,17 +2,27 @@
 
   <table class="products full_width">
     <tr>
-      <th>Date</th>
-      <th>Store</th>
-      <th>Sales Order Ref</th>
+      <th>Date Created</th>
+      <th>Ref Number</th>
+      <th>Customer</th>
+      <th>Txn Date</th>
+      <th>Customer PO</th>
+      <th>Location</th>
+      <th>Start Ship</th>
+      <th>Cancel Date</th>
       <th>SOS</th>
     </tr>
     <% wholesale_orders.each do |order| %>
       <tr>
         <td><a href='<%= wholesale_order_path(order)%>'><%= order.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %> <i class='fa fa-external-link-alt'></i></a></td>
-        <td><%= order.wholesale_order_items.first.customer %></td>
-        <td><%= order.wholesale_order_items.first.ref_number %></td>
-        <td><%=  %></td>
+        <td><%= order.ref_number %></td>
+        <td><%= order.customer %></td>
+        <td><%= order.txn_date.strftime("%m/%d/%Y") %></td>
+        <td><%= order.customer_po %></td>
+        <td><%= order.location %></td>
+        <td><%= order.start_ship.strftime("%m/%d/%Y") %></td>
+        <td><%= order.cancel_date.strftime("%m/%d/%Y") %></td>
+        <td><%= order.sos_id.present? ? order.sos_link %></td>
       </tr>
     <% end %>
   </table>

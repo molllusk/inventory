@@ -9,23 +9,13 @@
 
 <table class="products full_width">
   <tr>
-    <th>Txn Date</th>
-    <th>Customer PO</th>
     <th>Department</th>
-    <th>Location</th>
-    <th>Start Ship</th>
-    <th>Cancel Date</th>
     <th>Item Name</th>
     <th>Quantity Ordered</th>
   </tr>
   <% @wholesale_order.wholesale_order_items.each do |item| %>
     <tr>
-      <td><%= item.txn_date.strftime("%m/%d/%Y") %></td>
-      <td><%= item.customer_po %></td>
       <td><%= item.department %></td>
-      <td><%= item.location %></td>
-      <td><%= item.start_ship.strftime("%m/%d/%Y") %></td>
-      <td><%= item.cancel_date.strftime("%m/%d/%Y") %></td>
       <td><%= item.item_name %></td>
       <td><%= item.quantity_ordered %></td>
     </tr>

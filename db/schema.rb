@@ -391,14 +391,7 @@ ActiveRecord::Schema.define(version: 2019_11_22_020558) do
   end
 
   create_table "wholesale_order_items", force: :cascade do |t|
-    t.string "ref_number"
-    t.string "customer"
-    t.datetime "txn_date"
-    t.string "customer_po"
     t.string "department"
-    t.string "location"
-    t.datetime "start_ship"
-    t.datetime "cancel_date"
     t.string "item_name"
     t.integer "quantity_ordered"
     t.integer "wholesale_order_id"
@@ -406,6 +399,13 @@ ActiveRecord::Schema.define(version: 2019_11_22_020558) do
 
   create_table "wholesale_orders", force: :cascade do |t|
     t.integer "sos_id"
+    t.string "ref_number"
+    t.string "customer"
+    t.datetime "txn_date"
+    t.string "customer_po"
+    t.string "location"
+    t.datetime "start_ship"
+    t.datetime "cancel_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
