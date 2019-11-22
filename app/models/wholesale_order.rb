@@ -71,7 +71,7 @@ class WholesaleOrder < ApplicationRecord
         item = {
           department: order['Department'],
           item_name: order['ItemName'],
-          quantity_ordered: order['QuantityOrdered']
+          quantity_ordered: order['QuantityOrdered'].to_i
         }
         
         wholesale_order.wholesale_order_items << WholesaleOrderItem.new(item)
@@ -196,7 +196,7 @@ class WholesaleOrder < ApplicationRecord
     defaults[:location] = { id: sos_location['id'] }
     # defaults[:shipping][:address] = sos_customer['shipping']
     # defaults[:billing][:address] = sos_customer['billing']
-    defaults
+    p defaults
   end
 
   def sos_url
