@@ -1,0 +1,2 @@
+class WholesaleOrderItem < ApplicationRecord
+end

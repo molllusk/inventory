@@ -11,6 +11,8 @@ require 'google/apis/sheets_v4'
 module GoogleClient
   FILL_LEVEL = '1nvT_f86GTC_9-Kcz-_Q8e_VCgV3ppqXNOPC0xtC_iX8'
   RELEASE_SCHEDULE = '1LIW6Fa4VFpP9pFYrHGy_Hv4RbHB8dRYPdjLfKLLqRQ8'
+  WHOLESALE_ORDERS ='1zIIRQOSsmbBqOVuwi96Fxy_KQ1sMBPDmZSXsd1cA7uQ'
+  WHOLESALE_ORDER_SHEET = 'API Sales Order Import'
 
   def self.auth
     Google::Auth::ServiceAccountCredentials.make_creds(scope: 'https://www.googleapis.com/auth/drive')
@@ -46,6 +48,5 @@ module GoogleClient
       end
       lookup_row
     end
-    rows.sort_by { |row| row['Category'] }
   end
 end
