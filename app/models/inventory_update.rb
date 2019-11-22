@@ -60,7 +60,7 @@ end
 #
 #  id         :bigint(8)        not null, primary key
 #  adjustment :integer
-#  location   :integer          default(49481991)
+#  location   :bigint(8)        default(49481991)
 #  new_qty    :integer
 #  prior_qty  :integer
 #  vend_qty   :integer

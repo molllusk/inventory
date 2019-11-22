@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_21_234520) do
+ActiveRecord::Schema.define(version: 2019_11_22_020558) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -390,7 +390,22 @@ ActiveRecord::Schema.define(version: 2019_11_21_234520) do
     t.integer "daily_vend_sale_id"
   end
 
+  create_table "wholesale_order_items", force: :cascade do |t|
+    t.string "ref_number"
+    t.string "customer"
+    t.datetime "txn_date"
+    t.string "customer_po"
+    t.string "department"
+    t.string "location"
+    t.datetime "start_ship"
+    t.datetime "cancel_date"
+    t.string "item_name"
+    t.integer "quantity_ordered"
+    t.integer "wholesale_order_id"
+  end
+
   create_table "wholesale_orders", force: :cascade do |t|
+    t.integer "sos_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

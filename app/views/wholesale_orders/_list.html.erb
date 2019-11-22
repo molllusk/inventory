@@ -4,16 +4,20 @@
     <tr>
       <th>Date</th>
       <th>Store</th>
-      <th>Sales Order ID</th>
-      <th>Link</th>
+      <th>Sales Order Ref</th>
+      <th>SOS</th>
     </tr>
-    <% wholesale_orders.each do |threshold| %>
+    <% wholesale_orders.each do |order| %>
       <tr>
-        <td><%=  %></td>
-        <td><%=  %></td>
-        <td><%=  %></td>
+        <td><a href='<%= wholesale_order_path(order)%>'><%= order.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %> <i class='fa fa-external-link-alt'></i></a></td>
+        <td><%= order.wholesale_order_items.first.customer %></td>
+        <td><%= order.wholesale_order_items.first.ref_number %></td>
         <td><%=  %></td>
       </tr>
     <% end %>
   </table>
+</div>
+
+<div class='center'>
+  <%= will_paginate wholesale_orders %>
 </div>
