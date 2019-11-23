@@ -85,7 +85,8 @@ class WholesaleOrder < ApplicationRecord
   end
 
   def post_to_sos
-    response = SosClient.create_sales_order(compile_post_data)
+    data = compile_post_data
+    response = SosClient.create_sales_order(data)
     update_attribute(:sos_id, response['id'])
     update_attribute(:sos_total, response['total'])
     report_totals_to_sheet
