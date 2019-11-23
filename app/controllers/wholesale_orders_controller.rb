@@ -11,7 +11,7 @@ class WholesaleOrdersController < ApplicationController
 
   def post_to_sos
     SosSalesOrder.perform_async
-    flash[:success] = 'Sales Order Successfully Enqueued!'
+    flash[:success] = 'Sales Order Successfully Enqueued! Refresh page to monitor progress. Do not click button again for same order'
     redirect_to action: :index
   end
 end

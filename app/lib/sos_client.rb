@@ -27,27 +27,27 @@ class SosClient
   end
 
   def self.get_customers
-    @get_customers ||= paginator('customer')
+    paginator('customer')
   end
 
   def self.get_locations
-    @get_locations ||= connection.get('location').body['data']
+    connection.get('location').body['data']
   end
 
   def self.get_channels
-    @get_channels ||= connection.get('channel').body['data']
+    connection.get('channel').body['data']
   end
 
   def self.get_terms
-    @get_terms ||= connection.get('terms').body['data']
+    connection.get('terms').body['data']
   end
 
   def self.get_items
-    @get_items ||= paginator('item')
+    paginator('item')
   end
 
   def self.get_sales_reps
-    @get_sales_reps ||= connection.get('salesrep').body['data']
+    connection.get('salesrep').body['data']
   end
 
   def self.create_sales_order(data)

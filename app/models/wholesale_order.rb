@@ -31,11 +31,11 @@ class WholesaleOrder < ApplicationRecord
   }
 
   def self.pull_sheet
-    @pull_sheet ||= GoogleClient.sheet_values(GoogleClient::WHOLESALE_ORDERS, GoogleClient::WHOLESALE_ORDER_SHEET)
+    GoogleClient.sheet_values(GoogleClient::WHOLESALE_ORDERS, GoogleClient::WHOLESALE_ORDER_SHEET)
   end
 
   def self.pull_customer_data_sheet
-    @pull_customer_data_sheet ||= GoogleClient.sheet_values(GoogleClient::WHOLESALE_ORDERS, GoogleClient::CUSTOMER_DATA_SHEET)
+    GoogleClient.sheet_values(GoogleClient::WHOLESALE_ORDERS, GoogleClient::CUSTOMER_DATA_SHEET)
   end
 
   def self.process_orders
