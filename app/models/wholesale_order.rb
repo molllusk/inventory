@@ -93,7 +93,7 @@ class WholesaleOrder < ApplicationRecord
   end
 
   def report_totals_to_sheet
-    row = [customer, location, ref_number, total_by_department['Mens'], total_by_department['Womens'], sos_total]
+    row = [customer_data_row['Sales Analysis Name'], location, ref_number, total_by_department['Mens'], total_by_department['Womens'], sos_total]
     GoogleClient.append_to_spreadsheet(GoogleClient::WHOLESALE_ORDERS, GoogleClient::SO_REPORT_SHEET, row)
   end
 
