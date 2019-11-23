@@ -1,0 +1,14 @@
+<% provide(:title, 'Wholesale Orders') %>
+
+<h2 class='center'>Wholesale Orders</h2>
+
+<a href='/wholesale_orders/post_to_sos'>
+  <button class="btn btn-primary btn-sm mb-5">
+    <i class='fa fa-clone'></i> Create Orders in SOS
+  </button>
+</a>
+
+<%= render(
+  partial: 'list',
+  locals: { wholesale_orders: @wholesale_orders }
+) %>

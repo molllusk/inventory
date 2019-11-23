@@ -1,0 +1,43 @@
+<div id="filterrific_results">
+
+  <table class="products full_width">
+    <tr>
+      <th>Date Created</th>
+      <th>Ref Number</th>
+      <th>Customer</th>
+      <th>Customer PO</th>
+      <th>Location</th>
+      <th>Start Ship</th>
+      <th>Cancel Date</th>
+      <th>Men's</th>
+      <th>Women's</th>
+      <th>App Total</th>
+      <th>SOS Total</th>
+      <th>SOS</th>
+    </tr>
+    <% wholesale_orders.each do |order| %>
+      <tr>
+        <td><a href='<%= wholesale_order_path(order)%>'><%= order.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %> <i class='fa fa-external-link-alt'></i></a></td>
+        <td><%= order.ref_number %></td>
+        <td><%= order.customer %></td>
+        <td><%= order.customer_po %></td>
+        <td><%= order.location %></td>
+        <td><%= order.start_ship.strftime("%m/%d/%Y") %></td>
+        <td><%= order.cancel_date.strftime("%m/%d/%Y") %></td>
+        <td><%= number_to_currency(order.total_by_department['Mens'], unit: '$', separator: '.', delimiter: ',') %></td>
+        <td><%= number_to_currency(order.total_by_department['Womens'], unit: '$', separator: '.', delimiter: ',') %></td>
+        <td><%= number_to_currency(order.total, unit: '$', separator: '.', delimiter: ',') %></td>
+        <td><%= number_to_currency(order.sos_total, unit: '$', separator: '.', delimiter: ',') %></td>
+        <td>
+          <% if order.sos_id.present? %>
+            <a href='<%= order.sos_url %>' target='_blank'>SOS <i class='fa fa-external-link-alt'></i></a>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+
+<div class='center'>
+  <%= will_paginate wholesale_orders %>
+</div>

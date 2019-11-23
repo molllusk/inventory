@@ -13,7 +13,7 @@
         <a href='<%= shopify_sales_cost_path(cost) %>' target='_blank'><%= cost.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y") %> <i class='fa fa-external-link-alt'></i></a>
       </td>
       <td>
-        <%= number_to_currency(cost.cost, :unit => "$", :separator => ".", :delimiter => ",") %>
+        <%= number_to_currency(cost.cost, unit: '$', separator: '.', delimiter: ',') %>
       </td>
       <td>
         <%= render partial: 'shopify_costs_by_location', locals: { location_costs: cost.location_costs } %>

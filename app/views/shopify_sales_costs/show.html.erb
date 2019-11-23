@@ -13,7 +13,7 @@
       <%= @shopify_sales_cost.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %>
     </td>
     <td>
-      <%= number_to_currency(@shopify_sales_cost.cost, :unit => "$", :separator => ".", :delimiter => ",") %>
+      <%= number_to_currency(@shopify_sales_cost.cost, unit: '$', separator: '.', delimiter: ',') %>
     </td>
     <td>
       <%= render partial: '/daily_reports/shopify_costs_by_location', locals: { location_costs: @shopify_sales_cost.location_costs } %>
@@ -39,7 +39,7 @@
       </td>
       <td><a href='https://<%= @shopify_sales_cost.retail? ? 'mollusksurf' : 'molluskats' %>.myshopify.com/admin/orders/<%= order.order_id %>' target='_blank'><%= order.name %> <i class='fa fa-external-link-alt'></i></a></td>
       <td>
-        <%= number_to_currency(order.cost, :unit => "$", :separator => ".", :delimiter => ",") %>
+        <%= number_to_currency(order.cost, unit: '$', separator: '.', delimiter: ',') %>
       </td>
       <td>
         <%= render partial: '/daily_reports/shopify_costs_by_location', locals: { location_costs: order.location_costs } %>

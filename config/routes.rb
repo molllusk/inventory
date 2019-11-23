@@ -65,4 +65,10 @@ Rails.application.routes.draw do
       get :vend_sales_taxes
     end
   end
+
+  resources :wholesale_orders do
+    collection do
+      get :post_to_sos
+    end
+  end
 end

@@ -25,22 +25,22 @@
           <tr>
         <% end %>
           <td class='<%= 'border-bottom' if last_row %>'><%= receipt.outlet_name %></td>
-          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(receipt.product_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(receipt.gift_card_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(receipt.discount_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(receipt.discount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(receipt.sales_tax, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(receipt.shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(receipt.credit_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(receipt.cash_or_check_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(receipt.gift_card_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(receipt.product_sales, unit: '$', separator: '.', delimiter: ',') %></td>
+          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(receipt.gift_card_sales, unit: '$', separator: '.', delimiter: ',') %></td>
+          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(receipt.discount_sales, unit: '$', separator: '.', delimiter: ',') %></td>
+          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(receipt.discount, unit: '$', separator: '.', delimiter: ',') %></td>
+          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(receipt.sales_tax, unit: '$', separator: '.', delimiter: ',') %></td>
+          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(receipt.shipping, unit: '$', separator: '.', delimiter: ',') %></td>
+          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(receipt.credit_payments, unit: '$', separator: '.', delimiter: ',') %></td>
+          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(receipt.cash_or_check_payments, unit: '$', separator: '.', delimiter: ',') %></td>
+          <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(receipt.gift_card_payments, unit: '$', separator: '.', delimiter: ',') %></td>
           <td class='<%= 'border-bottom' if last_row %>'>
             <% if receipt.sum_check.to_d.truncate(2).to_f == 0.0 %>
               <p style='color: green'><i class="fa fa-check"></i></p>
             <% elsif receipt.sum_check > 0 %>
-              <p style='color: red'><%= number_to_currency(receipt.sum_check, :unit => "$", :separator => ".", :delimiter => ",") %></p>
+              <p style='color: red'><%= number_to_currency(receipt.sum_check, unit: '$', separator: '.', delimiter: ',') %></p>
             <% else %>
-              <p style='color: blue'><%= number_to_currency(receipt.sum_check, :unit => "$", :separator => ".", :delimiter => ",") %></p>
+              <p style='color: blue'><%= number_to_currency(receipt.sum_check, unit: '$', separator: '.', delimiter: ',') %></p>
             <% end %>
           </td>
           <td class='<%= 'border-bottom' if last_row %>'>
