@@ -14,6 +14,7 @@ module GoogleClient
   WHOLESALE_ORDERS ='1zIIRQOSsmbBqOVuwi96Fxy_KQ1sMBPDmZSXsd1cA7uQ'
   WHOLESALE_ORDER_SHEET = 'API Sales Order Import'
   CUSTOMER_DATA_SHEET = 'Customers Data'
+  SO_REPORT_SHEET = 'Placed Orders'
 
   def self.auth
     Google::Auth::ServiceAccountCredentials.make_creds(scope: 'https://www.googleapis.com/auth/drive')
@@ -37,6 +38,11 @@ module GoogleClient
 
   def self.get_sheet(id, range = 'Sheet1')
     sheet_service.get_spreadsheet_values(id, range)
+  end
+
+  def self.append_to_spreadsheet(id, range, row)
+    value_range = Google::Apis::SheetsV4::ValueRange.new(values: [row])
+    sheet_service.append_spreadsheet_value(id, range, value_range, {insert_data_option: 'INSERT_ROWS', value_input_option: 'USER_ENTERED'})
   end
 
   def self.sheet_values(id, range = 'Sheet1')

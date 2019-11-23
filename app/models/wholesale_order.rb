@@ -85,10 +85,15 @@ class WholesaleOrder < ApplicationRecord
   end
 
   def post_to_sos
-    data = compile_post_data
-    response = SosClient.create_sales_order(data)
+    response = SosClient.create_sales_order(compile_post_data)
     update_attribute(:sos_id, response['id'])
     update_attribute(:sos_total, response['total'])
+    report_totals_to_sheet
+  end
+
+  def report_totals_to_sheet
+    row = [customer, location, ref_number, total_by_department['Mens'], total_by_department['Womens'], sos_total]
+    GoogleClient.append_to_spreadsheet(GoogleClient::WHOLESALE_ORDERS, GoogleClient::SO_REPORT_SHEET, row)
   end
 
   def sos_location
