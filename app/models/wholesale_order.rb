@@ -157,8 +157,8 @@ class WholesaleOrder < ApplicationRecord
     }
 
     custom_fields = [
-      { id: 18, name: 'CancelDate', dataType: 'Date', value: cancel_date.strftime("%Y-%m-%dT%H:%M:%S") },
-      { id: 17, name: 'StartShip', dataType: 'Date', value: start_ship.strftime("%Y-%m-%dT%H:%M:%S") }
+      { id: 18, name: 'CancelDate', dataType: 'Date', value: cancel_date },
+      { id: 17, name: 'StartShip', dataType: 'Date', value: start_ship }
     ]
 
     defaults[:customFields] = custom_fields
