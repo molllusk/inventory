@@ -28,7 +28,7 @@
       <%= @daily_order.total_items %>
     </td>
     <td>
-      <%= number_to_currency(@daily_order.total_cost, :unit => "$", :separator => ".", :delimiter => ",") %>
+      <%= number_to_currency(@daily_order.total_cost, unit: '$', separator: '.', delimiter: ',') %>
     </td>
     <td>
       <% if @daily_order.vend_consignment_url %>
@@ -79,7 +79,7 @@
   <% @daily_order.orders.sort_by { |order| order.product.vend_datum.sort_key }.each do |order| %>
     <tr>
       <td><a href='<%= product_path(order.product) %>' target='_blank'><%= order.product.vend_datum.variant_name %> <i class='fa fa-external-link-alt'></i></a></td>
-      <td><%= number_to_currency(order.cost, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+      <td><%= number_to_currency(order.cost, unit: '$', separator: '.', delimiter: ',') %></td>
       <td><%= order.quantity %></td>
       <td><%= order.sent_orders %></td>
       <td><%= order.vend_qty %></td>

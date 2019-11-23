@@ -25,9 +25,9 @@
             <tr>
           <% end %>
             <td class='<%= 'border-bottom' if last_row %>'><%= tax.outlet_name %></td>
-            <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(tax.amount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-            <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(tax.sales_tax, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-            <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(tax.shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+            <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(tax.amount, unit: '$', separator: '.', delimiter: ',') %></td>
+            <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(tax.sales_tax, unit: '$', separator: '.', delimiter: ',') %></td>
+            <td class='<%= 'border-bottom' if last_row %>'><%= number_to_currency(tax.shipping, unit: '$', separator: '.', delimiter: ',') %></td>
             <td class='<%= 'border-bottom' if last_row %>'><%= tax.id %></td>
           </tr>
         <% end %>

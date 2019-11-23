@@ -393,7 +393,9 @@ ActiveRecord::Schema.define(version: 2019_11_22_020558) do
   create_table "wholesale_order_items", force: :cascade do |t|
     t.string "department"
     t.string "item_name"
-    t.integer "quantity_ordered"
+    t.float "unit_price", default: 0.0
+    t.bigint "sos_item_id"
+    t.integer "quantity_ordered", default: 0
     t.integer "wholesale_order_id"
   end
 
@@ -401,11 +403,12 @@ ActiveRecord::Schema.define(version: 2019_11_22_020558) do
     t.integer "sos_id"
     t.string "ref_number"
     t.string "customer"
-    t.datetime "txn_date"
     t.string "customer_po"
+    t.bigint "sos_customer_id"
     t.string "location"
     t.datetime "start_ship"
     t.datetime "cancel_date"
+    t.float "sos_total"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

@@ -17,21 +17,21 @@
   <% @wholesale_shopify_sales_receipts.each do |receipt| %>
     <tr>
       <td><a href='<%= shopify_sales_receipt_path(receipt) %>' target='_blank'><%= receipt.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %> <i class='fa fa-external-link-alt'></i></a></td>
-      <td><%= number_to_currency(receipt.product_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-      <td><%= number_to_currency(receipt.gift_card_sales, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-      <td><%= number_to_currency(receipt.discount, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-      <td><%= number_to_currency(receipt.sales_tax, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-      <td><%= number_to_currency(receipt.shipping, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-      <td><%= number_to_currency(receipt.shopify_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-      <td><%= number_to_currency(receipt.paypal_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
-      <td><%= number_to_currency(receipt.gift_card_payments, :unit => "$", :separator => ".", :delimiter => ",") %></td>
+      <td><%= number_to_currency(receipt.product_sales, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(receipt.gift_card_sales, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(receipt.discount, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(receipt.sales_tax, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(receipt.shipping, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(receipt.shopify_payments, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(receipt.paypal_payments, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(receipt.gift_card_payments, unit: '$', separator: '.', delimiter: ',') %></td>
       <td>
         <% if receipt.sum_check.to_d.truncate(2).to_f == 0.0 %>
           <p style='color: green'><i class="fa fa-check"></i></p>
         <% elsif receipt.sum_check > 0 %>
-          <p style='color: red'><%= number_to_currency(receipt.sum_check, :unit => "$", :separator => ".", :delimiter => ",") %></p>
+          <p style='color: red'><%= number_to_currency(receipt.sum_check, unit: '$', separator: '.', delimiter: ',') %></p>
         <% else %>
-          <p style='color: blue'><%= number_to_currency(receipt.sum_check, :unit => "$", :separator => ".", :delimiter => ",") %></p>
+          <p style='color: blue'><%= number_to_currency(receipt.sum_check, unit: '$', separator: '.', delimiter: ',') %></p>
         <% end %>
       </td>
       <td>

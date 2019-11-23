@@ -31,11 +31,11 @@ class WholesaleOrder < ApplicationRecord
   }
 
   def self.pull_sheet
-    GoogleClient.sheet_values(GoogleClient::WHOLESALE_ORDERS, GoogleClient::WHOLESALE_ORDER_SHEET)
+    @pull_sheet ||= GoogleClient.sheet_values(GoogleClient::WHOLESALE_ORDERS, GoogleClient::WHOLESALE_ORDER_SHEET)
   end
 
   def self.pull_customer_data_sheet
-    GoogleClient.sheet_values(GoogleClient::WHOLESALE_ORDERS, GoogleClient::CUSTOMER_DATA_SHEET)
+    @pull_customer_data_sheet ||= GoogleClient.sheet_values(GoogleClient::WHOLESALE_ORDERS, GoogleClient::CUSTOMER_DATA_SHEET)
   end
 
   def self.process_orders
@@ -51,8 +51,8 @@ class WholesaleOrder < ApplicationRecord
 
   def self.order_attributes(order)
     order_attrs = {}
-    order.except('Sales Analysis Name', 'Department', 'ItemName', 'QuantityOrdered').each do |header, value|
-      if ['TxnDate', 'StartShip', 'CancelDate'].include?(header)
+    order.except('Sales Analysis Name', 'Department', 'ItemName', 'QuantityOrdered', 'TxnDate').each do |header, value|
+      if ['StartShip', 'CancelDate'].include?(header)
         order_attrs[SAVED_HEADERS[header]] = Date.strptime(value, "%m/%d/%Y")
       else
         order_attrs[SAVED_HEADERS[header]] = value
@@ -86,6 +86,9 @@ class WholesaleOrder < ApplicationRecord
 
   def post_to_sos
     data = compile_post_data
+    response = SosClient.create_sales_order(data)
+    update_attribute(:sos_id, response['id'])
+    update_attribute(:sos_total, response['total'])
   end
 
   def sos_location
@@ -97,11 +100,15 @@ class WholesaleOrder < ApplicationRecord
   end
 
   def sos_channel
-    @sos_customer ||= SosClient.get_channels.find { |sos_channel| sos_channel['name'] == customer_data_row['Channel'] }
+    @sos_channel ||= SosClient.get_channels.find { |sos_channel| sos_channel['name'] == customer_data_row['Channel'] }
   end
 
   def sos_terms
-    @sos_customer ||= SosClient.get_terms.find { |sos_term| sos_term['name'] == customer_data_row['Terms'] }
+    @sos_terms ||= SosClient.get_terms.find { |sos_term| sos_term['name'] == customer_data_row['Terms'] }
+  end
+
+  def sos_sales_rep
+    @sos_sales_rep ||= SosClient.get_sales_reps.find { |sos_sales_rep| (sos_sales_rep['lastName'].present? ? "#{sos_sales_rep['firstName']} #{sos_sales_rep['lastName']}" : sos_sales_rep['firstName']) == customer_data_row['Sales Rep'] }
   end
 
   def sos_billing_contact_email
@@ -127,24 +134,19 @@ class WholesaleOrder < ApplicationRecord
       discountTaxable: false,
       shippingTaxable: false,
       dropShip: false,
-      closed: false,
-      archived: false,
-      summaryOnly: false,
-      hasSignature: false,
-      statusLink: '',
       billing: {
         company: '',
         contact: '',
         phone: '',
         addressName: '',
-        addressType: '',
+        addressType: ''
       },
       shipping: {
         company: '',
         contact: '',
         phone: '',
         addressName: '',
-        addressType: '',
+        addressType: ''
       }
     }
 
@@ -158,6 +160,8 @@ class WholesaleOrder < ApplicationRecord
     defaults[:customerPO] = customer_po
 
     defaults[:customer] = { id: sos_customer['id'] }
+
+    update_attribute(:sos_customer_id, sos_customer['id'])
 
     shipping_address = {
       line1: customer_data_row['ShipAddressLine1'],
@@ -187,16 +191,38 @@ class WholesaleOrder < ApplicationRecord
     defaults[:billing][:address] = billing_address
     defaults[:billing][:email] = customer_data_row['BillingEmail']
     defaults[:customerMessage] = customer_data_row['Shipping Method']
-    defaults[:priority] = customer_data_row['Priority for AOP OCs']
-
-    # defaults[:discountAmount] = customer_data_row['Customer Discount']
+    if customer_data_row['Priority for AOP OCs'].present?
+      defaults[:priority] = { id: customer_data_row['Priority for AOP OCs'].split(' ').first.to_i }
+    end
 
     defaults[:terms] = { id: sos_terms['id'] }
     defaults[:channel] = { id: sos_channel['id'] }
     defaults[:location] = { id: sos_location['id'] }
+    defaults[:salesRep] = { id: sos_sales_rep['id'] }
     # defaults[:shipping][:address] = sos_customer['shipping']
     # defaults[:billing][:address] = sos_customer['billing']
-    p defaults
+
+    defaults[:lines] = WholesaleOrderItem.items_post_data(wholesale_order_items)
+    defaults[:discountAmount] = customer_data_row['Customer Discount'].to_f * defaults[:lines].reduce(0) { |sum, line| sum + line[:amount] }
+
+    defaults
+  end
+
+  def total
+    wholesale_order_items.reduce(0.0) { |sum, item| sum + item.unit_price * item.quantity_ordered }
+  end
+
+  def total_mens
+
+  end
+
+  def total_womens
+    
+  end
+
+  def total_by_department
+    totals = Hash.new(0)
+    wholesale_order_items.each  { |item| totals[item.department] += (item.unit_price * item.quantity_ordered) }
   end
 
   def sos_url
@@ -208,8 +234,15 @@ end
 #
 # Table name: wholesale_orders
 #
-#  id         :bigint(8)        not null, primary key
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  sos_id     :integer
+#  id              :bigint(8)        not null, primary key
+#  cancel_date     :datetime
+#  customer        :string
+#  customer_po     :string
+#  location        :string
+#  ref_number      :string
+#  start_ship      :datetime
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  sos_customer_id :bigint(8)
+#  sos_id          :integer
 #

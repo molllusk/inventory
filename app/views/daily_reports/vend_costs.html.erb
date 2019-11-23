@@ -24,7 +24,7 @@
             <%= sales_cost.outlet_name %>
           </td>
           <td class='<%= 'border-bottom' if last_row %>'>
-            <%= number_to_currency(sales_cost.cost, :unit => "$", :separator => ".", :delimiter => ",") %>
+            <%= number_to_currency(sales_cost.cost, unit: '$', separator: '.', delimiter: ',') %>
           </td>
         </tr>
       <% end %>

@@ -37,7 +37,7 @@
           <%= order.total_items %>
         </td>
         <td class='<%= 'border-bottom' if last_row %>'>
-          <%= number_to_currency(order.total_cost, :unit => "$", :separator => ".", :delimiter => ",") %>
+          <%= number_to_currency(order.total_cost, unit: '$', separator: '.', delimiter: ',') %>
         </td>
         <td class='<%= 'border-bottom' if last_row %>'>
           <% if order.vend_consignment_url %>

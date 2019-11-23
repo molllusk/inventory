@@ -27,11 +27,11 @@
             <tr>
           <% end %>
             <td class='<%= 'border-bottom' if last_row %>'>
-              <strong><%= receiving_location_cost.outlet_name %>:</strong> <%= number_to_currency(receiving_location_cost.cost, :unit => "$", :separator => ".", :delimiter => ",") %>
+              <strong><%= receiving_location_cost.outlet_name %>:</strong> <%= number_to_currency(receiving_location_cost.cost, unit: '$', separator: '.', delimiter: ',') %>
             </td>
             <td class='<%= 'border-bottom' if last_row %>'>
               <% if supplying_location_costs[index].present? %>
-                <strong><%= supplying_location_costs[index].outlet_name %>:</strong> <%= number_to_currency(supplying_location_costs[index].cost, :unit => "$", :separator => ".", :delimiter => ",") %>
+                <strong><%= supplying_location_costs[index].outlet_name %>:</strong> <%= number_to_currency(supplying_location_costs[index].cost, unit: '$', separator: '.', delimiter: ',') %>
               <% end %>
             </td>
           </tr>

@@ -3,7 +3,9 @@ class CreateWholesaleOrderItems < ActiveRecord::Migration[5.2]
     create_table :wholesale_order_items do |t|
       t.string :department
       t.string :item_name
-      t.integer :quantity_ordered
+      t.float :unit_price, default: 0
+      t.bigint :sos_item_id
+      t.integer :quantity_ordered, default: 0
       t.integer :wholesale_order_id
     end
   end
