@@ -13,6 +13,10 @@
     <th>Location</th>
     <th>Start Ship</th>
     <th>Cancel Date</th>
+    <th>Men's</th>
+    <th>Women's</th>
+    <th>App Total</th>
+    <th>SOS Total</th>
     <th>SOS</th>
   </tr>
   <tr>
@@ -23,6 +27,10 @@
     <td><%= @wholesale_order.location %></td>
     <td><%= @wholesale_order.start_ship.strftime("%m/%d/%Y") %></td>
     <td><%= @wholesale_order.cancel_date.strftime("%m/%d/%Y") %></td>
+    <td><%= number_to_currency(@wholesale_order.total_by_department['Mens'], unit: '$', separator: '.', delimiter: ',') %></td>
+    <td><%= number_to_currency(@wholesale_order.total_by_department['Womens'], unit: '$', separator: '.', delimiter: ',') %></td>
+    <td><%= number_to_currency(@wholesale_order.total, unit: '$', separator: '.', delimiter: ',') %></td>
+    <td><%= number_to_currency(@wholesale_order.sos_total, unit: '$', separator: '.', delimiter: ',') %></td>
     <td>
       <% if @wholesale_order.sos_id.present? %>
         <a href='<%= @wholesale_order.sos_url %>'>SOS <i class='fa fa-external-link-alt'></i></a>

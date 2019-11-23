@@ -223,6 +223,7 @@ class WholesaleOrder < ApplicationRecord
   def total_by_department
     totals = Hash.new(0)
     wholesale_order_items.each  { |item| totals[item.department] += (item.unit_price * item.quantity_ordered) }
+    totals
   end
 
   def sos_url

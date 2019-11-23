@@ -24,8 +24,10 @@
         <td><%= order.location %></td>
         <td><%= order.start_ship.strftime("%m/%d/%Y") %></td>
         <td><%= order.cancel_date.strftime("%m/%d/%Y") %></td>
-        <td><%= order.wholesale_order_items.reduce(0.0) { |sum, item| sum + item.unit_price * item.quantity_ordered } %></td>
-        <td><%= order.sos_total %></td>
+        <td><%= number_to_currency(order.total_by_department['Mens'], unit: '$', separator: '.', delimiter: ',') %></td>
+        <td><%= number_to_currency(order.total_by_department['Womens'], unit: '$', separator: '.', delimiter: ',') %></td>
+        <td><%= number_to_currency(order.total, unit: '$', separator: '.', delimiter: ',') %></td>
+        <td><%= number_to_currency(order.sos_total, unit: '$', separator: '.', delimiter: ',') %></td>
         <td>
           <% if order.sos_id.present? %>
             <a href='<%= order.sos_url %>' target='_blank'>SOS <i class='fa fa-external-link-alt'></i></a>
