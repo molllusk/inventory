@@ -39,11 +39,11 @@ class WholesaleOrder < ApplicationRecord
   end
 
   def self.process_orders
-    orders = pull_sheet.reject! { |order| order['RefNumber'].blank? }
+    sheet_orders = pull_sheet.reject { |order| order['RefNumber'].blank? }
     orders_by_customer = Hash.new { |h,k| h[k] = [] }
 
-    orders.each do |order|
-      orders_by_customer[order['Customer']] << order
+    sheet_orders.each do |order|
+      orders_by_customer[order['Customer'] + order['RefNumber']] << order
     end
 
     orders_by_customer
@@ -210,14 +210,6 @@ class WholesaleOrder < ApplicationRecord
 
   def total
     wholesale_order_items.reduce(0.0) { |sum, item| sum + item.unit_price * item.quantity_ordered }
-  end
-
-  def total_mens
-
-  end
-
-  def total_womens
-    
   end
 
   def total_by_department

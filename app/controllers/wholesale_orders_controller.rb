@@ -10,7 +10,7 @@ class WholesaleOrdersController < ApplicationController
   end
 
   def post_to_sos
-    WholesaleOrder.create_orders
+    SosSalesOrder.perform_async
     redirect_to action: :index
   end
 end
