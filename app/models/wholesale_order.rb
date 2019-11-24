@@ -1,18 +1,4 @@
-# Example Order Row:
-#
-#   {
-#     'RefNumber'=>'4153',
-#     'Customer'=>'J.Crew NC DC',
-#     'TxnDate'=>'11/21/2019',
-#     'CustomerPO'=>'4153',
-#     'Department'=>'Mens',
-#     'Location'=>'SUM20',
-#     'StartShip'=>'05/01/2020',
-#     'CancelDate'=>'05/28/2020',
-#     'ItemName'=>'MS2000-WSP-S',
-#     'QuantityOrdered'=>'1',
-#     'Sales Analysis Name'=>'J.Crew'
-#   }
+# frozen_string_literal: true
 
 class WholesaleOrder < ApplicationRecord
   has_many :wholesale_order_items, dependent: :destroy
@@ -86,7 +72,16 @@ class WholesaleOrder < ApplicationRecord
 
   def post_to_sos
     data = compile_post_data
+    puts
+    puts
+    puts
+    p data
     response = SosClient.create_sales_order(data)
+    puts
+    puts
+    p response
+    puts
+    puts
     update_attribute(:sos_id, response['id'])
     update_attribute(:sos_total, response['total'])
     report_totals_to_sheet
