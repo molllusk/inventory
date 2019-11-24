@@ -72,16 +72,7 @@ class WholesaleOrder < ApplicationRecord
 
   def post_to_sos
     data = compile_post_data
-    puts
-    puts
-    puts
-    p data
     response = SosClient.create_sales_order(data)
-    puts
-    puts
-    p response
-    puts
-    puts
     update_attribute(:sos_id, response['id'])
     update_attribute(:sos_total, response['total'])
     report_totals_to_sheet
