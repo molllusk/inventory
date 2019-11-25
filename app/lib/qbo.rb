@@ -19,7 +19,7 @@ module Qbo
   end
 
   def self.realm_id
-    @realm_id ||= QboToken.last.realm_id
+    QboToken.last.realm_id
   end
 
   def self.service_params
@@ -87,13 +87,5 @@ module Qbo
 
   def self.journal_entry(params)
     Quickbooks::Model::JournalEntry.new(params)
-  end
-
-  def self.create_journal_entry(journal_entry)
-    service = Quickbooks::Service::JournalEntry.new
-    service.access_token = Qbo.token
-    service.company_id = QboToken.last.realm_id
-
-    service.create(journal_entry)
   end
 end
