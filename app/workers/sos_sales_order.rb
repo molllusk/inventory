@@ -2,7 +2,7 @@
 
 class SosSalesOrder
   include Sidekiq::Worker
-  sidekiq_options max_retries: 0
+  sidekiq_options queue: :orders, retry: false
 
   def perform
     WholesaleOrder.create_orders

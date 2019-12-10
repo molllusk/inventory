@@ -15,7 +15,9 @@ module Qbo
   MOLLUSK_WEST_CLASS = 300000000000824363.freeze  
 
   def self.token
-    @token ||= QboToken.last.refresh
+    current_token = QboToken.last
+    # should start saving expire time on QboToken model.
+    current_token.updated_at < 3600.seconds.ago ? current_token.refresh : current_token
   end
 
   def self.realm_id
