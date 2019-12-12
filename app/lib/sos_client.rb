@@ -2,7 +2,7 @@ class SosClient
   BASE_URL = 'https://api.sosinventory.com/api/v2'.freeze
 
   def self.connection
-    sleep(0.1)
+    sleep(1)
     Faraday.new(url: BASE_URL) do |faraday|
       faraday.authorization :Bearer, "6vFUA9YnEsG6UHB9t2c71CxPB3FnW0YdyMNADejF3f8BwBEUNepyyF3rPVFU9DENX_SYlSAAva2LFJL4HW7tA6_iJF8n-QKDwm3hwyGWG8OqmM-E_rY7xcwLgGiA4fKXvYE_zilVLJWvnBQUqpRbC0u9a7bz0MOvZp9HkojmjrhoKl4F5WiiWrziGeQnXIWYYoxXMT_bQ9wHzWDAO4oEPJMJpJRkzTVYKr-wuXwYF_T59g9XMems1D9C3mrIqKyQKQoFQhb6r7dXNeCGclHvmosOQOxHaMHQApV3F1b_PTubwIGQ3VHyMMtct_51XiJ0QlueHA"
       faraday.request  :url_encoded
