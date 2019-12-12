@@ -84,7 +84,7 @@ class WholesaleOrder < ApplicationRecord
   end
 
   def sos_location
-    @sos_location ||= SosClient.get_locations.find { |sos_location| sos_location['name'] == location }
+    SosClient.get_locations.find { |sos_location| sos_location['name'] == location }
   end
 
   def sos_customer
@@ -92,15 +92,15 @@ class WholesaleOrder < ApplicationRecord
   end
 
   def sos_channel
-    @sos_channel ||= SosClient.get_channels.find { |sos_channel| sos_channel['name'] == customer_data_row['Channel'] }
+    SosClient.get_channels.find { |sos_channel| sos_channel['name'] == customer_data_row['Channel'] }
   end
 
   def sos_terms
-    @sos_terms ||= SosClient.get_terms.find { |sos_term| sos_term['name'] == customer_data_row['Terms'] }
+    SosClient.get_terms.find { |sos_term| sos_term['name'] == customer_data_row['Terms'] }
   end
 
   def sos_sales_rep
-    @sos_sales_rep ||= SosClient.get_sales_reps.find { |sos_sales_rep| (sos_sales_rep['lastName'].present? ? "#{sos_sales_rep['firstName']} #{sos_sales_rep['lastName']}" : sos_sales_rep['firstName']) == customer_data_row['Sales Rep'] }
+    SosClient.get_sales_reps.find { |sos_sales_rep| (sos_sales_rep['lastName'].present? ? "#{sos_sales_rep['firstName']} #{sos_sales_rep['lastName']}" : sos_sales_rep['firstName']) == customer_data_row['Sales Rep'] }
   end
 
   def sos_billing_contact_email
