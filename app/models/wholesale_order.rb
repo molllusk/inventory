@@ -195,7 +195,7 @@ class WholesaleOrder < ApplicationRecord
     # defaults[:billing][:address] = sos_customer['billing']
 
     defaults[:lines] = WholesaleOrderItem.items_post_data(wholesale_order_items)
-    defaults[:discountAmount] = customer_data_row['Customer Discount'].to_f * defaults[:lines].reduce(0) { |sum, line| sum + line[:amount] }
+    defaults[:discountAmount] = -customer_data_row['Customer Discount'].to_f * defaults[:lines].reduce(0) { |sum, line| sum + line[:amount] }
 
     defaults
   end
