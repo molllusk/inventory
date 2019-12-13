@@ -24,7 +24,7 @@ class WholesaleOrder < ApplicationRecord
     GoogleClient.sheet_values(GoogleClient::WHOLESALE_ORDERS, GoogleClient::CUSTOMER_DATA_SHEET)
   end
 
-  def self.new_ref_number?
+  def self.ref_number_taken?
     exists?(ref_number: pull_sheet.first['RefNumber'])
   end
 

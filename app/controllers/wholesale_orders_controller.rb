@@ -10,7 +10,7 @@ class WholesaleOrdersController < ApplicationController
   end
 
   def post_to_sos
-    if WholesaleOrder.new_ref_number?
+    unless WholesaleOrder.ref_number_taken?
       SosSalesOrder.perform_async
       flash[:success] = 'Sales Order Successfully Enqueued! Refresh page to monitor progress. Do not click button again for same order'
     else
