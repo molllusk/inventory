@@ -17,18 +17,21 @@ class WholesaleOrder < ApplicationRecord
   }
 
   def self.pull_sheet
-    GoogleClient.sheet_values(GoogleClient::WHOLESALE_ORDERS, GoogleClient::WHOLESALE_ORDER_SHEET)
+    GoogleClient.sheet_values(GoogleClient::WHOLESALE_ORDERS, GoogleClient::WHOLESALE_ORDER_SHEET).reject { |order| order['RefNumber'].blank? }
   end
 
   def self.pull_customer_data_sheet
     GoogleClient.sheet_values(GoogleClient::WHOLESALE_ORDERS, GoogleClient::CUSTOMER_DATA_SHEET)
   end
 
+  def self.new_ref_number?
+    exists?(ref_number: pull_sheet.first['RefNumber'])
+  end
+
   def self.process_orders
-    sheet_orders = pull_sheet.reject { |order| order['RefNumber'].blank? }
     orders_by_customer = Hash.new { |h,k| h[k] = [] }
 
-    sheet_orders.each do |order|
+    pull_sheet.each do |order|
       orders_by_customer[order['Customer'] + order['RefNumber']] << order
     end
 
