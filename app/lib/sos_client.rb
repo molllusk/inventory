@@ -34,7 +34,7 @@ class SosClient
     paginator('item')
   end
 
-  def get_single_page_resource(resource_name, retries = 0)
+  def self.get_single_page_resource(resource_name, retries = 0)
     response = connection.get(resource_name)
     response_data = response.body['data']
     unless response_data.present?
