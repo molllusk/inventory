@@ -17,7 +17,7 @@ module Qbo
   def self.token
     current_token = QboToken.last
     # should start saving expire time on QboToken model.
-    current_token.updated_at < 3600.seconds.ago ? current_token.refresh : current_token
+    current_token.updated_at < 3600.seconds.ago ? current_token.refresh : current_token.token
   end
 
   def self.realm_id
