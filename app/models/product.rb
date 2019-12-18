@@ -93,6 +93,7 @@ class Product < ApplicationRecord
     update_retail_inventories(retail_orders)
     update_fluid_inventories(retail_orders)
     update_board_inventories(retail_orders)
+    # update_entire_store_inventories(retail_orders, 'Mollusk SL')
   end
 
   def self.update_retail_inventories(retail_orders, outlet = :sf)
@@ -102,7 +103,7 @@ class Product < ApplicationRecord
     end
   end
 
-  def self.update_entire_store_inventories(retail_orders, outlet = 'Mollusk SL')
+  def self.update_entire_store_inventories(retail_orders, outlet)
     with_shopify.find_each do |product|
       # do not update inventory if any order exists for that variant in any location
       product.update_inventory(retail_orders, outlet) if product.retail_shopify.inventory_at_location(outlet).present?
