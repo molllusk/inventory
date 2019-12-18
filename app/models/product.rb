@@ -46,8 +46,8 @@ class Product < ApplicationRecord
     where('LOWER(shopify_data.product_type) = ?', 'surfboard').joins(:shopify_data)
   }
 
-  scope :with_shopify, lambda {
-    joins(:shopify_data).distinct
+  scope :with_retail_shopify, lambda {
+    where('shopify_data.store = ?', ShopifyDatum.stores[:retail]).joins(:shopify_data).distinct
   }
 
   scope :search_query, lambda { |query|
@@ -93,7 +93,7 @@ class Product < ApplicationRecord
     update_retail_inventories(retail_orders)
     update_fluid_inventories(retail_orders)
     update_board_inventories(retail_orders)
-    update_entire_store_inventories(retail_orders, :sl)
+    update_entire_retail_store_inventories(retail_orders, :sl)
   end
 
   def self.update_retail_inventories(retail_orders, outlet = :sf)
@@ -103,8 +103,8 @@ class Product < ApplicationRecord
     end
   end
 
-  def self.update_entire_store_inventories(retail_orders, outlet = :sf)
-    with_shopify.find_each do |product|
+  def self.update_entire_retail_store_inventories(retail_orders, outlet = :sf)
+    with_retail_shopify.find_each do |product|
       # do not update inventory if any order exists for that variant in any location
       product.update_inventory(retail_orders, outlet) if product.vend_datum&.inventory_at_location(LOCATION_NAMES_BY_CODE[outlet]).present?
     end
