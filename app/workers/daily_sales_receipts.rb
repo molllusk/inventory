@@ -67,7 +67,7 @@ class DailySalesReceipts
       fulfillments = ShopifyClient.fulfillments(order['id'])
 
       order['line_items'].each do |line_item|
-        # why is variant id coming up blank?
+        next unless line_item['fulfillment_status'].present?
         variant_id = line_item['variant_id']
         fulfillment = fulfillments.detect { |fulfillment| fulfillment['line_items'].detect { |fulfillment_line_item| fulfillment_line_item['variant_id'] == variant_id } }
         location_id = fulfillment.present? && fulfillment['location_id'].present? ? fulfillment['location_id'] : 'no_location'
@@ -270,6 +270,7 @@ class DailySalesReceipts
       fulfillments = ShopifyClient.fulfillments(order['id'], :WHOLESALE)
 
       order['line_items'].each do |line_item|
+        next unless line_item['fulfillment_status'].present?
         variant_id = line_item['variant_id']
         fulfillment = fulfillments.detect { |fulfillment| fulfillment['line_items'].detect { |fulfillment_line_item| fulfillment_line_item['variant_id'] == variant_id } }
         location_id = fulfillment.present? && fulfillment['location_id'].present? ? fulfillment['location_id'] : 'no_location'

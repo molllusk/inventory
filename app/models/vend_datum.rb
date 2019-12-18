@@ -18,6 +18,10 @@ class VendDatum < ApplicationRecord
     end
   end
 
+  def inventory_at_location(location = 'San Francisco')
+    vend_inventories.find_by(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key(location))
+  end
+
   def sort_key
     vend_type&.[]('name') + name + variant_options.find { |vo| vo['name'] == 'Color' }&.[]('value').to_s + variant_options.find { |vo| vo['name'] == 'Size' }&.[]('value').to_s
   end
