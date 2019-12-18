@@ -322,12 +322,12 @@ class Product < ApplicationRecord
 
   def save_inventory_adjustment_vend(response, quantity, outlet)
     location_id = response['inventory_level']['location_id']
-    shopify_inventory = retail_shopify.shopify_inventories.find_by(location: location_id)
+    shopify_inventory = retail_shopify.inventory_at_location(location_id)&.inventory
     new_inventory = response['inventory_level']['available']
 
     InventoryUpdate.create(
       vend_qty: vend_inventory(outlet),
-      prior_qty: shopify_inventory.inventory,
+      prior_qty: shopify_inventory || 0,
       adjustment: quantity,
       product_id: id,
       new_qty: new_inventory,
