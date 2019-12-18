@@ -360,6 +360,7 @@ class Product < ApplicationRecord
       location = ShopifyInventory.locations["Mollusk #{outlet.to_s.upcase}"]
 
       response = ShopifyClient.connect_inventory_location(retail_shopify.inventory_item_id, location)
+      retail_shopify.shopify_inventories << ShopifyInventory.new(location: location, inventory: 0)
 
       Airbrake.notify("Could not CONNECT SF inventory location for Product: #{id}") unless ShopifyClient.inventory_item_updated?(response)
     rescue
