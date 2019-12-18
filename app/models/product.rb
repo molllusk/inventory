@@ -106,7 +106,7 @@ class Product < ApplicationRecord
   def self.update_entire_store_inventories(retail_orders, outlet = :sf)
     with_shopify.find_each do |product|
       # do not update inventory if any order exists for that variant in any location
-      product.update_inventory(retail_orders, outlet) if product.retail_shopify.inventory_at_location("Mollusk #{outlet.to_s.upcase}").present?
+      product.update_inventory(retail_orders, outlet) if product.retail_shopify&.inventory_at_location("Mollusk #{outlet.to_s.upcase}").present?
     end
   end
 
@@ -204,7 +204,7 @@ class Product < ApplicationRecord
   end
 
   def adjust_retail_inventory(outlet)
-    adjust_inventory_vend("Mollusk #{outlet.to_s.upcase}", inventory_adjustment(outlet))
+    adjust_inventory_vend(outlet, inventory_adjustment(outlet))
   end
 
   def inventory_csv_row
@@ -267,14 +267,15 @@ class Product < ApplicationRecord
     end
   end
 
-  def adjust_inventory_vend(location_name, quantity)
+  def adjust_inventory_vend(outlet, quantity)
+    location_name = "Mollusk #{outlet.to_s.upcase}"
     location_id = ShopifyInventory.locations[location_name]
 
     begin
       response = ShopifyClient.adjust_inventory(retail_shopify.inventory_item_id, location_id, quantity)
 
       if ShopifyClient.inventory_item_updated?(response)
-        save_inventory_adjustment_vend(response, quantity)
+        save_inventory_adjustment_vend(response, quantity, outlet)
       else
         Airbrake.notify("Could not UPDATE #{location_name}:#{location_id} inventory for Product: #{id}, Adjustment: #{quantity} | #{response}")
       end
@@ -319,13 +320,13 @@ class Product < ApplicationRecord
     end
   end
 
-  def save_inventory_adjustment_vend(response, quantity)
+  def save_inventory_adjustment_vend(response, quantity, outlet)
     location_id = response['inventory_level']['location_id']
     shopify_inventory = retail_shopify.shopify_inventories.find_by(location: location_id)
     new_inventory = response['inventory_level']['available']
 
     InventoryUpdate.create(
-      vend_qty: vend_datum.sf_inventory,
+      vend_qty: vend_inventory(outlet),
       prior_qty: shopify_inventory.inventory,
       adjustment: quantity,
       product_id: id,
