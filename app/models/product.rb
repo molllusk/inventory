@@ -46,6 +46,10 @@ class Product < ApplicationRecord
     where('LOWER(shopify_data.product_type) = ?', 'surfboard').joins(:shopify_data)
   }
 
+  scope :with_shopify, lambda {
+    joins(:shopify_data).distinct
+  }
+
   scope :search_query, lambda { |query|
     # Matches using LIKE, automatically appends '%' to each term.
     # LIKE is case INsensitive with MySQL, however it is case
@@ -95,6 +99,13 @@ class Product < ApplicationRecord
     third_party_or_sale.find_each do |product|
       # do not update inventory if any order exists for that variant in any location
       product.update_inventory(retail_orders, outlet) if product.retail_shopify.third_party_or_sale?
+    end
+  end
+
+  def self.update_entire_store_inventories(retail_orders, outlet = 'Mollusk SL')
+    with_shopify.find_each do |product|
+      # do not update inventory if any order exists for that variant in any location
+      product.update_inventory(retail_orders, outlet) if product.retail_shopify.inventory_at_location(outlet).present?
     end
   end
 

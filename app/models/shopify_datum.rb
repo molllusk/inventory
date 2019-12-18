@@ -20,7 +20,7 @@ class ShopifyDatum < ApplicationRecord
   scope :with_jam, -> { retail.joins(:shopify_inventories).merge(ShopifyInventory.with_jam) }
 
   def inventory_at_location(location = 'Mollusk SF')
-    shopify_inventories.find_by(location: location)&.inventory
+    shopify_inventories.find_by(location: location)
   end
 
   def inventory_item
