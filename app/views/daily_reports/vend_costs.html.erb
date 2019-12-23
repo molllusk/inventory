@@ -9,23 +9,29 @@
   </tr>
   <% @vend_costs.each do |costs| %>
     <tr>
-      <td class='border-bottom' rowspan='<%= costs.vend_sales_costs.count %>' style='background-color: #FFFFFF'>
+      <td class='border-bottom' rowspan='<%= costs.vend_sales_costs.count || 1 %>' style='background-color: #FFFFFF'>
         <a href='<%= daily_vend_cost_path(costs) %>' target='_blank'><%= costs.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y") %> <i class='fa fa-external-link-alt'></i></a>
       </td>
       <td class='border-bottom' rowspan='<%= costs.vend_sales_costs.count %>' style='background-color: #FFFFFF'>
         <% if costs.qbo_id.present? %><a href='https://c3.qbo.intuit.com/app/journal?txnId=<%= costs.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a><% end %>
       </td>
-      <% costs.vend_sales_costs.sort_by(&:outlet_id).each_with_index do |sales_cost, index| %>
-        <% last_row = (index == (costs.vend_sales_costs.count - 1)) %>
-        <% if index.positive? %>
-          <tr>
+      <% if costs.vend_sales_costs.present? %>
+        <% costs.vend_sales_costs.sort_by(&:outlet_id).each_with_index do |sales_cost, index| %>
+          <% last_row = (index == (costs.vend_sales_costs.count - 1)) %>
+          <% if index.positive? %>
+            <tr>
+          <% end %>
+            <td class='<%= 'border-bottom' if last_row %>'>
+              <%= sales_cost.outlet_name %>
+            </td>
+            <td class='<%= 'border-bottom' if last_row %>'>
+              <%= number_to_currency(sales_cost.cost, unit: '$', separator: '.', delimiter: ',') %>
+            </td>
+          </tr>
         <% end %>
-          <td class='<%= 'border-bottom' if last_row %>'>
-            <%= sales_cost.outlet_name %>
-          </td>
-          <td class='<%= 'border-bottom' if last_row %>'>
-            <%= number_to_currency(sales_cost.cost, unit: '$', separator: '.', delimiter: ',') %>
-          </td>
+      <% else %>
+          <td class='border-bottom'> - </td>
+          <td class='border-bottom'> - </td>
         </tr>
       <% end %>
   <% end %>

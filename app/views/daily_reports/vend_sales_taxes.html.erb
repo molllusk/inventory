@@ -16,9 +16,9 @@
     <th>id</th>
   </tr>
   <% @vend_sales_taxes.each do |day| %>
-    <% if day.vend_sales_tax.present? %>
-      <tr>
-        <td class='border-bottom' rowspan='<%= day.vend_sales_tax.vend_location_sales_taxes.count %>' style='background-color: #FFFFFF'><a href='<%= daily_vend_sale_path(day) %>' target='_blank'><%= day.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %> <i class='fa fa-external-link-alt'></i></a></td>
+    <tr>
+      <td class='border-bottom' rowspan='<%= day.vend_sales_tax.vend_location_sales_taxes.count || 1 %>' style='background-color: #FFFFFF'><a href='<%= daily_vend_sale_path(day) %>' target='_blank'><%= day.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %> <i class='fa fa-external-link-alt'></i></a></td>
+      <% if day.vend_sales_tax.vend_location_sales_taxes.present? %>
         <% day.vend_sales_tax.vend_location_sales_taxes.sort_by(&:outlet_id).each_with_index do |tax, index| %>
           <% last_row = (index == (day.vend_sales_tax.vend_location_sales_taxes.count - 1)) %>
           <% if index.positive? %>
@@ -32,8 +32,6 @@
           </tr>
         <% end %>
       <% else %>
-        <tr>
-          <td class='border-bottom'><a href='<%= daily_vend_sale_path(day) %>' target='_blank'><%= day.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %> <i class='fa fa-external-link-alt'></i></a></td>
           <td class='border-bottom'> - </td>
           <td class='border-bottom'> - </td>
           <td class='border-bottom'> - </td>
@@ -41,7 +39,6 @@
           <td class='border-bottom'> - </td>
         </tr>
       <% end %>
-  <% end %>
 </table>
 
 <div class='center'>
