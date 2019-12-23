@@ -19,7 +19,7 @@
   <% @vend_sales.each do |day| %>
     <tr>
       <td class='border-bottom' rowspan='<%= day.vend_sales_receipts.count || 1 %>' style='background-color: #FFFFFF'><a href='<%= daily_vend_sale_path(day) %>' target='_blank'><%= day.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %> <i class='fa fa-external-link-alt'></i></a></td>
-      <% day.vend_sales_receipts.present? %>
+      <% if day.vend_sales_receipts.present? %>
         <% day.vend_sales_receipts.sort_by(&:outlet_id).each_with_index do |receipt, index| %>
           <% last_row = (index == (day.vend_sales_receipts.count - 1)) %>
           <% if index.positive? %>

@@ -12,7 +12,7 @@
       <td class='border-bottom' rowspan='<%= costs.vend_sales_costs.count || 1 %>' style='background-color: #FFFFFF'>
         <a href='<%= daily_vend_cost_path(costs) %>' target='_blank'><%= costs.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y") %> <i class='fa fa-external-link-alt'></i></a>
       </td>
-      <td class='border-bottom' rowspan='<%= costs.vend_sales_costs.count %>' style='background-color: #FFFFFF'>
+      <td class='border-bottom' rowspan='<%= costs.vend_sales_costs.count || 1 %>' style='background-color: #FFFFFF'>
         <% if costs.qbo_id.present? %><a href='https://c3.qbo.intuit.com/app/journal?txnId=<%= costs.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a><% end %>
       </td>
       <% if costs.vend_sales_costs.present? %>
