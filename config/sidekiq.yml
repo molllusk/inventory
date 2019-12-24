@@ -5,7 +5,7 @@ max_retries: 3
   - orders
 :schedule:
   daily_ordering:
-    cron: '00 12 * * MON,WED,FRI'
+    cron: '00 12 * * MON,WED,THU'
     class: 'DailyOrdering'
     description: 'Daily Orders for inventory transfers'
   sku_check:
