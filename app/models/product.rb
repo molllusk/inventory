@@ -34,17 +34,18 @@ class Product < ApplicationRecord
       .joins(:shopify_data)
   }
 
-  scope :venice_boards, lambda {
-    where('LOWER(shopify_data.product_type) = ?', 'venice surfboard').joins(:shopify_data)
-  }
+  # Surfboard scopes not currently in use
+  # scope :venice_boards, lambda {
+  #   where('LOWER(shopify_data.product_type) = ?', 'venice surfboard').joins(:shopify_data)
+  # }
 
-  scope :silverlake_boards, lambda {
-    where('LOWER(shopify_data.product_type) = ?', 'silver lake surfboards').joins(:shopify_data)
-  }
+  # scope :silverlake_boards, lambda {
+  #   where('LOWER(shopify_data.product_type) = ?', 'silver lake surfboards').joins(:shopify_data)
+  # }
 
-  scope :boards, lambda {
-    where('LOWER(shopify_data.product_type) = ?', 'surfboard').joins(:shopify_data)
-  }
+  # scope :boards, lambda {
+  #   where('LOWER(shopify_data.product_type) = ?', 'surfboard').joins(:shopify_data)
+  # }
 
   scope :with_retail_shopify, lambda {
     where('shopify_data.store = ?', ShopifyDatum.stores[:retail]).joins(:shopify_data).distinct
@@ -92,37 +93,19 @@ class Product < ApplicationRecord
     retail_orders = ShopifyClient.order_quantities_by_variant
     update_retail_inventories(retail_orders)
     update_fluid_inventories(retail_orders)
-    update_board_inventories(retail_orders)
-    update_entire_retail_store_inventories(retail_orders, :sl)
   end
 
-  def self.update_retail_inventories(retail_orders, outlet = :sf)
-    third_party_or_sale.find_each do |product|
+  def self.update_retail_inventories(retail_orders)
+    [:sf, :vb].each do |outlet|
       # do not update inventory if any order exists for that variant in any location
-      product.update_inventory(retail_orders, outlet) if product.retail_shopify.third_party_or_sale?
+      update_entire_retail_store_inventory(retail_orders, outlet)
     end
   end
 
-  def self.update_entire_retail_store_inventories(retail_orders, outlet = :sf)
+  def self.update_entire_retail_store_inventory(retail_orders, outlet = :sf)
     with_retail_shopify.find_each do |product|
       # do not update inventory if any order exists for that variant in any location
       product.update_inventory(retail_orders, outlet) if product.vend_datum&.inventory_at_location(LOCATION_NAMES_BY_CODE[outlet]).present?
-    end
-  end
-
-  def self.update_board_inventories(retail_orders)
-    venice_boards.each do |board|
-      board.update_inventory(retail_orders, :vb)
-    end
-
-    silverlake_boards.each do |board|
-      board.update_inventory(retail_orders, :sl)
-    end
-
-    boards.each do |board|
-      [:sf, :sl, :vb].each do |outlet|
-        board.update_inventory(retail_orders, outlet)
-      end
     end
   end
 
