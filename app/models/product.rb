@@ -198,7 +198,7 @@ class Product < ApplicationRecord
       variant: (retail_shopify&.variant_title || wholesale_shopify&.variant_title || vend_datum&.variant_name).to_s.gsub(/Default(\s+Title)?/i, ''),
       type: vend_datum&.vend_type&.[]('name') || retail_shopify&.product_type || wholesale_shopify&.product_type,
       sku: vend_datum&.sku || retail_shopify&.barcode || wholesale_shopify&.barcode,
-      shopify_tags: retail_shopify&.tags.join(', '),
+      shopify_tags: retail_shopify&.tags&.join(', '),
       vend: vend_datum&.link,
       retail_shopify: retail_shopify&.link,
       wholesale_shopify: wholesale_shopify&.link,
