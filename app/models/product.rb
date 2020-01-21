@@ -96,7 +96,7 @@ class Product < ApplicationRecord
   end
 
   def self.update_retail_inventories(retail_orders)
-    [:sf, :sl, :vb].each do |outlet|
+    [:sf, :vb].each do |outlet|
       # do not update inventory if any order exists for that variant in any location
       update_entire_retail_store_inventory(retail_orders, outlet)
     end
