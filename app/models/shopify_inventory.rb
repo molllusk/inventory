@@ -1,7 +1,7 @@
 class ShopifyInventory < ApplicationRecord
   belongs_to :shopify_datum
 
-  scope :with_jam, -> { where('location = ? AND inventory > 0', ShopifyInventory::locations['Jam Warehouse Retail']) }
+  scope :with_warehouse, -> { where('location = ? AND inventory > 0', ShopifyInventory::locations['Postworks']) }
 
   enum location: {
     # retail site
