@@ -42,7 +42,7 @@ class ShopifySalesCost < ApplicationRecord
         # WHAT ABOUT THIS ONE???
         account_id: '3652', # 11137 Finished Goods - Shopify
         amount: location_cost('Postworks ATS').to_f,
-        description: 'Total Cost of Sales Wholesale Shopify - Jam Warehouse',
+        description: 'Total Cost of Sales Wholesale Shopify - Warehouse',
         posting_type: 'Credit'
       }
     ]
