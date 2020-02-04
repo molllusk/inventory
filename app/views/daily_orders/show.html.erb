@@ -12,6 +12,7 @@
     <th>Vend Consignment</th>
     <th>PO</th>
     <th>PDF</th>
+    <th>CSV</th>
     <th>QBO</th>
   </tr>
   <tr>
@@ -38,15 +39,22 @@
       <% end %>
     </td>
     <td>
-      <% if @daily_order.po_id.present? %>
+      <% if @daily_order.has_po? %>
         <a href='<%= daily_order_po_path(@daily_order) %>' target='_blank'><%= @daily_order.display_po %> <i class='fa fa-external-link-alt'></i></a>
       <% else %>
          -
       <% end %>
     </td>
     <td>
-      <% if @daily_order.po_id.present? %>
+      <% if @daily_order.has_po? %>
         <a href='<%= daily_order_po_path(@daily_order) %>.pdf'><i class='fa fa-file-pdf'></i> <i class='fa fa-cloud-download-alt'></i></a>
+      <% else %>
+         -
+      <% end %>
+    </td>
+    <td>
+      <% if @daily_order.has_po? %>
+        <a href='<%= daily_order_po_path(@daily_order) %>.csv'><i class='fa fa-file-csv'></i> <i class='fa fa-cloud-download-alt'></i></a>
       <% else %>
          -
       <% end %>
