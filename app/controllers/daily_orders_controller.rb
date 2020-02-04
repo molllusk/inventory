@@ -16,8 +16,8 @@ class DailyOrdersController < ApplicationController
       end
       format.csv do
         send_data(
-          @daily_order.csv,
-          filename: @daily_order.csv_file_name,
+          @daily_order.to_csv,
+          filename: @daily_order.csv_filename,
           type: 'text/csv; charset=utf-8; header=present'
         )
       end
