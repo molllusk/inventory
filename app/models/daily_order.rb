@@ -9,6 +9,24 @@ class DailyOrder < ApplicationRecord
     'Silver Lake' => 'Mollusk Surf Shop (Silver Lake)<br />3511 W Sunset Blvd<br />Los Angeles, CA 90026-9998'
   }
 
+  STREET_ADDRESSES = {
+    'San Francisco' => '4500 Irving Street',
+    'Venice Beach' => '1600 Pacific Avenue',
+    'Silver Lake' => '3511 W Sunset Blvd'
+  }
+
+  CITIES = {
+    'San Francisco' => 'San Francisco',
+    'Venice Beach' => 'Venice Beach',
+    'Silver Lake' => 'Los Angeles'
+  }
+
+  ZIPS = {
+    'San Francisco' => '94122-1132',
+    'Venice Beach' => '90291-9998',
+    'Silver Lake' => '90026-9998'
+  }
+
   def to_pdf
     # create an instance of ActionView, so we can use the render method outside of a controller
     av = ActionView::Base.new
@@ -28,8 +46,58 @@ class DailyOrder < ApplicationRecord
       )[:pdf]
   end
 
+  def to_csv
+    headers = [
+      :order_id,
+      :first_name,
+      :last_name,
+      :email,
+      :sku,
+      :count,
+      :address1,
+      :address2,
+      :city,
+      :province_code,
+      :country_code,
+      :zipcode,
+      :ship_after, # day the order is placed
+      :ship_before, # 3 days after the day the order is placed
+      :company,
+      :draft,
+      :note
+    ]
+
+    CSV.generate(headers: headers, write_headers: true) do |new_csv|
+      orders.sort_by { |order| order.product.vend_datum.sort_key }.each do |order|
+        new_csv << [
+          display_po,
+          "Mollusk",
+          outlet_name,
+          "joseph@mollusksurfshop.com",
+          order.product.retail_shopify&.sku,
+          order.quantity,
+          street_address,
+          nil,
+          city,
+          'CA',
+          'US',
+          zipcode,
+          daily_inventory_transfer.date.strftime('%m/%d/%y'),
+          (daily_inventory_transfer.date + 3).strftime('%m/%d/%y'),
+          'Mollusk',
+          nil,
+          nil
+        ]
+      end
+    end
+  end
+
   def pdf_filename
     "mollusk_#{po_stem}_order_#{po_id}.pdf"
+  end
+
+  def csv_filename
+    "mollusk_#{po_stem}_order_#{po_id}.csv"
   end
 
   def outlet_name
@@ -79,6 +147,18 @@ class DailyOrder < ApplicationRecord
 
   def ship_to_address
     PO_ADDRESSES[outlet_name]
+  end
+
+  def street_address
+    STREET_ADDRESSES[outlet_name]
+  end
+
+  def zipcode
+    ZIPS[outlet_name]
+  end
+
+  def city
+    CITIES[outlet_name]
   end
 
   def total_items
