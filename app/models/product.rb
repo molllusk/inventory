@@ -280,7 +280,7 @@ class Product < ApplicationRecord
         begin
           wholesale_response = ShopifyClient.adjust_inventory(
             wholesale_shopify.inventory_item_id,
-            ShopifyInventory.locations['Jam Warehouse Wholesale'],
+            ShopifyInventory.locations['Postworks ATS'],
             -quantity,
             :WHOLESALE
           )
@@ -323,7 +323,7 @@ class Product < ApplicationRecord
 
   def save_inventory_adjustment_fluid(quantity, retail_available, wholesale_available)
     retail_inventory = retail_shopify.shopify_inventories.find_by(location: 'Jam Warehouse Retail')
-    wholesale_inventory = wholesale_shopify.shopify_inventories.find_by(location: 'Jam Warehouse Wholesale')
+    wholesale_inventory = wholesale_shopify.shopify_inventories.find_by(location: 'Postworks ATS')
 
     FluidInventoryUpdate.create(
       prior_wholesale_qty: wholesale_inventory.inventory,
@@ -363,7 +363,7 @@ class Product < ApplicationRecord
   def fluid_inventory
     if has_retail_and_wholesale_shopify?
       retail_inventory = retail_shopify.shopify_inventories.find_by(location: 'Jam Warehouse Retail')&.inventory
-      wholesale_inventory = wholesale_shopify.shopify_inventories.find_by(location: 'Jam Warehouse Wholesale')&.inventory
+      wholesale_inventory = wholesale_shopify.shopify_inventories.find_by(location: 'Postworks ATS')&.inventory
 
       if retail_inventory.present?
         if wholesale_inventory.present?

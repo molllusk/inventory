@@ -41,7 +41,7 @@ class ShopifySalesCost < ApplicationRecord
       {
         # WHAT ABOUT THIS ONE???
         account_id: '3652', # 11137 Finished Goods - Shopify
-        amount: location_cost('Jam Warehouse Wholesale').to_f,
+        amount: location_cost('Postworks ATS').to_f,
         description: 'Total Cost of Sales Wholesale Shopify - Jam Warehouse',
         posting_type: 'Credit'
       }

@@ -12,6 +12,7 @@ class ShopifyInventory < ApplicationRecord
     'Mollusk SL' => 7702609973,
     'Mollusk VB' => 7702577205,
     'Postworks' => 18186895445,
+    'Postworks ATS' => 34463514711,
     # wholesale site
     '1283 42nd Ave Wholesale' => 29394010176,
     'Jam Warehouse Wholesale' => 29887823936

@@ -73,8 +73,8 @@
     <th>Sent Orders</th>
     <th>Store Inventory</th>
     <th>Threshold</th>
-    <th>Prior Jam Inventory</th>
-    <th>New Jam Inventory</th>
+    <th>Prior Warehouse Inventory</th>
+    <th>New Warehouse Inventory</th>
   </tr>
   <% @daily_order.orders.sort_by { |order| order.product.vend_datum.sort_key }.each do |order| %>
     <tr>
