@@ -17,7 +17,7 @@ class ShopifyDatum < ApplicationRecord
     where(store: :wholesale)
   }
 
-  scope :with_jam, -> { retail.joins(:shopify_inventories).merge(ShopifyInventory.with_jam) }
+  scope :with_warehouse, -> { retail.joins(:shopify_inventories).merge(ShopifyInventory.with_warehouse) }
 
   def inventory_at_location(location = 'Mollusk SF')
     shopify_inventories.find_by(location: location)

@@ -47,7 +47,7 @@ class DailyOrdering
     #  Redis.current.set('min_daily_order_version', daily_order.last['version']) if daily_orders.present?
     pacific_time = Time.now.in_time_zone('Pacific Time (US & Canada)').end_of_day
 
-    ShopifyDatum.with_jam.find_each do |shopify_product|
+    ShopifyDatum.with_warehouse.find_each do |shopify_product|
       next if shopify_product.sale?
       vend_product = shopify_product.product.vend_datum
       next unless vend_product.present?
@@ -100,11 +100,11 @@ class DailyOrdering
       end
 
       total_adjustments = inventories[:sf_adjustment].to_i + inventories[:vb_adjustment].to_i #+ inventories[:sl_adjustment].to_i 
-      jam_inventory = shopify_product.shopify_inventories.find_by(location: 'Jam Warehouse Retail')&.inventory.to_i
-      has_adjustment = total_adjustments > 0 && jam_inventory > 0
+      warehouse_inventory = shopify_product.shopify_inventories.find_by(location: 'Postworks')&.inventory.to_i
+      has_adjustment = total_adjustments > 0 && warehouse_inventory > 0
 
       if has_adjustment
-        if jam_inventory > 0
+        if warehouse_inventory > 0
           # order is important here: SF -> VB -> SL
           adjusted_locations = []
           adjusted_locations << 'Mollusk SF' if inventories[:sf_adjustment].to_i > 0
@@ -112,12 +112,12 @@ class DailyOrdering
           # adjusted_locations << 'Mollusk SL' if inventories[:sl_adjustment].to_i > 0
 
           adjusted_locations.each do |location|
-            break if jam_inventory < 1
+            break if warehouse_inventory < 1
             location_order = todays_orders[location]
 
             case location
             when 'Mollusk SF'
-              inventories[:sf_adjustment] = jam_inventory if inventories[:sf_adjustment] > jam_inventory
+              inventories[:sf_adjustment] = warehouse_inventory if inventories[:sf_adjustment] > warehouse_inventory
               location_order.orders.create(
                   quantity: inventories[:sf_adjustment],
                   product_id: shopify_product.product_id,
@@ -126,9 +126,9 @@ class DailyOrdering
                   cost: cost,
                   sent_orders: inventories[:sf_outstanding]
                 )
-              jam_inventory -= inventories[:sf_adjustment]
+              warehouse_inventory -= inventories[:sf_adjustment]
             when 'Mollusk VB'
-              inventories[:vb_adjustment] = jam_inventory if inventories[:vb_adjustment] > jam_inventory
+              inventories[:vb_adjustment] = warehouse_inventory if inventories[:vb_adjustment] > warehouse_inventory
               location_order.orders.create(
                   quantity: inventories[:vb_adjustment],
                   product_id: shopify_product.product_id,
@@ -137,9 +137,9 @@ class DailyOrdering
                   cost: cost,
                   sent_orders: inventories[:vb_outstanding]
                 )
-              jam_inventory -= inventories[:vb_adjustment]
+              warehouse_inventory -= inventories[:vb_adjustment]
             # when 'Mollusk SL'
-            #   inventories[:sl_adjustment] = jam_inventory if inventories[:sl_adjustment] > jam_inventory
+            #   inventories[:sl_adjustment] = warehouse_inventory if inventories[:sl_adjustment] > warehouse_inventory
             #   location_order.orders.create(
             #       quantity: inventories[:sl_adjustment],
             #       product_id: shopify_product.product_id,
@@ -148,7 +148,7 @@ class DailyOrdering
             #       cost: cost,
             #       sent_orders: inventories[:sl_outstanding]
             #     )
-            #   jam_inventory -= inventories[:sl_adjustment]
+            #   warehouse_inventory -= inventories[:sl_adjustment]
             end
           end
         end

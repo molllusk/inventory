@@ -3,7 +3,7 @@ module Api
     def shopify_jammers
       products = []
 
-      ShopifyDatum.with_jam.find_each do |product|
+      ShopifyDatum.with_warehouse.find_each do |product|
         next if product.sale?
 
         product_data = {
@@ -17,13 +17,13 @@ module Api
         }
 
         product.shopify_inventories.where(location: [
-              ShopifyInventory::locations['Jam Warehouse Retail'],
+              ShopifyInventory::locations['Postworks'],
               ShopifyInventory::locations['Mollusk SF'],
               ShopifyInventory::locations['Mollusk SL'],
               ShopifyInventory::locations['Mollusk VB']
             ]).each do |inventory|
           case inventory.location
-          when 'Jam Warehouse Retail'
+          when 'Postworks'
             product_data[:jam_inv] = inventory.inventory
           when 'Mollusk SF'
             product_data[:sf_inv] = inventory.inventory
@@ -42,7 +42,7 @@ module Api
     def vend_jammers
       products = []
 
-      VendDatum.where(product_id: ShopifyDatum.with_jam.pluck(:product_id)).find_each do |product|
+      VendDatum.where(product_id: ShopifyDatum.with_warehouse.pluck(:product_id)).find_each do |product|
         next if ShopifyDatum.find_by(product_id: product.product_id)&.sale?
 
         size = product.variant_options.find { |vo| vo['name'] == 'Size' }&.[]('value')

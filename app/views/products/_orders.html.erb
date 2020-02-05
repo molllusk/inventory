@@ -10,8 +10,8 @@
       <th>Sent Orders</th>
       <th>Store Inventory</th>
       <th>Threshold</th>
-      <th>Prior Jam Inventory</th>
-      <th>New Jam Inventory</th>
+      <th>Prior Warehouse Inventory</th>
+      <th>New Warehouse Inventory</th>
     </tr>
 
     <% @orders.sort { |a,b| b.daily_order.daily_inventory_transfer.date <=> a.daily_order.daily_inventory_transfer.date }.each do |order| %>

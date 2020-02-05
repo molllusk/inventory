@@ -18,7 +18,7 @@ class DailyInventoryTransfer < ApplicationRecord
   end
 
   def send_po
-    ApplicationMailer.po_pdf(self).deliver
+    ApplicationMailer.po(self).deliver
   end
 
   def fluid_inventory

@@ -14,12 +14,15 @@ class ApplicationMailer < ActionMailer::Base
     mail to: 'joseph@mollusksurfshop.com, arvelhernandez@gmail.com', subject: 'Mismatched SKU Report', content_type: 'text/html', body: body
   end
 
-  def po_pdf(daily_inventory_transfer)
+  def po(daily_inventory_transfer)
     daily_inventory_transfer.daily_orders.each do |daily_order|
-      attachments[daily_order.pdf_filename] = daily_order.to_pdf unless daily_order.orders.blank?
+      unless daily_order.orders.blank?
+        attachments[daily_order.pdf_filename] = daily_order.to_pdf
+        attachments[daily_order.csv_filename] = daily_order.to_csv
+      end
     end
     @daily_inventory_transfer = daily_inventory_transfer
 
-    mail to: 'xh@jamwhse.com', cc: 'joseph@mollusksurfshop.com, john@mollusksurfshop.com, johanna@mollusksurfshop.com, sfmanager@mollusksurfshop.com, arvelhernandez@gmail.com', subject: "Mollusk Order #{daily_inventory_transfer.po_id}"
+    mail to: 'kevin@postworks.io, david@postworks.io', cc: 'joseph@mollusksurfshop.com, john@mollusksurfshop.com, johanna@mollusksurfshop.com, sfmanager@mollusksurfshop.com, arvelhernandez@gmail.com', subject: "Mollusk Order #{daily_inventory_transfer.po_id}"
   end
 end

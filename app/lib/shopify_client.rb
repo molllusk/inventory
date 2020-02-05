@@ -1,8 +1,6 @@
 module ShopifyClient
   RETAIL_BASE_URL = "https://#{ENV['SHOPIFY_USER']}:#{ENV['SHOPIFY_PASSWORD']}@mollusksurf.myshopify.com".freeze
   WHOLESALE_BASE_URL = "https://#{ENV['WHOLESALE_SHOPIFY_USER']}:#{ENV['WHOLESALE_SHOPIFY_PASSWORD']}@molluskats.myshopify.com".freeze
-  SF_RETAIL_INVENTORY_LOCATION = 49481991.freeze
-  JAM_WHOLESALE_INVENTORY_LOCATION = 29887823936.freeze
   API_VERSION = '/admin/api/2019-07'.freeze
 
   SAVED_PRODUCT_ATTRIBUTES = %i[
@@ -131,12 +129,6 @@ module ShopifyClient
     response.body['inventory_levels'] || []
   end
 
-  # Might be able to get rid of or replace this
-  def self.get_inventory_levels(inventory_item_ids, store = :RETAIL)
-    response = connection(store).get "#{API_VERSION}/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}&location_ids=#{inventory_location(store)}&limit=250"
-    response.body['inventory_levels'] || []
-  end
-
   def self.get_inventory_items(inventory_item_ids, store = :RETAIL)
     inventory_items = []
 
@@ -168,11 +160,6 @@ module ShopifyClient
     return unless inventory_item.present?
 
     inventory_item['cost'].to_f
-  end
-
-  # might be able to get rid of and replace this and the inventory location constants
-  def self.inventory_location(store = :RETAIL)
-    store.to_s.upcase == 'RETAIL' ? SF_RETAIL_INVENTORY_LOCATION : JAM_WHOLESALE_INVENTORY_LOCATION
   end
 
   def self.update_inventories(store = :RETAIL)

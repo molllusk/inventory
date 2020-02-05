@@ -208,7 +208,7 @@ class Product < ApplicationRecord
     shopify_data.each do |shopify|
       shopify.shopify_inventories.each do |inventory|
         data[inventory.location] = inventory.inventory
-        total_inventory += inventory.inventory if ['Jam Warehouse Retail', 'Jam Warehouse Wholesale'].include?(inventory.location)
+        total_inventory += inventory.inventory if ['Postworks', 'Postworks ATS'].include?(inventory.location)
       end
     end
 
@@ -226,28 +226,28 @@ class Product < ApplicationRecord
     begin
       response = ShopifyClient.adjust_inventory(
         retail_shopify.inventory_item_id,
-        ShopifyInventory.locations['Jam Warehouse Retail'],
+        ShopifyInventory.locations['Postworks'],
         -order.quantity
       )
 
       if ShopifyClient.inventory_item_updated?(response)
-        updated_jam_inventory = response['inventory_level']['available']
-        shopify_inventory = retail_shopify.shopify_inventories.find_by(location: 'Jam Warehouse Retail')
-        expected_jam_inventory = shopify_inventory.inventory - order.quantity
+        updated_warehouse_inventory = response['inventory_level']['available']
+        shopify_inventory = retail_shopify.shopify_inventories.find_by(location: 'Postworks')
+        expected_warehouse_inventory = shopify_inventory.inventory - order.quantity
 
         order.create_order_inventory_update(
-          new_jam_qty: updated_jam_inventory,
+          new_jam_qty: updated_warehouse_inventory,
           prior_jam_qty: shopify_inventory.inventory
         )
 
-        shopify_inventory.update_attribute(:inventory, updated_jam_inventory)
+        shopify_inventory.update_attribute(:inventory, updated_warehouse_inventory)
 
-        Airbrake.notify("ORDER INVENTORY: Product #{id} expected jam qty #{expected_jam_inventory} but got #{updated_jam_inventory}") unless expected_jam_inventory == updated_jam_inventory
+        Airbrake.notify("ORDER INVENTORY: Product #{id} expected warehouse qty #{expected_warehouse_inventory} but got #{updated_warehouse_inventory}") unless expected_warehouse_inventory == updated_warehouse_inventory
       else
-        Airbrake.notify("Could not UPDATE Jam inventory during ORDER for Product: #{id}, Adjustment: #{-order.quantity}")
+        Airbrake.notify("Could not UPDATE warehouse inventory during ORDER for Product: #{id}, Adjustment: #{-order.quantity}")
       end
     rescue
-      Airbrake.notify("There was an error UPDATING Jam inventory during ORDER of Product: #{id}, Adjustment: #{-order.quantity}")
+      Airbrake.notify("There was an error UPDATING warehouse inventory during ORDER of Product: #{id}, Adjustment: #{-order.quantity}")
     end
   end
 
@@ -272,7 +272,7 @@ class Product < ApplicationRecord
     begin
       retail_response = ShopifyClient.adjust_inventory(
         retail_shopify.inventory_item_id,
-        ShopifyInventory.locations['Jam Warehouse Retail'],
+        ShopifyInventory.locations['Postworks'],
         quantity
       )
       
@@ -280,7 +280,7 @@ class Product < ApplicationRecord
         begin
           wholesale_response = ShopifyClient.adjust_inventory(
             wholesale_shopify.inventory_item_id,
-            ShopifyInventory.locations['Jam Warehouse Wholesale'],
+            ShopifyInventory.locations['Postworks ATS'],
             -quantity,
             :WHOLESALE
           )
@@ -291,16 +291,16 @@ class Product < ApplicationRecord
 
             Airbrake.notify("Fluid Inventory: expected Wholesale qty #{expected_wholesale_inventory} but got #{updated_wholesale_inventory}") unless expected_wholesale_inventory == updated_wholesale_inventory
           else
-            Airbrake.notify("Could not UPDATE Wholesale Jam Warehouse inventory after already adjusting Retail inventory for Product: #{id}, Adjustment: #{-quantity}")
+            Airbrake.notify("Could not UPDATE Wholesale Postworks Warehouse inventory after already adjusting Retail inventory for Product: #{id}, Adjustment: #{-quantity}")
           end
         rescue
-          Airbrake.notify("There was an error UPDATING Wholesale Jam Warehouse inventory after already adjusting Retail inventory for Product: #{id}, Adjustment: #{-quantity}")
+          Airbrake.notify("There was an error UPDATING Wholesale Postworks Warehouse inventory after already adjusting Retail inventory for Product: #{id}, Adjustment: #{-quantity}")
         end
       else
-        Airbrake.notify("Could not UPDATE Retail Jam Warehouse inventory for Product: #{id}, Adjustment: #{quantity}")
+        Airbrake.notify("Could not UPDATE Retail Postworks Warehouse inventory for Product: #{id}, Adjustment: #{quantity}")
       end
     rescue
-      Airbrake.notify("There was an error UPDATING Retail Jam Warehouse inventory for Product: #{id}, Adjustment: #{quantity}")
+      Airbrake.notify("There was an error UPDATING Retail Postworks Warehouse inventory for Product: #{id}, Adjustment: #{quantity}")
     end
   end
 
@@ -322,8 +322,8 @@ class Product < ApplicationRecord
   end
 
   def save_inventory_adjustment_fluid(quantity, retail_available, wholesale_available)
-    retail_inventory = retail_shopify.shopify_inventories.find_by(location: 'Jam Warehouse Retail')
-    wholesale_inventory = wholesale_shopify.shopify_inventories.find_by(location: 'Jam Warehouse Wholesale')
+    retail_inventory = retail_shopify.shopify_inventories.find_by(location: 'Postworks')
+    wholesale_inventory = wholesale_shopify.shopify_inventories.find_by(location: 'Postworks ATS')
 
     FluidInventoryUpdate.create(
       prior_wholesale_qty: wholesale_inventory.inventory,
@@ -346,9 +346,9 @@ class Product < ApplicationRecord
       response = ShopifyClient.connect_inventory_location(retail_shopify.inventory_item_id, location)
       retail_shopify.shopify_inventories << ShopifyInventory.new(location: location, inventory: 0)
 
-      Airbrake.notify("Could not CONNECT SF inventory location for Product: #{id}") unless ShopifyClient.inventory_item_updated?(response)
+      Airbrake.notify("Could not CONNECT #{outlet.to_s.upcase} inventory location for Product: #{id}") unless ShopifyClient.inventory_item_updated?(response)
     rescue
-      Airbrake.notify("There was an error CONNECTING SF inventory for Product: #{id}")
+      Airbrake.notify("There was an error CONNECTING #{outlet.to_s.upcase} inventory location for Product: #{id}")
     end
   end
 
@@ -362,8 +362,8 @@ class Product < ApplicationRecord
 
   def fluid_inventory
     if has_retail_and_wholesale_shopify?
-      retail_inventory = retail_shopify.shopify_inventories.find_by(location: 'Jam Warehouse Retail')&.inventory
-      wholesale_inventory = wholesale_shopify.shopify_inventories.find_by(location: 'Jam Warehouse Wholesale')&.inventory
+      retail_inventory = retail_shopify.shopify_inventories.find_by(location: 'Postworks')&.inventory
+      wholesale_inventory = wholesale_shopify.shopify_inventories.find_by(location: 'Postworks ATS')&.inventory
 
       if retail_inventory.present?
         if wholesale_inventory.present?
@@ -378,10 +378,10 @@ class Product < ApplicationRecord
             Airbrake.notify("Missing fluid inventory threshold for Product Type: #{retail_shopify.product_type} Product: #{id}")
           end
         else
-          Airbrake.notify("Missing WHOLESALE Jam Inventory for Product: #{id}")
+          Airbrake.notify("Missing WHOLESALE Postworks Inventory for Product: #{id}")
         end
       else
-        Airbrake.notify("Missing RETAIL Jam Inventory for Product: #{id}")
+        Airbrake.notify("Missing RETAIL Postworks Inventory for Product: #{id}")
       end
     end
   end
