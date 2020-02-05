@@ -208,7 +208,7 @@ class Product < ApplicationRecord
     shopify_data.each do |shopify|
       shopify.shopify_inventories.each do |inventory|
         data[inventory.location] = inventory.inventory
-        total_inventory += inventory.inventory if inventory.location == 'Postworks'
+        total_inventory += inventory.inventory if ['Postworks', 'Postworks ATS'].include?(inventory.location)
       end
     end
 
@@ -346,9 +346,9 @@ class Product < ApplicationRecord
       response = ShopifyClient.connect_inventory_location(retail_shopify.inventory_item_id, location)
       retail_shopify.shopify_inventories << ShopifyInventory.new(location: location, inventory: 0)
 
-      Airbrake.notify("Could not CONNECT SF inventory location for Product: #{id}") unless ShopifyClient.inventory_item_updated?(response)
+      Airbrake.notify("Could not CONNECT #{outlet.to_s.upcase} inventory location for Product: #{id}") unless ShopifyClient.inventory_item_updated?(response)
     rescue
-      Airbrake.notify("There was an error CONNECTING SF inventory for Product: #{id}")
+      Airbrake.notify("There was an error CONNECTING #{outlet.to_s.upcase} inventory location for Product: #{id}")
     end
   end
 
