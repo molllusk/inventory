@@ -4,6 +4,10 @@ class OrderInventoryUpdate < ApplicationRecord
   def success?
     new_jam_qty == (prior_jam_qty - order.quantity)
   end
+
+  # need to add an undo method here
+  def undo
+  end
 end
 
 # == Schema Information

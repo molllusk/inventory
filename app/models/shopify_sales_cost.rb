@@ -39,10 +39,9 @@ class ShopifySalesCost < ApplicationRecord
         posting_type: 'Debit'
       },
       {
-        # WHAT ABOUT THIS ONE???
-        account_id: '3652', # 11137 Finished Goods - Shopify
+        account_id: '3660', # 11137 Finished Goods - Shopify
         amount: location_cost('Postworks ATS').to_f,
-        description: 'Total Cost of Sales Wholesale Shopify - Warehouse',
+        description: 'Total Cost of Sales Wholesale Shopify - Postworks ATS',
         posting_type: 'Credit'
       }
     ]
@@ -55,12 +54,6 @@ class ShopifySalesCost < ApplicationRecord
         amount: cost,
         description: 'Total Cost of Sales Shopify',
         posting_type: 'Debit'
-      },
-      {
-        account_id: '3652', # 11137 Finished Goods - Shopify
-        amount: location_cost('Postworks').to_f,
-        description: 'Total Cost of Sales Shopify - Postworks',
-        posting_type: 'Credit'
       },
       {
         account_id: '3617', # 11001 Inventory Asset - San Francisco
