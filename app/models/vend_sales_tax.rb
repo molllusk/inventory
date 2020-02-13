@@ -2,8 +2,9 @@ class VendSalesTax < ApplicationRecord
   belongs_to :daily_vend_sale
   has_many :vend_location_sales_taxes, dependent: :destroy
 
+  # maybe have this take an argument of number of months ago, see self.csv below
   scope :last_month, lambda {
-    joins(:daily_vend_sale).where('daily_vend_sales.date >= ? AND daily_vend_sales.date <= ?', 4.month.ago.beginning_of_month, 4.month.ago.end_of_month)
+    joins(:daily_vend_sale).where('daily_vend_sales.date >= ? AND daily_vend_sales.date <= ?', 1.month.ago.beginning_of_month, 1.month.ago.end_of_month)
   }
 
   RENTAL_IDS = %w[
@@ -18,6 +19,8 @@ class VendSalesTax < ApplicationRecord
     "Vend_sales_tax_#{1.month.ago.strftime("%B")}.csv"
   end
 
+  # maybe have this take an argument of number of months ago and pass that to the 'last_month' scope (default 1)
+  # to regenerate prior months when needed
   def self.csv
     CSV.generate(headers: VendLocationSalesTax::CSV_HEADERS, write_headers: true) do |new_csv|
       VendSalesTax.last_month.each do |day|
