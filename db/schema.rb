@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_22_020558) do
+ActiveRecord::Schema.define(version: 2020_02_18_232243) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -249,6 +249,15 @@ ActiveRecord::Schema.define(version: 2019_11_22_020558) do
     t.datetime "updated_at", null: false
     t.integer "store", default: 0
     t.bigint "qbo_id"
+  end
+
+  create_table "sos_tokens", force: :cascade do |t|
+    t.text "access_token"
+    t.text "refresh_token"
+    t.integer "expires_in"
+    t.string "token_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "users", force: :cascade do |t|

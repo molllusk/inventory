@@ -1,5 +1,9 @@
 class SosClient
   BASE_URL = 'https://api.sosinventory.com/api/v2'.freeze
+  AUTH_URL = 'https://api.sosinventory.com/oauth2/token'.freeze
+  SOS_CLIENT_ID = ENV['SOS_CLIENT_ID'].freeze
+  SOS_CLIENT_SECRET = ENV['SOS_CLIENT_SECRET'].freeze
+  SOS_CODE = ENV['SOS_CODE'].freeze
 
   def self.connection
     sleep(0.5)
@@ -72,5 +76,43 @@ class SosClient
     end
 
     response.body['data']
+  end
+
+  # Need to get a new code every time this is done
+  # get code via: "https://api.sosinventory.com/oauth2/authorize?response_type=code&client_id=#{SOS_CLIENT_ID}"
+  def self.request_token()
+    data = [
+        "grant_type=authorization_code",
+        "client_id=#{SOS_CLIENT_ID}",
+        "client_secret=#{SOS_CLIENT_SECRET}",
+        "code=#{SOS_CODE}" # REPLACE THIS CONFIG VAR (see comment above)
+      ].join('&')
+
+    response = connection.post do |req|
+      req.url AUTH_URL
+      req.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+      req.body = data
+    end
+
+    SosToken.last&.destroy
+    SosToken.create(response.body)
+  end
+
+  def self.renew_token()
+    token = SosToken.last
+
+    data = [
+        "grant_type=refresh_token",
+        "refresh_token=#{token.refresh_token}"
+      ].join('&')
+
+    response = SosClient.connection.post do |req|
+      req.url AUTH_URL
+      req.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+      req.body = data
+    end
+
+    token.update_attributes(response.body)
+    token
   end
 end

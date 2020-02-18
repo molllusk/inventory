@@ -228,6 +228,7 @@ end
 #  customer_po     :string
 #  location        :string
 #  ref_number      :string
+#  sos_total       :float
 #  start_ship      :datetime
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null

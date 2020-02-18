@@ -52,8 +52,8 @@ end
 #  id                 :bigint(8)        not null, primary key
 #  department         :string
 #  item_name          :string
-#  quantity_ordered   :integer
-#  unit_price         :float
+#  quantity_ordered   :integer          default(0)
+#  unit_price         :float            default(0.0)
 #  sos_item_id        :bigint(8)
 #  wholesale_order_id :integer
 #
