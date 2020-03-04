@@ -80,6 +80,7 @@ class SosClient
 
   # Need to get a new code every time this is done
   # get code via: "https://api.sosinventory.com/oauth2/authorize?response_type=code&client_id=#{SOS_CLIENT_ID}"
+  # and then logging in to SOS. The code will be in the URL you are redirected to.
   def self.request_token
     data = [
         "grant_type=authorization_code",
