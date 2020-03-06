@@ -3,6 +3,7 @@ max_retries: 3
   - accounting
   - default
   - orders
+  - reporting
 :schedule:
   sku_check:
     cron: '0 21 * * *'
