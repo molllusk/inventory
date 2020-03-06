@@ -158,7 +158,7 @@ class GenerateSalesReport
 
     shopify_orders.each do |wholesale_order|
       wholesale_order['line_items'].each do |line_item|
-        product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]]
+        product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
           product['Prior Last 90 Days Shopify Wholesale'] += quantity
