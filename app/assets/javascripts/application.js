@@ -15,4 +15,6 @@
 //= require rails-ujs
 //= require turbolinks
 //= require filterrific/filterrific-jquery
+//= require moment
+//= require daterangepicker
 //= require_tree .

@@ -155,7 +155,7 @@ class Product < ApplicationRecord
   end
 
   def self.inventory_csv
-    CSV.generate(headers: inventory_csv_headers + ['total_inventory'], write_headers: true) do |new_csv|
+    CSV.generate(headers: inventory_csv_headers, write_headers: true) do |new_csv|
       find_each do |product|
         new_csv << product.inventory_csv_row
       end
@@ -163,8 +163,8 @@ class Product < ApplicationRecord
   end
 
   def self.inventory_csv_headers
-    stem = %i(product variant type sku shopify_tags vend retail_shopify wholesale_shopify app)
-    stem + ShopifyInventory::locations.keys + VendClient::OUTLET_NAMES_BY_ID.values
+    stem = %i(id product variant type size sku handle shopify_tags vend retail_shopify wholesale_shopify app)
+    stem + ShopifyInventory::locations.keys + VendClient::OUTLET_NAMES_BY_ID.values + [:total_inventory]
   end
 
   def update_inventory(retail_orders, outlet)
@@ -190,36 +190,43 @@ class Product < ApplicationRecord
     adjust_inventory_vend(outlet, inventory_adjustment(outlet))
   end
 
-  def inventory_csv_row
-    total_inventory = 0
-
-    data = { 
+  def inventory_csv_row_data
+    data = {
+      id: id,
       product: vend_datum&.name || retail_shopify&.title || wholesale_shopify&.title,
       variant: (retail_shopify&.variant_title || wholesale_shopify&.variant_title || vend_datum&.variant_name).to_s.gsub(/Default(\s+Title)?/i, ''),
       type: vend_datum&.vend_type&.[]('name') || retail_shopify&.product_type || wholesale_shopify&.product_type,
+      size: retail_shopify&.option1.to_s.strip.downcase || wholesale_shopify&.option1.to_s.strip.downcase,
       sku: vend_datum&.sku || retail_shopify&.barcode || wholesale_shopify&.barcode,
+      handle: retail_shopify&.handle || wholesale_shopify&.handle,
       shopify_tags: retail_shopify&.tags&.join(', '),
       vend: vend_datum&.link,
       retail_shopify: retail_shopify&.link,
       wholesale_shopify: wholesale_shopify&.link,
       app: "https://mollusk.herokuapp.com/products/#{id}",
+      total_inventory: 0
     }
     
     shopify_data.each do |shopify|
       shopify.shopify_inventories.each do |inventory|
         data[inventory.location] = inventory.inventory
-        total_inventory += inventory.inventory if ['Postworks', 'Postworks ATS'].include?(inventory.location)
+        data[:total_inventory] += inventory.inventory if ['Postworks', 'Postworks ATS'].include?(inventory.location)
       end
     end
 
     if vend_datum.present?
       vend_datum.vend_inventories.each do |inventory|
         data[inventory.location] = inventory.inventory
-        total_inventory += inventory.inventory
+        data[:total_inventory] += inventory.inventory
       end
     end
 
-    Product.inventory_csv_headers.map { |header| data[header] } + [total_inventory]
+    data
+  end
+
+  def inventory_csv_row
+    data = inventory_csv_row_data
+    Product.inventory_csv_headers.map { |header| data[header] }
   end
 
   def adjust_order_inventory(order)

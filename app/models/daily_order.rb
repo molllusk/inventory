@@ -83,7 +83,7 @@ class DailyOrder < ApplicationRecord
           'US',
           zipcode,
           daily_inventory_transfer.date.strftime('%m/%d/%y'),
-          (daily_inventory_transfer.date + 3.days).strftime('%m/%d/%y'),
+          daily_inventory_transfer.date.strftime('%m/%d/%y'),
           'Mollusk',
           nil,
           nil
