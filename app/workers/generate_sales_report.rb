@@ -51,8 +51,8 @@ class GenerateSalesReport
     end
 
     summary_headers = [
-      :category,
-      :size,
+      'category',
+      'size',
       'On-Hand Inventory',
       'Last Year Sales Present to Buy Period',
       'Last 90 Days',
@@ -67,7 +67,7 @@ class GenerateSalesReport
     shopify_orders.each do |retail_order|
       retail_order['line_items'].each do |line_item|
         product = raw_data_by_sku[line_item['sku']]
-        quantity = line_item['quantity']
+        quantity = line_item['quantity'].to_i
         if product.present?
           product['Lead Up Shopify Retail'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
@@ -82,7 +82,7 @@ class GenerateSalesReport
     shopify_orders.each do |retail_order|
       retail_order['line_items'].each do |line_item|
         product = raw_data_by_sku[line_item['sku']]
-        quantity = line_item['quantity']
+        quantity = line_item['quantity'].to_i
         if product.present?
           product['Buy Period Shopify Retail'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
@@ -97,7 +97,7 @@ class GenerateSalesReport
     shopify_orders.each do |wholesale_order|
       wholesale_order['line_items'].each do |line_item|
         product = raw_data_by_sku[line_item['sku']]
-        quantity = line_item['quantity']
+        quantity = line_item['quantity'].to_i
         if product.present?
           product['Lead Up Shopify Wholesale'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
@@ -112,7 +112,7 @@ class GenerateSalesReport
     shopify_orders.each do |wholesale_order|
       wholesale_order['line_items'].each do |line_item|
         product = raw_data_by_sku[line_item['sku']]
-        quantity = line_item['quantity']
+        quantity = line_item['quantity'].to_i
         if product.present?
           product['Buy Period Shopify Wholesale'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
@@ -127,7 +127,7 @@ class GenerateSalesReport
     shopify_orders.each do |retail_order|
       retail_order['line_items'].each do |line_item|
         product = raw_data_by_sku[line_item['sku']]
-        quantity = line_item['quantity']
+        quantity = line_item['quantity'].to_i
         if product.present?
           product['Prior Last 90 Days Shopify Retail'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
@@ -142,7 +142,7 @@ class GenerateSalesReport
     shopify_orders.each do |retail_order|
       retail_order['line_items'].each do |line_item|
         product = raw_data_by_sku[line_item['sku']]
-        quantity = line_item['quantity']
+        quantity = line_item['quantity'].to_i
         if product.present?
           product['Last 90 Days Shopify Retail'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
@@ -157,7 +157,7 @@ class GenerateSalesReport
     shopify_orders.each do |wholesale_order|
       wholesale_order['line_items'].each do |line_item|
         product = raw_data_by_sku[line_item['sku']]
-        quantity = line_item['quantity']
+        quantity = line_item['quantity'].to_i
         if product.present?
           product['Prior Last 90 Days Shopify Wholesale'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
@@ -172,7 +172,7 @@ class GenerateSalesReport
     shopify_orders.each do |wholesale_order|
       wholesale_order['line_items'].each do |line_item|
         product = raw_data_by_sku[line_item['sku']]
-        quantity = line_item['quantity']
+        quantity = line_item['quantity'].to_i
         if product.present?
           product['Last 90 Days Shopify Wholesale'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
@@ -188,7 +188,7 @@ class GenerateSalesReport
       retail_order['line_items'].each do |line_item|
         sku = VendDatum.where(vend_id: line_item['product_id']).pluck(:sku).first
         product = raw_data_by_sku[line_item['sku']]
-        quantity = line_item['quantity']
+        quantity = line_item['quantity'].to_i
         if product.present?
           product['Lead Up Vend'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
@@ -204,7 +204,7 @@ class GenerateSalesReport
       retail_order['line_items'].each do |line_item|
         sku = VendDatum.where(vend_id: line_item['product_id']).pluck(:sku).first
         product = raw_data_by_sku[line_item['sku']]
-        quantity = line_item['quantity']
+        quantity = line_item['quantity'].to_i
         if product.present?
           product['Buy Period Vend'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
@@ -220,7 +220,7 @@ class GenerateSalesReport
       retail_order['line_items'].each do |line_item|
         sku = VendDatum.where(vend_id: line_item['product_id']).pluck(:sku).first
         product = raw_data_by_sku[line_item['sku']]
-        quantity = line_item['quantity']
+        quantity = line_item['quantity'].to_i
         if product.present?
           product['Prior Last 90 Days Vend'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
@@ -236,7 +236,7 @@ class GenerateSalesReport
       retail_order['line_items'].each do |line_item|
         sku = VendDatum.where(vend_id: line_item['product_id']).pluck(:sku).first
         product = raw_data_by_sku[line_item['sku']]
-        quantity = line_item['quantity']
+        quantity = line_item['quantity'].to_i
         if product.present?
           product['Last 90 Days Vend'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
@@ -250,8 +250,8 @@ class GenerateSalesReport
     raw_sheet = xls.create_worksheet name: 'Sales Data'
     summary_sheet = xls.create_worksheet name: 'OTB Report'
 
-    raw_sheet.row(0).concat raw_headers
-    summary_sheet.row(0).concat summary_headers
+    raw_sheet.row(0).concat raw_headers.map { |h| h.to_s }
+    summary_sheet.row(0).concat summary_headers.map { |h| h.to_s }
 
     row = 1
     raw_data_by_sku.each do |sku, product|
@@ -262,8 +262,8 @@ class GenerateSalesReport
     row = 1
     sales_by_type_and_size.each do |type, sales_by_size|
       sales_by_size.each do |size, sales|
-        sales[:category] = type
-        sales[:size] = size
+        sales['category'] = type
+        sales['size'] = size
         yoy = 0
         if sales['Prior Last 90 Days'] > 0
           yoy = (sales['Last 90 Days'] - sales['Prior Last 90 Days']) / sales['Prior Last 90 Days'].to_f
