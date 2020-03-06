@@ -294,7 +294,7 @@ module ShopifyClient
       }
 
       response = connection(store).get "#{API_VERSION}/orders.json", params
-      p response.body
+      # p response.body
       orders += response.body['orders']
     end
     orders
