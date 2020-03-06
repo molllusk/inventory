@@ -62,11 +62,13 @@ class GenerateSalesReport
       'Optimal Buy'
     ]
 
+    missing_product_count = 0
+
     shopify_orders = ShopifyClient.closed_orders_between(begin_date, start_date - 1.day)
     
     shopify_orders.each do |retail_order|
       retail_order['line_items'].each do |line_item|
-        product = raw_data_by_sku[line_item['sku']]
+        product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
           product['Lead Up Shopify Retail'] += quantity
@@ -81,7 +83,7 @@ class GenerateSalesReport
 
     shopify_orders.each do |retail_order|
       retail_order['line_items'].each do |line_item|
-        product = raw_data_by_sku[line_item['sku']]
+        product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
           product['Buy Period Shopify Retail'] += quantity
@@ -96,7 +98,7 @@ class GenerateSalesReport
 
     shopify_orders.each do |wholesale_order|
       wholesale_order['line_items'].each do |line_item|
-        product = raw_data_by_sku[line_item['sku']]
+        product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
           product['Lead Up Shopify Wholesale'] += quantity
@@ -111,7 +113,7 @@ class GenerateSalesReport
 
     shopify_orders.each do |wholesale_order|
       wholesale_order['line_items'].each do |line_item|
-        product = raw_data_by_sku[line_item['sku']]
+        product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
           product['Buy Period Shopify Wholesale'] += quantity
@@ -126,7 +128,7 @@ class GenerateSalesReport
 
     shopify_orders.each do |retail_order|
       retail_order['line_items'].each do |line_item|
-        product = raw_data_by_sku[line_item['sku']]
+        product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
           product['Prior Last 90 Days Shopify Retail'] += quantity
@@ -141,7 +143,7 @@ class GenerateSalesReport
 
     shopify_orders.each do |retail_order|
       retail_order['line_items'].each do |line_item|
-        product = raw_data_by_sku[line_item['sku']]
+        product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
           product['Last 90 Days Shopify Retail'] += quantity
@@ -156,7 +158,7 @@ class GenerateSalesReport
 
     shopify_orders.each do |wholesale_order|
       wholesale_order['line_items'].each do |line_item|
-        product = raw_data_by_sku[line_item['sku']]
+        product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]]
         quantity = line_item['quantity'].to_i
         if product.present?
           product['Prior Last 90 Days Shopify Wholesale'] += quantity
@@ -171,7 +173,7 @@ class GenerateSalesReport
 
     shopify_orders.each do |wholesale_order|
       wholesale_order['line_items'].each do |line_item|
-        product = raw_data_by_sku[line_item['sku']]
+        product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
           product['Last 90 Days Shopify Wholesale'] += quantity
@@ -187,7 +189,7 @@ class GenerateSalesReport
     vend_orders.each do |retail_order|
       retail_order['line_items'].each do |line_item|
         sku = VendDatum.where(vend_id: line_item['product_id']).pluck(:sku).first
-        product = raw_data_by_sku[line_item['sku']]
+        product = raw_data_by_sku[sku]
         quantity = line_item['quantity'].to_i
         if product.present?
           product['Lead Up Vend'] += quantity
@@ -203,7 +205,7 @@ class GenerateSalesReport
     vend_orders.each do |retail_order|
       retail_order['line_items'].each do |line_item|
         sku = VendDatum.where(vend_id: line_item['product_id']).pluck(:sku).first
-        product = raw_data_by_sku[line_item['sku']]
+        product = raw_data_by_sku[sku]
         quantity = line_item['quantity'].to_i
         if product.present?
           product['Buy Period Vend'] += quantity
@@ -219,7 +221,7 @@ class GenerateSalesReport
     vend_orders.each do |retail_order|
       retail_order['line_items'].each do |line_item|
         sku = VendDatum.where(vend_id: line_item['product_id']).pluck(:sku).first
-        product = raw_data_by_sku[line_item['sku']]
+        product = raw_data_by_sku[sku]
         quantity = line_item['quantity'].to_i
         if product.present?
           product['Prior Last 90 Days Vend'] += quantity
@@ -235,7 +237,7 @@ class GenerateSalesReport
     vend_orders.each do |retail_order|
       retail_order['line_items'].each do |line_item|
         sku = VendDatum.where(vend_id: line_item['product_id']).pluck(:sku).first
-        product = raw_data_by_sku[line_item['sku']]
+        product = raw_data_by_sku[sku]
         quantity = line_item['quantity'].to_i
         if product.present?
           product['Last 90 Days Vend'] += quantity
@@ -247,8 +249,8 @@ class GenerateSalesReport
     end
 
     xls = Spreadsheet::Workbook.new
-    raw_sheet = xls.create_worksheet name: 'Sales Data'
     summary_sheet = xls.create_worksheet name: 'OTB Report'
+    raw_sheet = xls.create_worksheet name: 'Sales Data'
 
     raw_sheet.row(0).concat raw_headers.map { |h| h.to_s }
     summary_sheet.row(0).concat summary_headers.map { |h| h.to_s }
