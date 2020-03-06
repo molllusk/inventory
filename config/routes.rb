@@ -66,6 +66,12 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :reports do
+    collection do
+      get :generate
+    end
+  end
+
   resources :wholesale_orders do
     collection do
       get :post_to_sos

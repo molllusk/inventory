@@ -59,6 +59,22 @@ class VendClient
     all_products.select { |product| product['is_active'] }
   end
 
+  def self.sales_range(start_date, end_date)
+    min_date =  start_date.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
+    min_date -= min_date.utc_offset
+    max_date = end_date.to_time.in_time_zone('Pacific Time (US & Canada)').end_of_day
+    max_date -= max_date.utc_offset
+
+    data = []
+
+    loop do
+      response = connection.get 'search', { page_size: 1000, type: 'sales', date_from: min_date.iso8601, date_to: max_date.iso8601, offset: data.length }
+      break if response.body['data'].blank?
+      data += response.body['data']
+    end
+    data
+  end
+
   def self.sales(day)
     min_date =  day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
     min_date -= min_date.utc_offset

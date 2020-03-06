@@ -262,6 +262,44 @@ module ShopifyClient
     orders
   end
 
+  def self.closed_orders_between_count(start_date, end_date, store = :RETAIL)
+    min_date = start_date.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
+    max_date = end_date.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
+
+    count_params = {
+      status: 'closed',
+      created_at_min: min_date,
+      created_at_max: max_date
+    }
+
+    count_response = connection(store).get "#{API_VERSION}/orders/count.json", count_params
+    count_response.body['count'].to_i
+  end
+
+  def self.closed_orders_between(start_date, end_date, store = :RETAIL)
+    orders = []
+
+    pages = (closed_orders_between_count(start_date, end_date, store) / 250.0).ceil
+
+    min_date = start_date.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
+    max_date = end_date.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
+
+    pages.times do |page|
+      params = {
+        limit: 250,
+        page: page + 1,
+        status: 'closed',
+        created_at_min: min_date,
+        created_at_max: max_date
+      }
+
+      response = connection(store).get "#{API_VERSION}/orders.json", params
+      p response.body
+      orders += response.body['orders']
+    end
+    orders
+  end
+
   def self.transactions(order_id, store = :RETAIL)
     response = connection(store).get "#{API_VERSION}/orders/#{order_id}/transactions.json"
     response.body['transactions'] || []
