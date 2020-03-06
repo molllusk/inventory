@@ -283,6 +283,6 @@ class GenerateSalesReport
     spreadsheet = StringIO.new
     xls.write spreadsheet 
 
-    ApplicationMailer.otb_report(spreadsheet.string, start_date, end_date)
+    ApplicationMailer.otb_report(spreadsheet.string, start_date, end_date).deliver
   end
 end
