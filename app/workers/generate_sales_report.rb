@@ -5,13 +5,8 @@ class GenerateSalesReport
   sidekiq_options queue: :reporting, retry: false
 
   def perform(start_date, end_date)
-    dates = {"start"=>"September 6, 2019", "end"=>"March 6, 2020"}
-
-    # start_date = Date.parse(start_date) - 1.year
-    # end_date = Date.parse(end_date) - 1.year
-
-    start_date = Date.parse(dates["start"])
-    end_date = Date.parse(dates["end"])
+    start_date = Date.parse(start_date) - 1.year
+    end_date = Date.parse(end_date) - 1.year
 
 
     begin_date = 1.year.ago.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
