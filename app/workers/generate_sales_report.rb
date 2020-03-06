@@ -58,7 +58,7 @@ class GenerateSalesReport
       'Last 90 Days',
       'Prior Last 90 Days',
       'YoY Change Last 90 Days',
-      'Projected (Last Year) Sales for Buy Period',
+      'Projected (Last Year) Sales during Buy Period',
       'Optimal Buy'
     ]
 
@@ -271,7 +271,7 @@ class GenerateSalesReport
           yoy = (sales['Last 90 Days'] - sales['Prior Last 90 Days']) / sales['Prior Last 90 Days'].to_f
         end
         sales['YoY Change Last 90 Days'] = yoy
-        sales['Optimal Buy'] = ((sales['Projected (Last Year) Sales for Buy Period'] + sales['Last Year Sales Present to Buy Period']) * yoy)  -  sales['On-Hand Inventory']
+        sales['Optimal Buy'] = ((sales['Projected (Last Year) Sales during Buy Period'] + sales['Last Year Sales Present to Buy Period']) * yoy)  -  sales['On-Hand Inventory']
         summary_sheet.row(row).concat summary_headers.map { |header| sales[header] }
         row += 1
       end
