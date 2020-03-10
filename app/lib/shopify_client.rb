@@ -264,7 +264,7 @@ module ShopifyClient
 
   def self.closed_orders_between_count(start_date, end_date, store = :RETAIL)
     min_date = start_date.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
-    max_date = end_date.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
+    max_date = end_date.to_time.in_time_zone('Pacific Time (US & Canada)').end_of_day
 
     count_params = {
       status: 'closed',
@@ -282,7 +282,7 @@ module ShopifyClient
     pages = (closed_orders_between_count(start_date, end_date, store) / 250.0).ceil
 
     min_date = start_date.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
-    max_date = end_date.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
+    max_date = end_date.to_time.in_time_zone('Pacific Time (US & Canada)').end_of_day
 
     pages.times do |page|
       params = {
