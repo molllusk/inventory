@@ -295,7 +295,7 @@ module ShopifyClient
 
       response = connection(store).get "#{API_VERSION}/orders.json", params
       # p response.body
-      orders += response.body['orders']
+      orders += response.body['orders'] unless response.body['orders'].blank?
     end
     orders
   end
