@@ -285,8 +285,8 @@ class GenerateSalesReport
     products_sheet = xls.create_worksheet name: 'Products'
     orders_sheet = xls.create_worksheet name: 'orders'
 
-    raw_sheet.row(0).concat raw_headers.map { |h| h.to_s }
-    summary_sheet.row(0).concat summary_headers.map { |h| h.to_s }
+    products_sheet.row(0).concat raw_headers.map { |h| h.to_s }
+    otb_sheet.row(0).concat summary_headers.map { |h| h.to_s }
     orders_sheet.row(0).concat order_headers.map { |h| h.to_s }
 
     row = 1
