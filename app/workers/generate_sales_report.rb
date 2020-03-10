@@ -111,7 +111,7 @@ class GenerateSalesReport
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << ['Shopify Wholesale', retail_order['id'], line_item['sku'], quantity]
+          orders << ['Shopify Wholesale', wholesale_order['id'], line_item['sku'], quantity]
           product['Lead Up Shopify Wholesale'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Last Year Sales Present to Buy Period'] += quantity
@@ -129,7 +129,7 @@ class GenerateSalesReport
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << ['Shopify Wholesale', retail_order['id'], line_item['sku'], quantity]
+          orders << ['Shopify Wholesale', wholesale_order['id'], line_item['sku'], quantity]
           product['Buy Period Shopify Wholesale'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Projected (Last Year) Sales during Buy Period'] += quantity
@@ -183,7 +183,7 @@ class GenerateSalesReport
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << ['Shopify Wholesale', retail_order['id'], line_item['sku'], quantity]
+          orders << ['Shopify Wholesale', wholesale_order['id'], line_item['sku'], quantity]
           product['Prior Last 90 Days Shopify Wholesale'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Prior Last 90 Days'] += quantity
@@ -201,7 +201,7 @@ class GenerateSalesReport
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << ['Shopify Wholesale', retail_order['id'], line_item['sku'], quantity]
+          orders << ['Shopify Wholesale', wholesale_order['id'], line_item['sku'], quantity]
           product['Last 90 Days Shopify Wholesale'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Last 90 Days'] += quantity
