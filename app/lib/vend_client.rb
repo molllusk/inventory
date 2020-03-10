@@ -68,7 +68,7 @@ class VendClient
     data = []
 
     loop do
-      response = connection.get 'search', { page_size: 1000, type: 'sales', date_from: min_date.iso8601, date_to: max_date.iso8601, offset: data.length }
+      response = connection.get 'search', { page_size: 2000, type: 'sales', date_from: min_date.iso8601, date_to: max_date.iso8601, offset: data.length }
       break if response.body['data'].blank?
       data += response.body['data']
     end
