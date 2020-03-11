@@ -65,14 +65,26 @@ class VendClient
     max_date = end_date.to_time.in_time_zone('Pacific Time (US & Canada)').end_of_day
     max_date -= max_date.utc_offset
 
-    data = []
+    end_query_date = min_date + 1.week
+    full_data = []
 
     loop do
-      response = connection.get 'search', { page_size: 2000, type: 'sales', date_from: min_date.iso8601, date_to: max_date.iso8601, offset: data.length }
-      break if response.body['data'].blank?
-      data += response.body['data']
+      weekly_data = []
+
+      loop do
+        response = connection.get 'search', { page_size: 1000, type: 'sales', date_from: min_date.iso8601, date_to: end_query_date.iso8601, offset: weekly_data.length }
+        break if response.body['data'].blank?
+        weekly_data += response.body['data']
+      end
+      full_data += weekly_data
+
+      break if end_query_date == max_date
+
+      min_date = end_query_date
+      end_query_date = end_query_date + 1.week
+      end_query_date = max_date if end_query_date > max_date
     end
-    data
+    full_data
   end
 
   def self.sales(day)
@@ -81,8 +93,15 @@ class VendClient
     max_date = day.to_time.in_time_zone('Pacific Time (US & Canada)').end_of_day
     max_date -= max_date.utc_offset
 
-    response = connection.get 'search', { page_size: 10000, type: 'sales', date_from: min_date.iso8601, date_to: max_date.iso8601 }
-    response.body['data']
+    data = []
+
+    loop do
+      response = connection.get 'search', { page_size: 1000, type: 'sales', date_from: min_date.iso8601, date_to: max_date.iso8601, offset: data.length }
+      break if response.body['data'].blank?
+      data += response.body['data']
+    end
+
+    data
   end
 
   def self.daily_orders

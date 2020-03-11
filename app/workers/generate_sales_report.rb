@@ -11,7 +11,7 @@ class GenerateSalesReport
     begin_date = 1.year.ago.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
     prior_ninety_days = begin_date - 90.days
 
-    yesterday = Date.yesterday.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
+    today = Date.today.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
     ninety_days = 90.days.ago.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
 
     raw_data_by_sku = {}
@@ -22,7 +22,7 @@ class GenerateSalesReport
 
     raw_product_headers = Product.inventory_csv_headers
 
-    order_headers = ['Category', 'Size', 'Point of Sale', 'Sale id', 'sku', 'quantity']
+    order_headers = ['Category', 'Size', 'Point of Sale', 'Sale id', 'SKU', 'Quantity']
 
     orders = []
 
@@ -158,7 +158,7 @@ class GenerateSalesReport
       end
     end
 
-    shopify_orders = ShopifyClient.closed_orders_between(ninety_days, yesterday)
+    shopify_orders = ShopifyClient.closed_orders_between(ninety_days, today)
 
     shopify_orders.each do |retail_order|
       retail_order['line_items'].each do |line_item|
@@ -194,7 +194,7 @@ class GenerateSalesReport
       end
     end
 
-    shopify_orders = ShopifyClient.closed_orders_between(ninety_days, yesterday, :WHOLESALE)
+    shopify_orders = ShopifyClient.closed_orders_between(ninety_days, today, :WHOLESALE)
 
     shopify_orders.each do |wholesale_order|
       wholesale_order['line_items'].each do |line_item|
@@ -263,7 +263,7 @@ class GenerateSalesReport
       end
     end
 
-    vend_orders = VendClient.sales_range(ninety_days, yesterday)
+    vend_orders = VendClient.sales_range(ninety_days, today)
 
     vend_orders.each do |retail_order|
       retail_order['line_items'].each do |line_item|
