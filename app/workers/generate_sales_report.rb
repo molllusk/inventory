@@ -14,6 +14,9 @@ class GenerateSalesReport
     today = Date.today.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
     ninety_days = 90.days.ago.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
 
+    date_ranges_headers = ['Range','Start','End']
+    date_ranges = []
+
     raw_data_by_sku = {}
     
     product_types = Product.get_daily_order_inventory_levels.keys
@@ -22,7 +25,7 @@ class GenerateSalesReport
 
     raw_product_headers = Product.inventory_csv_headers
 
-    order_headers = ['Date', 'Category', 'Size', 'Point of Sale', 'Sale id', 'SKU', 'Quantity']
+    order_headers = ['Period', 'Date', 'Category', 'Size', 'Point of Sale', 'Sale id', 'SKU', 'Quantity']
 
     orders = []
 
@@ -70,6 +73,7 @@ class GenerateSalesReport
     missing_products = []
 
     # Begin Date
+    date_ranges << ['Present to Buy Period', begin_date.strftime('%m/%d/%Y'), (start_date - 1.day).strftime('%m/%d/%Y')]
 
     query_orders = VendClient.sales_range(begin_date, start_date - 1.day)
 
@@ -79,7 +83,7 @@ class GenerateSalesReport
         product = raw_data_by_sku[sku]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << [retail_order['sale_date'], product[:type], product[:size], 'Vend', retail_order['id'], sku, quantity]
+          orders << ['Present to Buy Period', retail_order['sale_date'], product[:type], product[:size], 'Vend', retail_order['id'], sku, quantity]
           product['Lead Up Vend'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Present to Buy Period'] += quantity
@@ -95,7 +99,7 @@ class GenerateSalesReport
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << [retail_order['created_at'], product[:type], product[:size], 'Shopify Retail', retail_order['id'], line_item['sku'], quantity]
+          orders << ['Present to Buy Period', retail_order['created_at'], product[:type], product[:size], 'Shopify Retail', retail_order['id'], line_item['sku'], quantity]
           product['Lead Up Shopify Retail'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Present to Buy Period'] += quantity
@@ -113,7 +117,7 @@ class GenerateSalesReport
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << [wholesale_order['created_at'], product[:type], product[:size], 'Shopify Wholesale', wholesale_order['id'], line_item['sku'], quantity]
+          orders << ['Present to Buy Period', wholesale_order['created_at'], product[:type], product[:size], 'Shopify Wholesale', wholesale_order['id'], line_item['sku'], quantity]
           product['Lead Up Shopify Wholesale'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Present to Buy Period'] += quantity
@@ -125,6 +129,7 @@ class GenerateSalesReport
     end
 
     # Start Date
+    date_ranges << ['During Buy Period', start_date.strftime('%m/%d/%Y'), end_date.strftime('%m/%d/%Y')]
 
     query_orders = VendClient.sales_range(start_date, end_date)
 
@@ -134,7 +139,7 @@ class GenerateSalesReport
         product = raw_data_by_sku[sku]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << [retail_order['sale_date'], product[:type], product[:size], 'Vend', retail_order['id'], sku, quantity]
+          orders << ['During Buy Period', retail_order['sale_date'], product[:type], product[:size], 'Vend', retail_order['id'], sku, quantity]
           product['Buy Period Vend'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales During Buy Period'] += quantity
@@ -150,7 +155,7 @@ class GenerateSalesReport
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << [retail_order['created_at'], product[:type], product[:size], 'Shopify Retail', retail_order['id'], line_item['sku'], quantity]
+          orders << ['During Buy Period', retail_order['created_at'], product[:type], product[:size], 'Shopify Retail', retail_order['id'], line_item['sku'], quantity]
           product['Buy Period Shopify Retail'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales During Buy Period'] += quantity
@@ -168,7 +173,7 @@ class GenerateSalesReport
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << [wholesale_order['created_at'], product[:type], product[:size], 'Shopify Wholesale', wholesale_order['id'], line_item['sku'], quantity]
+          orders << ['During Buy Period', wholesale_order['created_at'], product[:type], product[:size], 'Shopify Wholesale', wholesale_order['id'], line_item['sku'], quantity]
           product['Buy Period Shopify Wholesale'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales During Buy Period'] += quantity
@@ -180,7 +185,7 @@ class GenerateSalesReport
     end
 
     # Ninety Days
-
+    date_ranges << ['Last 90 Days', ninety_days.strftime('%m/%d/%Y'), today.strftime('%m/%d/%Y')]
     query_orders = VendClient.sales_range(ninety_days, today)
 
     query_orders.each do |retail_order|
@@ -189,7 +194,7 @@ class GenerateSalesReport
         product = raw_data_by_sku[sku]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << [retail_order['sale_date'], product[:type], product[:size], 'Vend', retail_order['id'], sku, quantity]
+          orders << ['Last 90 Days', retail_order['sale_date'], product[:type], product[:size], 'Vend', retail_order['id'], sku, quantity]
           product['Sales Last 90 Days Vend'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Last 90 Days'] += quantity
@@ -205,7 +210,7 @@ class GenerateSalesReport
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << [retail_order['created_at'], product[:type], product[:size], 'Shopify Retail', retail_order['id'], line_item['sku'], quantity]
+          orders << ['Last 90 Days', retail_order['created_at'], product[:type], product[:size], 'Shopify Retail', retail_order['id'], line_item['sku'], quantity]
           product['Sales Last 90 Days Shopify Retail'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Last 90 Days'] += quantity
@@ -223,7 +228,7 @@ class GenerateSalesReport
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << [wholesale_order['created_at'], product[:type], product[:size], 'Shopify Wholesale', wholesale_order['id'], line_item['sku'], quantity]
+          orders << ['Last 90 Days', wholesale_order['created_at'], product[:type], product[:size], 'Shopify Wholesale', wholesale_order['id'], line_item['sku'], quantity]
           product['Sales Last 90 Days Shopify Wholesale'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Last 90 Days'] += quantity
@@ -235,7 +240,7 @@ class GenerateSalesReport
     end
 
     # Prior Ninety Days
-
+    date_ranges << ['Last 90 Days Previous Year', prior_ninety_days.strftime('%m/%d/%Y'), (begin_date - 1.day).strftime('%m/%d/%Y')]
     query_orders = VendClient.sales_range(prior_ninety_days, begin_date - 1.day)
 
     query_orders.each do |retail_order|
@@ -244,7 +249,7 @@ class GenerateSalesReport
         product = raw_data_by_sku[sku]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << [retail_order['sale_date'], product[:type], product[:size], 'Vend', retail_order['id'], sku, quantity]
+          orders << ['Last 90 Days Previous Year', retail_order['sale_date'], product[:type], product[:size], 'Vend', retail_order['id'], sku, quantity]
           product['Sales Last 90 Days Previous Year Vend'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Last 90 Days Previous Year'] += quantity
@@ -260,7 +265,7 @@ class GenerateSalesReport
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << [retail_order['created_at'], product[:type], product[:size], 'Shopify Retail', retail_order['id'], line_item['sku'], quantity]
+          orders << ['Last 90 Days Previous Year', retail_order['created_at'], product[:type], product[:size], 'Shopify Retail', retail_order['id'], line_item['sku'], quantity]
           product['Sales Last 90 Days Previous Year Shopify Retail'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Last 90 Days Previous Year'] += quantity
@@ -278,7 +283,7 @@ class GenerateSalesReport
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << [wholesale_order['created_at'], product[:type], product[:size], 'Shopify Wholesale', wholesale_order['id'], line_item['sku'], quantity]
+          orders << ['Last 90 Days Previous Year', wholesale_order['created_at'], product[:type], product[:size], 'Shopify Wholesale', wholesale_order['id'], line_item['sku'], quantity]
           product['Sales Last 90 Days Previous Year Shopify Wholesale'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Last 90 Days Previous Year'] += quantity
@@ -293,10 +298,16 @@ class GenerateSalesReport
     otb_sheet = xls.create_worksheet name: 'OTB Report'
     products_sheet = xls.create_worksheet name: 'Products'
     orders_sheet = xls.create_worksheet name: 'Orders'
+    date_ranges_sheet = xls.create_worksheet name: 'Date Ranges'
 
     products_sheet.row(0).concat raw_headers.map { |h| h.to_s }
     otb_sheet.row(0).concat summary_headers.map { |h| h.to_s }
     orders_sheet.row(0).concat order_headers.map { |h| h.to_s }
+    date_ranges_sheet.row(0).concat date_ranges_headers
+
+    date_ranges.each_with_index do |range, row|
+      date_ranges_sheet.row(row + 1).concat range
+    end
 
     row = 1
     raw_data_by_sku.each do |sku, product|
