@@ -94,7 +94,7 @@ class GenerateSalesReport
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << [retail_order['created_at'], product[:type], product[:size], product[:type], product[:size], 'Shopify Retail', retail_order['id'], line_item['sku'], quantity]
+          orders << [retail_order['created_at'], product[:type], product[:size], 'Shopify Retail', retail_order['id'], line_item['sku'], quantity]
           product['Lead Up Shopify Retail'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Present to Buy Period'] += quantity
@@ -291,7 +291,7 @@ class GenerateSalesReport
     xls = Spreadsheet::Workbook.new
     otb_sheet = xls.create_worksheet name: 'OTB Report'
     products_sheet = xls.create_worksheet name: 'Products'
-    orders_sheet = xls.create_worksheet name: 'orders'
+    orders_sheet = xls.create_worksheet name: 'Orders'
 
     products_sheet.row(0).concat raw_headers.map { |h| h.to_s }
     otb_sheet.row(0).concat summary_headers.map { |h| h.to_s }
