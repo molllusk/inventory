@@ -22,7 +22,7 @@ class GenerateSalesReport
 
     raw_product_headers = Product.inventory_csv_headers
 
-    order_headers = ['Category', 'Size', 'Point of Sale', 'Sale id', 'SKU', 'Quantity']
+    order_headers = ['Date', 'Category', 'Size', 'Point of Sale', 'Sale id', 'SKU', 'Quantity']
 
     orders = []
 
@@ -68,14 +68,33 @@ class GenerateSalesReport
 
     missing_products = []
 
-    shopify_orders = ShopifyClient.closed_orders_between(begin_date, start_date - 1.day)
+    # Begin Date
+
+    query_orders = VendClient.sales_range(begin_date, start_date - 1.day)
+
+    query_orders.each do |retail_order|
+      retail_order['line_items'].each do |line_item|
+        sku = VendDatum.where(vend_id: line_item['product_id']).pluck(:sku).first
+        product = raw_data_by_sku[sku]
+        quantity = line_item['quantity'].to_i
+        if product.present?
+          orders << [retail_order['sale_date'], product[:type], product[:size], 'Vend', retail_order['id'], sku, quantity]
+          product['Lead Up Vend'] += quantity
+          if product_types.include? product[:type].to_s.strip.downcase
+            sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Present to Buy Period'] += quantity
+          end
+        end
+      end
+    end
+
+    query_orders = ShopifyClient.closed_orders_between(begin_date, start_date - 1.day)
     
-    shopify_orders.each do |retail_order|
+    query_orders.each do |retail_order|
       retail_order['line_items'].each do |line_item|
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << [product[:type], product[:size], product[:type], product[:size], 'Shopify Retail', retail_order['id'], line_item['sku'], quantity]
+          orders << [retail_order['created_at'], product[:type], product[:size], product[:type], product[:size], 'Shopify Retail', retail_order['id'], line_item['sku'], quantity]
           product['Lead Up Shopify Retail'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Present to Buy Period'] += quantity
@@ -86,32 +105,14 @@ class GenerateSalesReport
       end
     end
 
-    shopify_orders = ShopifyClient.closed_orders_between(start_date, end_date)
+    query_orders = ShopifyClient.closed_orders_between(begin_date, start_date - 1.day, :WHOLESALE)
 
-    shopify_orders.each do |retail_order|
-      retail_order['line_items'].each do |line_item|
-        product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
-        quantity = line_item['quantity'].to_i
-        if product.present?
-          orders << [product[:type], product[:size], 'Shopify Retail', retail_order['id'], line_item['sku'], quantity]
-          product['Buy Period Shopify Retail'] += quantity
-          if product_types.include? product[:type].to_s.strip.downcase
-            sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales During Buy Period'] += quantity
-          end
-        else
-          missing_products << line_item['sku']
-        end
-      end
-    end
-
-    shopify_orders = ShopifyClient.closed_orders_between(begin_date, start_date - 1.day, :WHOLESALE)
-
-    shopify_orders.each do |wholesale_order|
+    query_orders.each do |wholesale_order|
       wholesale_order['line_items'].each do |line_item|
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << [product[:type], product[:size], 'Shopify Wholesale', wholesale_order['id'], line_item['sku'], quantity]
+          orders << [wholesale_order['created_at'], product[:type], product[:size], 'Shopify Wholesale', wholesale_order['id'], line_item['sku'], quantity]
           product['Lead Up Shopify Wholesale'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Present to Buy Period'] += quantity
@@ -122,14 +123,51 @@ class GenerateSalesReport
       end
     end
 
-    shopify_orders = ShopifyClient.closed_orders_between(start_date, end_date, :WHOLESALE)
+    # Start Date
 
-    shopify_orders.each do |wholesale_order|
+    query_orders = VendClient.sales_range(start_date, end_date)
+
+    query_orders.each do |retail_order|
+      retail_order['line_items'].each do |line_item|
+        sku = VendDatum.where(vend_id: line_item['product_id']).pluck(:sku).first
+        product = raw_data_by_sku[sku]
+        quantity = line_item['quantity'].to_i
+        if product.present?
+          orders << [retail_order['sale_date'], product[:type], product[:size], 'Vend', retail_order['id'], sku, quantity]
+          product['Buy Period Vend'] += quantity
+          if product_types.include? product[:type].to_s.strip.downcase
+            sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales During Buy Period'] += quantity
+          end
+        end
+      end
+    end
+
+    query_orders = ShopifyClient.closed_orders_between(start_date, end_date)
+
+    query_orders.each do |retail_order|
+      retail_order['line_items'].each do |line_item|
+        product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
+        quantity = line_item['quantity'].to_i
+        if product.present?
+          orders << [retail_order['created_at'], product[:type], product[:size], 'Shopify Retail', retail_order['id'], line_item['sku'], quantity]
+          product['Buy Period Shopify Retail'] += quantity
+          if product_types.include? product[:type].to_s.strip.downcase
+            sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales During Buy Period'] += quantity
+          end
+        else
+          missing_products << line_item['sku']
+        end
+      end
+    end
+
+    query_orders = ShopifyClient.closed_orders_between(start_date, end_date, :WHOLESALE)
+
+    query_orders.each do |wholesale_order|
       wholesale_order['line_items'].each do |line_item|
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << [product[:type], product[:size], 'Shopify Wholesale', wholesale_order['id'], line_item['sku'], quantity]
+          orders << [wholesale_order['created_at'], product[:type], product[:size], 'Shopify Wholesale', wholesale_order['id'], line_item['sku'], quantity]
           product['Buy Period Shopify Wholesale'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales During Buy Period'] += quantity
@@ -140,32 +178,33 @@ class GenerateSalesReport
       end
     end
 
-    shopify_orders = ShopifyClient.closed_orders_between(prior_ninety_days, begin_date - 1.day)
+    # Ninety Days
 
-    shopify_orders.each do |retail_order|
+    query_orders = VendClient.sales_range(ninety_days, today)
+
+    query_orders.each do |retail_order|
       retail_order['line_items'].each do |line_item|
-        product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
+        sku = VendDatum.where(vend_id: line_item['product_id']).pluck(:sku).first
+        product = raw_data_by_sku[sku]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << [product[:type], product[:size], 'Shopify Retail', retail_order['id'], line_item['sku'], quantity]
-          product['Sales Last 90 Days Previous Year Shopify Retail'] += quantity
+          orders << [retail_order['sale_date'], product[:type], product[:size], 'Vend', retail_order['id'], sku, quantity]
+          product['Sales Last 90 Days Vend'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
-            sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Last 90 Days Previous Year'] += quantity
+            sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Last 90 Days'] += quantity
           end
-        else
-          missing_products << line_item['sku']
         end
       end
     end
 
-    shopify_orders = ShopifyClient.closed_orders_between(ninety_days, today)
+    query_orders = ShopifyClient.closed_orders_between(ninety_days, today)
 
-    shopify_orders.each do |retail_order|
+    query_orders.each do |retail_order|
       retail_order['line_items'].each do |line_item|
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << [product[:type], product[:size], 'Shopify Retail', retail_order['id'], line_item['sku'], quantity]
+          orders << [retail_order['created_at'], product[:type], product[:size], 'Shopify Retail', retail_order['id'], line_item['sku'], quantity]
           product['Sales Last 90 Days Shopify Retail'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Last 90 Days'] += quantity
@@ -176,32 +215,14 @@ class GenerateSalesReport
       end
     end
 
-    shopify_orders = ShopifyClient.closed_orders_between(prior_ninety_days, begin_date - 1.day, :WHOLESALE)
+    query_orders = ShopifyClient.closed_orders_between(ninety_days, today, :WHOLESALE)
 
-    shopify_orders.each do |wholesale_order|
+    query_orders.each do |wholesale_order|
       wholesale_order['line_items'].each do |line_item|
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << [product[:type], product[:size], 'Shopify Wholesale', wholesale_order['id'], line_item['sku'], quantity]
-          product['Sales Last 90 Days Previous Year Shopify Wholesale'] += quantity
-          if product_types.include? product[:type].to_s.strip.downcase
-            sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Last 90 Days Previous Year'] += quantity
-          end
-        else
-          missing_products << line_item['sku']
-        end
-      end
-    end
-
-    shopify_orders = ShopifyClient.closed_orders_between(ninety_days, today, :WHOLESALE)
-
-    shopify_orders.each do |wholesale_order|
-      wholesale_order['line_items'].each do |line_item|
-        product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
-        quantity = line_item['quantity'].to_i
-        if product.present?
-          orders << [product[:type], product[:size], 'Shopify Wholesale', wholesale_order['id'], line_item['sku'], quantity]
+          orders << [wholesale_order['created_at'], product[:type], product[:size], 'Shopify Wholesale', wholesale_order['id'], line_item['sku'], quantity]
           product['Sales Last 90 Days Shopify Wholesale'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Last 90 Days'] += quantity
@@ -212,49 +233,17 @@ class GenerateSalesReport
       end
     end
 
-    vend_orders = VendClient.sales_range(begin_date, start_date - 1.day)
+    # Prior Ninety Days
 
-    vend_orders.each do |retail_order|
+    query_orders = VendClient.sales_range(prior_ninety_days, begin_date - 1.day)
+
+    query_orders.each do |retail_order|
       retail_order['line_items'].each do |line_item|
         sku = VendDatum.where(vend_id: line_item['product_id']).pluck(:sku).first
         product = raw_data_by_sku[sku]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << [product[:type], product[:size], 'Vend', retail_order['id'], sku, quantity]
-          product['Lead Up Vend'] += quantity
-          if product_types.include? product[:type].to_s.strip.downcase
-            sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Present to Buy Period'] += quantity
-          end
-        end
-      end
-    end
-
-    vend_orders = VendClient.sales_range(start_date, end_date)
-
-    vend_orders.each do |retail_order|
-      retail_order['line_items'].each do |line_item|
-        sku = VendDatum.where(vend_id: line_item['product_id']).pluck(:sku).first
-        product = raw_data_by_sku[sku]
-        quantity = line_item['quantity'].to_i
-        if product.present?
-          orders << [product[:type], product[:size], 'Vend', retail_order['id'], sku, quantity]
-          product['Buy Period Vend'] += quantity
-          if product_types.include? product[:type].to_s.strip.downcase
-            sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales During Buy Period'] += quantity
-          end
-        end
-      end
-    end
-
-    vend_orders = VendClient.sales_range(prior_ninety_days, begin_date - 1.day)
-
-    vend_orders.each do |retail_order|
-      retail_order['line_items'].each do |line_item|
-        sku = VendDatum.where(vend_id: line_item['product_id']).pluck(:sku).first
-        product = raw_data_by_sku[sku]
-        quantity = line_item['quantity'].to_i
-        if product.present?
-          orders << [product[:type], product[:size], 'Vend', retail_order['id'], sku, quantity]
+          orders << [retail_order['sale_date'], product[:type], product[:size], 'Vend', retail_order['id'], sku, quantity]
           product['Sales Last 90 Days Previous Year Vend'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
             sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Last 90 Days Previous Year'] += quantity
@@ -263,19 +252,38 @@ class GenerateSalesReport
       end
     end
 
-    vend_orders = VendClient.sales_range(ninety_days, today)
+    query_orders = ShopifyClient.closed_orders_between(prior_ninety_days, begin_date - 1.day)
 
-    vend_orders.each do |retail_order|
+    query_orders.each do |retail_order|
       retail_order['line_items'].each do |line_item|
-        sku = VendDatum.where(vend_id: line_item['product_id']).pluck(:sku).first
-        product = raw_data_by_sku[sku]
+        product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
         if product.present?
-          orders << [product[:type], product[:size], 'Vend', retail_order['id'], sku, quantity]
-          product['Sales Last 90 Days Vend'] += quantity
+          orders << [retail_order['created_at'], product[:type], product[:size], 'Shopify Retail', retail_order['id'], line_item['sku'], quantity]
+          product['Sales Last 90 Days Previous Year Shopify Retail'] += quantity
           if product_types.include? product[:type].to_s.strip.downcase
-            sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Last 90 Days'] += quantity
+            sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Last 90 Days Previous Year'] += quantity
           end
+        else
+          missing_products << line_item['sku']
+        end
+      end
+    end
+
+    query_orders = ShopifyClient.closed_orders_between(prior_ninety_days, begin_date - 1.day, :WHOLESALE)
+
+    query_orders.each do |wholesale_order|
+      wholesale_order['line_items'].each do |line_item|
+        product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
+        quantity = line_item['quantity'].to_i
+        if product.present?
+          orders << [wholesale_order['created_at'], product[:type], product[:size], 'Shopify Wholesale', wholesale_order['id'], line_item['sku'], quantity]
+          product['Sales Last 90 Days Previous Year Shopify Wholesale'] += quantity
+          if product_types.include? product[:type].to_s.strip.downcase
+            sales_by_type_and_size[product[:type].to_s][product[:size].to_s]['Sales Last 90 Days Previous Year'] += quantity
+          end
+        else
+          missing_products << line_item['sku']
         end
       end
     end
