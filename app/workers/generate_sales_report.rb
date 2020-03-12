@@ -58,6 +58,7 @@ class GenerateSalesReport
       'size',
       'On-Hand Inventory',
       'Sales Present to Buy Period',
+      'Leftover Inventory',
       'Sales During Buy Period',
       'Sales Last 90 Days',
       'Sales Last 90 Days Previous Year',
@@ -322,9 +323,11 @@ class GenerateSalesReport
         sales['size'] = size
         sales['YoY Change Last 90 Days (by type)'] = yoy
 
-        sales['Optimal Buy With Percentage'] = sales['Sales During Buy Period'] * (1 + yoy) - sales['On-Hand Inventory']
+        sales['Leftover Inventory'] = sales['Sales Present to Buy Period'] < sales['On-Hand Inventory'] ? sales['On-Hand Inventory'] - sales['Sales Present to Buy Period'] : 0
 
-        sales['Optimal Buy Without Percentage'] = sales['Sales During Buy Period'] - sales['On-Hand Inventory']
+        sales['Optimal Buy With Percentage'] = sales['Sales During Buy Period'] * (1 + yoy) - sales['Leftover Inventory']
+
+        sales['Optimal Buy Without Percentage'] = sales['Sales During Buy Period'] - sales['Leftover Inventory']
 
         otb_sheet.row(row).concat summary_headers.map { |header| sales[header] }
         row += 1
