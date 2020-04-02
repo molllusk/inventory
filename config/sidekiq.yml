@@ -13,11 +13,11 @@ max_retries: 3
     cron: '0 9 * * *'
     class: 'DailySalesReceipts'
     description: 'Report accounting to QBO and App'
-  daily_ordering:
-    cron: '00 12 * * MON,WED,FRI'
-    class: 'DailyOrdering'
-    description: 'Daily Orders for inventory transfers'
   renew_sos_token:
     cron: '* * 1 * *'
     class: 'RenewSosToken'
     description: 'Refresh SOS access token once a month'
+  # daily_ordering:
+  #   cron: '00 12 * * MON,WED,FRI'
+  #   class: 'DailyOrdering'
+  #   description: 'Daily Orders for inventory transfers'
