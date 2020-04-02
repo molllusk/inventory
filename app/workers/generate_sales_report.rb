@@ -4,6 +4,7 @@ class GenerateSalesReport
   include Sidekiq::Worker
   sidekiq_options queue: :reporting, retry: false
 
+  # Params format {"start"=>"March 27, 2020", "end"=>"February 15, 2021"}
   def perform(start_date, end_date)
     start_date = Date.parse(start_date) - 1.year
     end_date = Date.parse(end_date) - 1.year
