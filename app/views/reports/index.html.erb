@@ -3,7 +3,7 @@
 <div class='container-fluid'>
   <div class='row'>
     <div class='col-md-2 col-md-offset-1' style='text-align: right'>
-      <h2>OTB Report:</h2>
+      <h2 class='m-1 p-2'>OTB Report:</h2>
     </div>
     <div id='reportrange' class='col-md-4' style='cursor: pointer; padding: 5px 10px; border: 1px solid #ccc'>
         <i class='fa fa-calendar'></i>&nbsp;
@@ -20,7 +20,7 @@
   <hr />
   <div class='row mt-5'>
     <div class='col-md-3 col-md-offset-4' style='text-align: right'>
-      <h2>Product Inventory Report:</h2>
+      <h2 class='m-1 p-2'>Product Inventory Report:</h2>
     </div>
     <div class='col-md-2'>
       <%= form_for(:generate, class: 'form-inline', url: generate_products_reports_path, method: :get) do |f| %>
