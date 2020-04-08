@@ -271,7 +271,7 @@ module ShopifyClient
     response.body['refunds'] || []
   end
 
-  # Pagination methods
+  # Pagination methods https://www.shopify.com/partners/blog/relative-pagination
   def self.cursor_paginate(resource, params, store = :RETAIL)
     response = connection(store).get "#{API_VERSION}/#{resource}.json", params
     resources = response.body[resource]
