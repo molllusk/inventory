@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class GenerateSalesReport
+class GenerateOtbReport
   include Sidekiq::Worker
   sidekiq_options queue: :reporting, retry: false
 

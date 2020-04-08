@@ -4,12 +4,19 @@ class ReportsController < ApplicationController
   def index
   end
 
-  def generate
+  def generate_otb
     dates = params[:generate]
 
-    GenerateSalesReport.perform_async(dates[:start], dates[:end])
+    GenerateOtbReport.perform_async(dates[:start], dates[:end])
     puts [dates[:start], dates[:end]]
-    flash[:success] = 'The report is generating and will be emailed to john@mollusksurfshop.com when it finishes'
+    flash[:success] = 'The OTB Report is generating and will be emailed to John and Joseph when it finishes'
+
+    redirect_to action: :index
+  end
+
+  def generate_products
+    GenerateProductsReport.perform_async
+    flash[:success] = 'The Product Inventory Report is generating and will be emailed to John and Joseph when it finishes'
 
     redirect_to action: :index
   end

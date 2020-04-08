@@ -43,7 +43,15 @@ class VendClient
     page = 0
     data = []
     loop do
-      response = connection.get path, { after: page }
+      retries = 0
+      begin
+        response = connection.get path, { after: page }
+      rescue
+        if (retries += 1) < 5
+          sleep(retries)
+          retry
+        end
+      end
       break if response.body['data'].blank?
       data += response.body['data']
       page = response.body['version']['max']
@@ -72,7 +80,15 @@ class VendClient
       weekly_data = []
 
       loop do
-        response = connection.get 'search', { page_size: 500, type: 'sales', date_from: min_date.iso8601, date_to: end_query_date.iso8601, offset: weekly_data.length }
+        retries = 0
+        begin
+          response = connection.get 'search', { page_size: 1000, type: 'sales', date_from: min_date.iso8601, date_to: end_query_date.iso8601, offset: weekly_data.length }
+        rescue
+          if (retries += 1) < 5
+            sleep(retries)
+            retry
+          end
+        end
         break if response.body['data'].blank?
         weekly_data += response.body['data']
       end
@@ -96,7 +112,16 @@ class VendClient
     data = []
 
     loop do
-      response = connection.get 'search', { page_size: 1000, type: 'sales', date_from: min_date.iso8601, date_to: max_date.iso8601, offset: data.length }
+      retries = 0
+      begin
+        response = connection.get 'search', { page_size: 1000, type: 'sales', date_from: min_date.iso8601, date_to: max_date.iso8601, offset: data.length }
+      rescue
+        if (retries += 1) < 5
+          sleep(retries)
+          retry
+        end
+      end
+
       break if response.body['data'].blank?
       data += response.body['data']
     end

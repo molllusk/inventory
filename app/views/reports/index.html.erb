@@ -7,9 +7,19 @@
         <span></span>&nbsp;<i class='fa fa-caret-down'></i>
     </div>
     <div class='col-md-2'>
-      <%= form_for(:generate, class: 'form-inline', url: generate_reports_path, method: :get) do |f| %>
+      <%= form_for(:generate, class: 'form-inline', url: generate_otb_reports_path, method: :get) do |f| %>
         <%= f.hidden_field :start, id: 'daterangestart' %>
         <%= f.hidden_field :end, id: 'daterangeend' %>
+        <%= f.submit :generate, class: 'btn btn-small btn-primary' %>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<div class='container-fluid'>
+  <div class='row'>
+    <div class='col-md-12'>
+      <%= form_for(:generate, class: 'form-inline', url: generate_products_reports_path, method: :get) do |f| %>
         <%= f.submit :generate, class: 'btn btn-small btn-primary' %>
       <% end %>
     </div>

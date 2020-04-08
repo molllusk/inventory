@@ -5,13 +5,13 @@ class ApplicationMailer < ActionMailer::Base
   layout 'mailer'
 
   def inventory_report(csv)
-    attachments["Inventory_report_#{Time.now.strftime('%Y-%m-%d_%H-%M-%S')}.csv"] = { mime_type: 'text/csv', content: csv }
-    mail to: 'joseph@mollusksurfshop.com, arvelhernandez@gmail.com', subject: 'Inventory Report Spreadsheet', body: 'See attached for the most recent inventory report'
+    attachments["Product_Inventory_Report_#{Time.now.strftime('%Y-%m-%d_%H-%M-%S')}.csv"] = { mime_type: 'text/csv', content: csv }
+    mail to: 'joseph@mollusksurfshop.com, john@mollusksurfshop.com', cc: 'arvelhernandez@gmail.com', subject: 'Inventory Report Spreadsheet', body: 'See attached for the most recent inventory report'
   end
 
   def otb_report(xls, start_date, end_date)
     subject = "OTB Report - #{start_date.strftime('%m/%d/%Y')}-#{end_date.strftime('%m/%d/%Y')}"
-    body = "The latest OTB report from #{start_date.strftime('%m/%d/%Y')} to #{end_date.strftime('%m/%d/%Y')} is leashed to this email"
+    body = "See attached for the latest OTB report from #{start_date.strftime('%m/%d/%Y')} to #{end_date.strftime('%m/%d/%Y')}."
 
     attachments["#{subject}.xls"] = { mime_type: 'application/xls; charset=utf-8; header=present', content: xls }
     mail to: 'john@mollusksurfshop.com', cc: 'joseph@mollusksurfshop.com, arvelhernandez@gmail.com', subject: subject, body: body

@@ -68,7 +68,8 @@ Rails.application.routes.draw do
 
   resources :reports do
     collection do
-      get :generate
+      get :generate_otb
+      get :generate_products
     end
   end
 
