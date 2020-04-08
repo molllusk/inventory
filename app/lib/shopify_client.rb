@@ -1,7 +1,7 @@
 module ShopifyClient
   RETAIL_BASE_URL = "https://#{ENV['SHOPIFY_USER']}:#{ENV['SHOPIFY_PASSWORD']}@mollusksurf.myshopify.com".freeze
   WHOLESALE_BASE_URL = "https://#{ENV['WHOLESALE_SHOPIFY_USER']}:#{ENV['WHOLESALE_SHOPIFY_PASSWORD']}@molluskats.myshopify.com".freeze
-  API_VERSION = '/admin/api/2019-07'.freeze
+  API_VERSION = '/admin/api/2020-04'.freeze
 
   SAVED_PRODUCT_ATTRIBUTES = %i[
     handle
@@ -49,37 +49,12 @@ module ShopifyClient
   end
 
   def self.all_products(store = :RETAIL)
-    all_resource_cursor('products', store)
+    all_resource('products', store)
   end
 
   def self.all_resource(resource, store = :RETAIL)
-    resources = []
-    pages = (count(resource, store).to_i / 250.0).ceil
-    pages.times do |page|
-      response = connection(store).get "#{API_VERSION}/#{resource}.json", { limit: 250, page: page + 1 }
-      resources += response.body[resource]
-    end
-    resources
-  end
-
-  def self.all_resource_cursor(resource, store = :RETAIL)
-    response = connection(store).get "#{API_VERSION}/#{resource}.json", { limit: 250 }
-    resources = response.body[resource]
-
-    loop do
-      links = response.headers['link']
-      break unless links.present?
-
-      next_link = links.split(', ').find { |link| link.include?("rel=\"next\"") }
-      break unless next_link.present?
-
-      next_url = next_link.split(';').first.gsub(/\<|\>/, '')
-
-      response = connection(store).get next_url
-      resources += response.body[resource]
-    end
-
-    resources || []
+    params = { limit: 250 }
+    cursor_paginate(resource, params, store)
   end
 
   def self.all_orders(store = :RETAIL)
@@ -242,24 +217,15 @@ module ShopifyClient
   end
 
   def self.closed_orders_since(day, store = :RETAIL)
-    orders = []
-
-    pages = (closed_orders_since_count(day, store) / 250.0).ceil
-
     min_date =  day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
 
-    pages.times do |page|
-      params = {
-        limit: 250,
-        page: page + 1,
-        status: 'closed',
-        updated_at_min: min_date
-      }
+    params = {
+      limit: 250,
+      status: 'closed',
+      updated_at_min: min_date
+    }
 
-      response = connection(store).get "#{API_VERSION}/orders.json", params
-      orders += response.body['orders']
-    end
-    orders
+    cursor_paginate('orders', params, store)
   end
 
   def self.closed_orders_between_count(start_date, end_date, store = :RETAIL)
@@ -277,27 +243,17 @@ module ShopifyClient
   end
 
   def self.closed_orders_between(start_date, end_date, store = :RETAIL)
-    orders = []
-
-    pages = (closed_orders_between_count(start_date, end_date, store) / 250.0).ceil
-
     min_date = start_date.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
     max_date = end_date.to_time.in_time_zone('Pacific Time (US & Canada)').end_of_day
 
-    pages.times do |page|
-      params = {
-        limit: 250,
-        page: page + 1,
-        status: 'closed',
-        created_at_min: min_date,
-        created_at_max: max_date
-      }
+    params = {
+      limit: 250,
+      status: 'closed',
+      created_at_min: min_date,
+      created_at_max: max_date
+    }
 
-      response = connection(store).get "#{API_VERSION}/orders.json", params
-      # p response.body
-      orders += response.body['orders'] unless response.body['orders'].blank?
-    end
-    orders
+    cursor_paginate('orders', params, store)
   end
 
   def self.transactions(order_id, store = :RETAIL)
@@ -313,5 +269,32 @@ module ShopifyClient
   def self.refunds(order_id, store = :RETAIL)
     response = connection(store).get "#{API_VERSION}/orders/#{order_id}/refunds.json"
     response.body['refunds'] || []
+  end
+
+  # Pagination methods https://www.shopify.com/partners/blog/relative-pagination
+  def self.cursor_paginate(resource, params, store = :RETAIL)
+    response = connection(store).get "#{API_VERSION}/#{resource}.json", params
+    resources = response.body[resource]
+
+    loop do
+      links = response.headers['link']
+      break unless links.present?
+
+      next_link = next_page_link(links)
+      break unless next_link.present?
+
+      response = connection(store).get next_page_url(next_link)
+      resources += response.body[resource]
+    end
+
+    resources || []
+  end
+
+  def self.next_page_link(links)
+    links.split(', ').find { |link| link.include?("rel=\"next\"") }
+  end
+
+  def self.next_page_url(next_link)
+    next_link.split(';').first.gsub(/\<|\>/, '')
   end
 end
