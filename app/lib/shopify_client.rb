@@ -53,23 +53,8 @@ module ShopifyClient
   end
 
   def self.all_resource(resource, store = :RETAIL)
-    response = connection(store).get "#{API_VERSION}/#{resource}.json", { limit: 250 }
-    resources = response.body[resource]
-
-    loop do
-      links = response.headers['link']
-      break unless links.present?
-
-      next_link = links.split(', ').find { |link| link.include?("rel=\"next\"") }
-      break unless next_link.present?
-
-      next_url = next_link.split(';').first.gsub(/\<|\>/, '')
-
-      response = connection(store).get next_url
-      resources += response.body[resource]
-    end
-
-    resources || []
+    params = { limit: 250 }
+    cursor_paginate(resource, params, store)
   end
 
   def self.all_orders(store = :RETAIL)
@@ -240,23 +225,7 @@ module ShopifyClient
       updated_at_min: min_date
     }
 
-    response = connection(store).get "#{API_VERSION}/orders.json", params
-    orders = response.body['orders']
-
-    loop do
-      links = response.headers['link']
-      break unless links.present?
-
-      next_link = links.split(', ').find { |link| link.include?("rel=\"next\"") }
-      break unless next_link.present?
-
-      next_url = next_link.split(';').first.gsub(/\<|\>/, '')
-
-      response = connection(store).get next_url
-      orders += response.body['orders']
-    end
-
-    orders || []
+    cursor_paginate('orders', params, store)
   end
 
   def self.closed_orders_between_count(start_date, end_date, store = :RETAIL)
@@ -284,23 +253,7 @@ module ShopifyClient
       created_at_max: max_date
     }
 
-    response = connection(store).get "#{API_VERSION}/orders.json", params
-    orders = response.body['orders']
-
-    loop do
-      links = response.headers['link']
-      break unless links.present?
-
-      next_link = links.split(', ').find { |link| link.include?("rel=\"next\"") }
-      break unless next_link.present?
-
-      next_url = next_link.split(';').first.gsub(/\<|\>/, '')
-
-      response = connection(store).get next_url
-      orders += response.body['orders']
-    end
-
-    orders || []
+    cursor_paginate('orders', params, store)
   end
 
   def self.transactions(order_id, store = :RETAIL)
@@ -316,5 +269,32 @@ module ShopifyClient
   def self.refunds(order_id, store = :RETAIL)
     response = connection(store).get "#{API_VERSION}/orders/#{order_id}/refunds.json"
     response.body['refunds'] || []
+  end
+
+  # Pagination methods
+  def self.cursor_paginate(resource, params, store = :RETAIL)
+    response = connection(store).get "#{API_VERSION}/#{resource}.json", params
+    resources = response.body[resource]
+
+    loop do
+      links = response.headers['link']
+      break unless links.present?
+
+      next_link = next_page_link(links)
+      break unless next_link.present?
+
+      response = connection(store).get next_page_url(next_link)
+      resources += response.body[resource]
+    end
+
+    resources || []
+  end
+
+  def self.next_page_link(links)
+    links.split(', ').find { |link| link.include?("rel=\"next\"") }
+  end
+
+  def self.next_page_url(next_link)
+    next_link.split(';').first.gsub(/\<|\>/, '')
   end
 end
