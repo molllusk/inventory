@@ -60,5 +60,18 @@
         </td>
       <% end %>
     </tr>
+    <tr>
+      <td></td>
+      <% if retail_shopify.present? %>
+        <td>
+          <%= link_to(raw('<i class="fa fa-trash"></i> delete retail data'), shopify_datum_destroy_path(retail_shopify), method: :delete, data: { confirm: 'Are you sure?' }, class: 'red') %>
+        </td>
+      <% end %>
+      <% if wholesale_shopify.present? %>
+        <td>
+          <%= link_to(raw('<i class="fa fa-trash"></i> delete wholesale data'), shopify_datum_destroy_path(wholesale_shopify), method: :delete, data: { confirm: 'Are you sure?' }, class: 'red') %>
+        </td>
+      <% end %>
+    </tr>
   <table>
 <% end %>

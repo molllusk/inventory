@@ -10,23 +10,6 @@ Rails.application.routes.draw do
   post   '/login',   to: 'sessions#create'
   delete '/logout',  to: 'sessions#destroy'
 
-  resources :daily_inventory_transfers
-  resources :inventory_updates
-  resources :fluid_inventory_thresholds
-  resources :fluid_inventory_updates
-  resources :products
-  resources :users
-  resources :shopify_sales_receipts
-  resources :shopify_refunds
-  resources :shopify_sales_costs
-  resources :daily_vend_consignments
-  resources :daily_vend_costs
-  resources :daily_vend_sales do
-    collection do
-      get :sales_tax_csv
-    end
-  end
-
   namespace :admin do
     root to: '#index'
   end
@@ -47,6 +30,8 @@ Rails.application.routes.draw do
     get '/quickbooks/oauth_callback', to: 'quickbooks#oauth_callback'
   end
 
+  resources :daily_inventory_transfers
+
   resources :daily_orders do
     get :po
   end
@@ -66,12 +51,36 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :daily_vend_consignments
+  resources :daily_vend_costs
+
+  resources :daily_vend_sales do
+    collection do
+      get :sales_tax_csv
+    end
+  end
+
+  resources :fluid_inventory_thresholds
+  resources :fluid_inventory_updates
+  resources :inventory_updates
+
+  resources :products
+
   resources :reports do
     collection do
       get :generate_otb
       get :generate_products
     end
   end
+
+  resources :shopify_data do
+    delete :destroy
+  end
+
+  resources :shopify_refunds
+  resources :shopify_sales_costs
+  resources :shopify_sales_receipts
+  resources :users
 
   resources :wholesale_orders do
     collection do
