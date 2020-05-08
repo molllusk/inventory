@@ -16,7 +16,8 @@ class ShopifyInventory < ApplicationRecord
     # wholesale site
     '1283 42nd Ave Wholesale' => 29394010176,
     'Jam Warehouse Wholesale' => 29887823936,
-    'Shopify Fulfillment Network' => 36225056853
+    'Shopify Fulfillment Network Retail' => 36225056853,
+    'Shopify Fulfillment Network Wholesale' => 35174482007
   }
 end
 
