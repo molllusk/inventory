@@ -7,6 +7,7 @@ class Product < ApplicationRecord
 
   LOCATION_NAMES_BY_CODE = {
     sf: 'San Francisco',
+    sb: 'Santa Barbara',
     sl: 'Silver Lake',
     vb: 'Venice Beach'
   }
@@ -40,7 +41,7 @@ class Product < ApplicationRecord
   # }
 
   # scope :silverlake_boards, lambda {
-  #   where('LOWER(shopify_data.product_type) = ?', 'silver lake surfboards').joins(:shopify_data)
+  #   where('LOWER(shopify_data.product_type) = ?', 'Santa Barbara surfboards').joins(:shopify_data)
   # }
 
   # scope :boards, lambda {
