@@ -68,9 +68,9 @@ class ShopifySalesCost < ApplicationRecord
         posting_type: 'Credit'
       },
       {
-        account_id: '3618', # 11002 Inventory Asset - Santa Barbara
-        amount: location_cost('Mollusk SB').to_f,
-        description: 'Total Cost of Sales Shopify - Santa Barbara',
+        account_id: '3618', # 11002 Inventory Asset - Silver Lake
+        amount: location_cost('Mollusk SL').to_f,
+        description: 'Total Cost of Sales Shopify - Silver Lake',
         posting_type: 'Credit'
       },
       {
