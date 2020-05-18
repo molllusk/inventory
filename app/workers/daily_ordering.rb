@@ -14,16 +14,16 @@ class DailyOrdering
 
     sf = DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('San Francisco'))
     vb = DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Venice Beach'))
-    # sl = DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Silver Lake'))
+    # sb = DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Santa Barbara'))
 
     daily_inventory_transfer.daily_orders << sf
     daily_inventory_transfer.daily_orders << vb
-    # daily_inventory_transfer.daily_orders << sl
+    # daily_inventory_transfer.daily_orders << sb
 
     todays_orders = {
       'Mollusk SF' => sf,
       'Mollusk VB' => vb,
-      # 'Mollusk SL' => sl
+      # 'Mollusk SB' => sb
     }
 
     outstanding_orders_by_product = Hash.new { |hash, key| hash[key] = Hash.new(0) }
@@ -71,14 +71,14 @@ class DailyOrdering
       vend_product.vend_inventories.where(outlet_id: [
             VendClient::OUTLET_NAMES_BY_ID.key('San Francisco'),
             VendClient::OUTLET_NAMES_BY_ID.key('Venice Beach'),
-            # VendClient::OUTLET_NAMES_BY_ID.key('Silver Lake')
+            # VendClient::OUTLET_NAMES_BY_ID.key('Santa Barbara')
           ]).each do |inventory|
 
         outstanding_orders = outstanding_orders_by_outlet_id[inventory.outlet_id]
         store_inventory = inventory.inventory < 0 ? 0 : inventory.inventory
         complete_inventory = store_inventory + outstanding_orders
 
-        # fill_level = fill_levels['fill'].to_i if new_release && inventory.location == 'Silver Lake'
+        # fill_level = fill_levels['fill'].to_i if new_release && inventory.location == 'Santa Barbara'
         adjustment = complete_inventory < fill_level ? fill_level - complete_inventory : 0
 
         if adjustment > 0
@@ -87,10 +87,10 @@ class DailyOrdering
             inventories[:sf_outstanding] = outstanding_orders
             inventories[:sf_vend] = inventory.inventory
             inventories[:sf_adjustment] = adjustment
-          # when 'Silver Lake'
-          #   inventories[:sl_outstanding] = outstanding_orders
-          #   inventories[:sl_vend] = inventory.inventory
-          #   inventories[:sl_adjustment] = adjustment
+          # when 'Santa Barbara'
+          #   inventories[:sb_outstanding] = outstanding_orders
+          #   inventories[:sb_vend] = inventory.inventory
+          #   inventories[:sb_adjustment] = adjustment
           when 'Venice Beach'
             inventories[:vb_outstanding] = outstanding_orders
             inventories[:vb_vend] = inventory.inventory
@@ -99,17 +99,17 @@ class DailyOrdering
         end
       end
 
-      total_adjustments = inventories[:sf_adjustment].to_i + inventories[:vb_adjustment].to_i #+ inventories[:sl_adjustment].to_i 
+      total_adjustments = inventories[:sf_adjustment].to_i + inventories[:vb_adjustment].to_i #+ inventories[:sb_adjustment].to_i 
       warehouse_inventory = shopify_product.shopify_inventories.find_by(location: 'Postworks')&.inventory.to_i
       has_adjustment = total_adjustments > 0 && warehouse_inventory > 0
 
       if has_adjustment
         if warehouse_inventory > 0
-          # order is important here: SF -> VB -> SL
+          # order is important here: SF -> VB -> SB
           adjusted_locations = []
           adjusted_locations << 'Mollusk SF' if inventories[:sf_adjustment].to_i > 0
           adjusted_locations << 'Mollusk VB' if inventories[:vb_adjustment].to_i > 0
-          # adjusted_locations << 'Mollusk SL' if inventories[:sl_adjustment].to_i > 0
+          # adjusted_locations << 'Mollusk SB' if inventories[:sb_adjustment].to_i > 0
 
           adjusted_locations.each do |location|
             break if warehouse_inventory < 1
@@ -138,17 +138,17 @@ class DailyOrdering
                   sent_orders: inventories[:vb_outstanding]
                 )
               warehouse_inventory -= inventories[:vb_adjustment]
-            # when 'Mollusk SL'
-            #   inventories[:sl_adjustment] = warehouse_inventory if inventories[:sl_adjustment] > warehouse_inventory
+            # when 'Mollusk SB'
+            #   inventories[:sb_adjustment] = warehouse_inventory if inventories[:sb_adjustment] > warehouse_inventory
             #   location_order.orders.create(
-            #       quantity: inventories[:sl_adjustment],
+            #       quantity: inventories[:sb_adjustment],
             #       product_id: shopify_product.product_id,
             #       threshold: fill_level,
-            #       vend_qty: inventories[:sl_vend],
+            #       vend_qty: inventories[:sb_vend],
             #       cost: cost,
-            #       sent_orders: inventories[:sl_outstanding]
+            #       sent_orders: inventories[:sb_outstanding]
             #     )
-            #   warehouse_inventory -= inventories[:sl_adjustment]
+            #   warehouse_inventory -= inventories[:sb_adjustment]
             end
           end
         end
