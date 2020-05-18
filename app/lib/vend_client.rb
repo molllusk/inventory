@@ -3,7 +3,7 @@ class VendClient
 
   OUTLET_NAMES_BY_ID = {
     '5e234f4e-8eed-11e0-8e09-4040f540b50a' => 'San Francisco',
-    '8d27bed3-060b-11e4-a0f5-b8ca3a64f8f4' => 'Santa Barbara',
+    '8d27bed3-060b-11e4-a0f5-b8ca3a64f8f4' => 'Silver Lake',
     '0adfd74a-153e-11e9-fa42-67b5781ba1fb' => 'Venice Beach'
   }.freeze
 

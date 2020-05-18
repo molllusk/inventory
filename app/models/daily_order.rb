@@ -6,25 +6,25 @@ class DailyOrder < ApplicationRecord
   PO_ADDRESSES = {
     'San Francisco' => 'Mollusk Surf Shop (San Francisco)<br />4500 Irving Street<br />San Francisco, CA 94122-1132',
     'Venice Beach' => 'Mollusk Surf Shop (Venice Beach)<br />1600 Pacific Avenue<br />Venice Beach, CA 90291-9998',
-    'Santa Barbara' => 'Mollusk Surf Shop (Santa Barbara)<br />121 E Yanonali Street<br />Santa Barbara, CA 93101'
+    'Silver Lake' => 'Mollusk Surf Shop (Silver Lake)<br />3511 W Sunset Blvd<br />Los Angeles, CA 90026-9998'
   }
 
   STREET_ADDRESSES = {
     'San Francisco' => '4500 Irving Street',
     'Venice Beach' => '1600 Pacific Avenue',
-    'Santa Barbara' => '121 E Yanonali Street'
+    'Silver Lake' => '3511 W Sunset Blvd'
   }
 
   CITIES = {
     'San Francisco' => 'San Francisco',
     'Venice Beach' => 'Venice Beach',
-    'Santa Barbara' => 'Santa Barbara'
+    'Silver Lake' => 'Los Angeles'
   }
 
   ZIPS = {
     'San Francisco' => '94122-1132',
     'Venice Beach' => '90291-9998',
-    'Santa Barbara' => '93101'
+    'Silver Lake' => '90026-9998'
   }
 
   def to_pdf

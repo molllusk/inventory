@@ -9,7 +9,7 @@ class ShopifyInventory < ApplicationRecord
     'EasyPost' => 7662829621,
     'Jam Warehouse Retail' => 7700054069,
     'Mollusk SF' => 49481991,
-    'Mollusk SB' => 7702609973,
+    'Mollusk SL' => 7702609973,
     'Mollusk VB' => 7702577205,
     'Postworks' => 18186895445,
     'Shopify Fulfillment Network Retail' => 36225056853,

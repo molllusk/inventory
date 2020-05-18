@@ -19,7 +19,7 @@ module Api
         product.shopify_inventories.where(location: [
               ShopifyInventory::locations['Postworks'],
               ShopifyInventory::locations['Mollusk SF'],
-              ShopifyInventory::locations['Mollusk SB'],
+              ShopifyInventory::locations['Mollusk SL'],
               ShopifyInventory::locations['Mollusk VB']
             ]).each do |inventory|
           case inventory.location
@@ -27,8 +27,8 @@ module Api
             product_data[:jam_inv] = inventory.inventory
           when 'Mollusk SF'
             product_data[:sf_inv] = inventory.inventory
-          when 'Mollusk SB'
-            product_data[:sb_inv] = inventory.inventory
+          when 'Mollusk SL'
+            product_data[:sl_inv] = inventory.inventory
           when 'Mollusk VB'
             product_data[:vb_inv] = inventory.inventory
           end
@@ -58,14 +58,14 @@ module Api
 
         product.vend_inventories.where(outlet_id: [
               VendClient::OUTLET_NAMES_BY_ID.key('San Francisco'),
-              VendClient::OUTLET_NAMES_BY_ID.key('Santa Barbara'),
+              VendClient::OUTLET_NAMES_BY_ID.key('Silver Lake'),
               VendClient::OUTLET_NAMES_BY_ID.key('Venice Beach')
             ]).each do |inventory|
           case inventory.location
           when 'San Francisco'
             product_data[:sf_inv] = inventory.inventory
-          when 'Santa Barbara'
-            product_data[:sb_inv] = inventory.inventory
+          when 'Silver Lake'
+            product_data[:sl_inv] = inventory.inventory
           when 'Venice Beach'
             product_data[:vb_inv] = inventory.inventory
           end
