@@ -2,18 +2,6 @@ class DailyVendCost < ApplicationRecord
   has_many :vend_sales_costs, dependent: :destroy
   has_many :vend_sales_cost_sales, dependent: :destroy
 
-  ACCOUNT_ID_BY_OUTLET = {
-    'San Francisco' => '3617', # 11001 Inventory Asset - San Francisco
-    'Silver Lake' => '3618', # 11002 Inventory Asset - Silver Lake
-    'Venice Beach' => '3626' # 11003 Inventory Asset - Venice Beach
-  }
-
-  CLASS_ID_BY_OUTLET = {
-    'San Francisco' => Qbo::SAN_FRAN_CLASS,
-    'Silver Lake' => Qbo::SILVER_LAKE_CLASS,
-    'Venice Beach' => Qbo::VENICE_BEACH_CLASS
-  }
-
   def journal_entry_params
     {
       txn_date: date,
@@ -31,15 +19,15 @@ class DailyVendCost < ApplicationRecord
         amount: sales_cost.cost,
         description: 'Total Cost of Sales Vend',
         posting_type: 'Debit',
-        class_id: CLASS_ID_BY_OUTLET[sales_cost.outlet_name]
+        class_id: Qbo::CLASS_ID_BY_OUTLET[sales_cost.outlet_name]
       }
     
       details << {
-        account_id: ACCOUNT_ID_BY_OUTLET[sales_cost.outlet_name], # Location specific Inventory Asset
+        account_id: Qbo::ACCOUNT_ID_BY_OUTLET[sales_cost.outlet_name], # Location specific Inventory Asset
         amount: sales_cost.cost,
         description: 'Total Cost of Sales Vend',
         posting_type: 'Credit',
-        class_id: CLASS_ID_BY_OUTLET[sales_cost.outlet_name]
+        class_id: Qbo::CLASS_ID_BY_OUTLET[sales_cost.outlet_name]
       }
     end
     details

@@ -2,18 +2,6 @@ class DailyVendConsignment < ApplicationRecord
   has_many :vend_consignment_location_costs, dependent: :destroy
   has_many :vend_consignments, dependent: :destroy
 
-  ACCOUNT_ID_BY_OUTLET = {
-    'San Francisco' => '3617', # 11001 Inventory Asset - San Francisco
-    'Silver Lake' => '3618', # 11002 Inventory Asset - Silver Lake
-    'Venice Beach' => '3626' # 11003 Inventory Asset - Venice Beach
-  }
-
-  CLASS_ID_BY_OUTLET = {
-    'San Francisco' => Qbo::SAN_FRAN_CLASS,
-    'Silver Lake' => Qbo::SILVER_LAKE_CLASS,
-    'Venice Beach' => Qbo::VENICE_BEACH_CLASS
-  }
-
   def journal_entry_params
     {
       txn_date: date,
@@ -25,11 +13,11 @@ class DailyVendConsignment < ApplicationRecord
     details = []
     vend_consignment_location_costs.each do |location_cost|
       details << {
-        account_id: ACCOUNT_ID_BY_OUTLET[location_cost.outlet_name],
+        account_id: Qbo::ACCOUNT_ID_BY_OUTLET[location_cost.outlet_name],
         amount: location_cost.cost,
         description: "Inventory transfer / Consignment cost for #{location_cost.role}: #{location_cost.outlet_name}",
         posting_type: location_cost.role == 'receiver' ? 'Debit' : 'Credit',
-        class_id: CLASS_ID_BY_OUTLET[location_cost.outlet_name]
+        class_id: Qbo::CLASS_ID_BY_OUTLET[location_cost.outlet_name]
       }
     end
     details

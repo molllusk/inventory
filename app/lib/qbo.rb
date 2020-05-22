@@ -1,12 +1,39 @@
 module Qbo
   # Vend
-  SF_CUSTOMER_ID = 24913.freeze
-  VENICE_CUSTOMER_ID = 24918.freeze
-  SILVER_LAKE_CUSTOMER_ID = 24914.freeze
+  ACCOUNT_ID_BY_OUTLET = {
+    'San Francisco' => '3617', # 11001 Inventory Asset - San Francisco
+    'Santa Barbara' => '3677', # 11005 Inventory Account - Santa Barbara
+    'Silver Lake' => '3618', # 11002 Inventory Asset - Silver Lake
+    'Venice Beach' => '3626' # 11003 Inventory Asset - Venice Beach
+  }.freeze
 
-  SAN_FRAN_CLASS = 300000000000824364.freeze
-  SILVER_LAKE_CLASS = 300000000000824366.freeze
-  VENICE_BEACH_CLASS = 300000000000824365.freeze
+  CLASS_ID_BY_OUTLET = {
+    'San Francisco' => 300000000000824364,
+    'Santa Barbara' => 300000000000880547,
+    'Silver Lake' => 300000000000824366,
+    'Venice Beach' => 300000000000824365
+  }.freeze
+
+  CUSTOMER_ID_BY_OUTLET = {
+    'San Francisco' => 24913,
+    'Santa Barbara' => 24918,
+    'Silver Lake' => 26373,
+    'Venice Beach' => 24914
+  }.freeze
+
+  TAX_ITEM_ID_BY_OUTLET = {
+    'San Francisco' => '172116',
+    'Santa Barbara' => '182878',
+    'Silver Lake' => '174884',
+    'Venice Beach' => '181525'
+  }.freeze
+
+  CREDIT_CARD_PAYMENT_ID_BY_OUTLET = {
+    'San Francisco' => '181526',
+    'Santa Barbara' => '182879',
+    'Silver Lake' => '181528',
+    'Venice Beach' => '181529'
+  }.freeze
 
   # Shopify
   SHOPIFY_CUSTOMER_ID = 24694.freeze

@@ -1,18 +1,6 @@
 class DailyInventoryTransfer < ApplicationRecord
   has_many :daily_orders, dependent: :destroy
 
-  ACCOUNT_ID_BY_OUTLET = {
-    'San Francisco' => '3617', # 11001 Inventory Asset - San Francisco
-    'Silver Lake' => '3618', # 11002 Inventory Asset - Silver Lake
-    'Venice Beach' => '3626' # 11003 Inventory Asset - Venice Beach
-  }
-
-  CLASS_ID_BY_OUTLET = {
-    'San Francisco' => Qbo::SAN_FRAN_CLASS,
-    'Silver Lake' => Qbo::SILVER_LAKE_CLASS,
-    'Venice Beach' => Qbo::VENICE_BEACH_CLASS
-  }
-
   def self.last_po
     maximum(:po_id).to_i
   end
@@ -42,11 +30,11 @@ class DailyInventoryTransfer < ApplicationRecord
     daily_orders.each do |daily_order|
       if daily_order.orders.count.positive?
         details << {
-          account_id: ACCOUNT_ID_BY_OUTLET[daily_order.outlet_name],
+          account_id: Qbo::ACCOUNT_ID_BY_OUTLET[daily_order.outlet_name],
           amount: daily_order.total_cost,
           description: "Daily Inventory Transfer Cost of Goods for PO #{daily_order.display_po}",
           posting_type: 'Debit',
-          class_id: CLASS_ID_BY_OUTLET[daily_order.outlet_name]
+          class_id: Qbo::CLASS_ID_BY_OUTLET[daily_order.outlet_name]
         }
         total_cost += daily_order.total_cost
         pos << daily_order.display_po
