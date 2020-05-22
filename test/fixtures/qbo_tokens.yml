@@ -2,13 +2,11 @@
 
 one:
   token: MyString
-  secret: MyString
-  realmid: MyString
+  realm_id: MyString
 
 two:
   token: MyString
-  secret: MyString
-  realmid: MyString
+  realm_id: MyString
 
 # == Schema Information
 #

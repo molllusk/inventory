@@ -1,12 +1,12 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  location_id: MyString
+  outlet_id: MyString
   daily_vend_cost_id: 1
   cost: 1.5
 
 two:
-  location_id: MyString
+  outlet_id: MyString
   daily_vend_cost_id: 1
   cost: 1.5
 

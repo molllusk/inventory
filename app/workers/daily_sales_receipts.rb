@@ -387,8 +387,6 @@ class DailySalesReceipts
       vend_sales_costs_by_sale[sale_id][:receipt_number] = sale['receipt_number']
 
       sale['line_items'].each do |item|
-        vend_sales_receipt_by_sale
-
         discount = item['discount_total'].negative? ? 0 : item['discount_total']
 
         case item['product_id']

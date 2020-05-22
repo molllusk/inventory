@@ -56,15 +56,15 @@ class DailyInventoryTransfer < ApplicationRecord
     details
   end
 
-  def orders??
+  def orders?
     daily_orders.find { |daily_order| daily_order.orders.count.positive? }
   end
 
   def post_to_qbo
-    if orders??
-      qbo = Qbo.create_journal_entry(journal_entry)
-      update_attribute(:qbo_id, qbo.id) unless qbo.blank?
-    end
+    return unless orders?
+
+    qbo = Qbo.create_journal_entry(journal_entry)
+    update_attribute(:qbo_id, qbo.id) unless qbo.blank?
   end
 
   def journal_entry
