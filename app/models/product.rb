@@ -36,17 +36,21 @@ class Product < ApplicationRecord
   }
 
   # Surfboard scopes not currently in use
-  # scope :venice_boards, lambda {
-  #   where('LOWER(shopify_data.product_type) = ?', 'venice surfboard').joins(:shopify_data)
-  # }
+  scope :venice_boards, lambda {
+    where('LOWER(shopify_data.product_type) = ?', 'venice surfboard').joins(:shopify_data)
+  }
 
-  # scope :silverlake_boards, lambda {
-  #   where('LOWER(shopify_data.product_type) = ?', 'Santa Barbara surfboards').joins(:shopify_data)
-  # }
+  scope :silverlake_boards, lambda {
+    where('LOWER(shopify_data.product_type) = ?', 'silver lake surfboards').joins(:shopify_data)
+  }
 
-  # scope :boards, lambda {
-  #   where('LOWER(shopify_data.product_type) = ?', 'surfboard').joins(:shopify_data)
-  # }
+  scope :santa_barabara_boards, lambda {
+    where('LOWER(shopify_data.product_type) = ?', 'santa barbara surfboard').joins(:shopify_data)
+  }
+
+  scope :boards, lambda {
+    where('LOWER(shopify_data.product_type) = ?', 'surfboard').joins(:shopify_data)
+  }
 
   scope :with_retail_shopify, lambda {
     where('shopify_data.store = ?', ShopifyDatum.stores[:retail]).joins(:shopify_data).distinct
