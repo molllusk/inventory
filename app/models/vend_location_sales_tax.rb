@@ -15,8 +15,9 @@ class VendLocationSalesTax < ApplicationRecord
 
   ZIPS_BY_LOCATION = {
     'San Francisco' => '94122',
-    'Venice Beach' => '90291',
-    'Santa Barbara' => '93101'
+    'Santa Barbara' => '93101',
+    'Silver Lake' => '90026',
+    'Venice Beach' => '90291'
   }
 
   def outlet_name
