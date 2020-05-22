@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Product < ApplicationRecord
   has_one :vend_datum, dependent: :destroy
   has_many :shopify_data, dependent: :destroy
@@ -10,13 +12,13 @@ class Product < ApplicationRecord
     sb: 'Santa Barbara',
     sl: 'Silver Lake',
     vb: 'Venice Beach'
-  }
+  }.freeze
 
   filterrific(
     default_filter_params: { sorted_by: 'created_at_desc' },
-    available_filters: [
-      :search_query,
-      :sorted_by
+    available_filters: %i[
+      search_query
+      sorted_by
     ]
   )
 
@@ -65,9 +67,9 @@ class Product < ApplicationRecord
 
     terms = query.to_s.downcase.split(/\s+/)
 
-    terms = terms.map { |e|
+    terms = terms.map do |e|
       ('%' + e + '%').gsub(/%+/, '%')
-    }
+    end
 
     # configure number of OR conditions for provision
     # of interpolation arguments. Adjust this if you
@@ -75,22 +77,22 @@ class Product < ApplicationRecord
     num_or_conds = 4
 
     joins(:shopify_data, :vend_datum).where(
-      terms.map { |term|
-        "(LOWER(shopify_data.title) LIKE ? OR LOWER(shopify_data.variant_title) LIKE ? OR LOWER(vend_data.name) LIKE ? OR LOWER(vend_data.variant_name) LIKE ?)"
-      }.join(' AND '),
+      terms.map do |_term|
+        '(LOWER(shopify_data.title) LIKE ? OR LOWER(shopify_data.variant_title) LIKE ? OR LOWER(vend_data.name) LIKE ? OR LOWER(vend_data.variant_name) LIKE ?)'
+      end.join(' AND '),
       *terms.map { |e| [e] * num_or_conds }.flatten
     )
   }
 
   scope :sorted_by, lambda { |sort_option|
     # extract the sort direction from the param value.
-    direction = (sort_option =~ /desc$/) ? 'desc' : 'asc'
+    direction = sort_option =~ /desc$/ ? 'desc' : 'asc'
 
     case sort_option.to_s
     when /^created_at_/
-      order("products.created_at #{ direction }")
+      order("products.created_at #{direction}")
     else
-      raise(ArgumentError, "Invalid sort option: #{ sort_option.inspect }")
+      raise(ArgumentError, "Invalid sort option: #{sort_option.inspect}")
     end
   }
 
@@ -101,7 +103,7 @@ class Product < ApplicationRecord
   end
 
   def self.update_retail_inventories(retail_orders)
-    [:sf, :vb, :sb].each do |outlet|
+    %i[sf vb sb].each do |outlet|
       # do not update inventory if any order exists for that variant in any location
       update_entire_retail_store_inventory(retail_orders, outlet)
     end
@@ -117,7 +119,7 @@ class Product < ApplicationRecord
   def self.update_fluid_inventories(retail_orders, product_ids = [])
     query = product_ids.present? ? where(id: product_ids) : all
     query.find_each do |product|
-      if product.has_retail_and_wholesale_shopify?
+      if product.retail_and_wholesale_shopify?
         # do not update inventory if any order exists for that variant in any location
         product.fluid_inventory unless product.retail_orders_present?(retail_orders)
       end
@@ -151,7 +153,7 @@ class Product < ApplicationRecord
 
   def self.get_daily_order_inventory_levels
     levels = GoogleClient.sheet_values(GoogleClient::FILL_LEVEL).sort_by { |row| row['Category'] }
-    levels_by_type_and_size = Hash.new { |hash, key| hash[key] = Hash.new { |hash, key| hash[key] = {} } }
+    levels_by_type_and_size = Hash.new { |types, type_key| types[type_key] = Hash.new { |sizes, size_key| sizes[size_key] = {} } }
     levels.each do |level|
       levels_by_type_and_size[level['Category'].to_s.strip.downcase][level['Size'].to_s.strip.downcase]['fill'] = level['Fill']
       levels_by_type_and_size[level['Category'].to_s.strip.downcase][level['Size'].to_s.strip.downcase]['new_release_fill'] = level['New Release Fill']
@@ -168,8 +170,8 @@ class Product < ApplicationRecord
   end
 
   def self.inventory_csv_headers
-    stem = %i(id product variant type size sku handle shopify_tags vend retail_shopify wholesale_shopify app)
-    stem + ShopifyInventory::locations.keys + VendClient::OUTLET_NAMES_BY_ID.values + [:total_inventory]
+    stem = %i[id product variant type size sku handle shopify_tags vend retail_shopify wholesale_shopify app]
+    stem + ShopifyInventory.locations.keys + VendClient::OUTLET_NAMES_BY_ID.values + [:total_inventory]
   end
 
   def update_inventory(retail_orders, outlet)
@@ -179,7 +181,7 @@ class Product < ApplicationRecord
     end
   end
 
-  def has_retail_and_wholesale_shopify?
+  def retail_and_wholesale_shopify?
     retail_shopify.present? && wholesale_shopify.present?
   end
 
@@ -211,7 +213,7 @@ class Product < ApplicationRecord
       app: "https://mollusk.herokuapp.com/products/#{id}",
       total_inventory: 0
     }
-    
+
     shopify_data.each do |shopify|
       shopify.shopify_inventories.each do |inventory|
         data[inventory.location] = inventory.inventory
@@ -235,32 +237,30 @@ class Product < ApplicationRecord
   end
 
   def adjust_order_inventory(order)
-    begin
-      response = ShopifyClient.adjust_inventory(
-        retail_shopify.inventory_item_id,
-        ShopifyInventory.locations['Postworks'],
-        -order.quantity
+    response = ShopifyClient.adjust_inventory(
+      retail_shopify.inventory_item_id,
+      ShopifyInventory.locations['Postworks'],
+      -order.quantity
+    )
+
+    if ShopifyClient.inventory_item_updated?(response)
+      updated_warehouse_inventory = response['inventory_level']['available']
+      shopify_inventory = retail_shopify.shopify_inventories.find_by(location: 'Postworks')
+      expected_warehouse_inventory = shopify_inventory.inventory - order.quantity
+
+      order.create_order_inventory_update(
+        new_jam_qty: updated_warehouse_inventory,
+        prior_jam_qty: shopify_inventory.inventory
       )
 
-      if ShopifyClient.inventory_item_updated?(response)
-        updated_warehouse_inventory = response['inventory_level']['available']
-        shopify_inventory = retail_shopify.shopify_inventories.find_by(location: 'Postworks')
-        expected_warehouse_inventory = shopify_inventory.inventory - order.quantity
+      shopify_inventory.update_attribute(:inventory, updated_warehouse_inventory)
 
-        order.create_order_inventory_update(
-          new_jam_qty: updated_warehouse_inventory,
-          prior_jam_qty: shopify_inventory.inventory
-        )
-
-        shopify_inventory.update_attribute(:inventory, updated_warehouse_inventory)
-
-        Airbrake.notify("ORDER INVENTORY: Product #{id} expected warehouse qty #{expected_warehouse_inventory} but got #{updated_warehouse_inventory}") unless expected_warehouse_inventory == updated_warehouse_inventory
-      else
-        Airbrake.notify("Could not UPDATE warehouse inventory during ORDER for Product: #{id}, Adjustment: #{-order.quantity}")
-      end
-    rescue
-      Airbrake.notify("There was an error UPDATING warehouse inventory during ORDER of Product: #{id}, Adjustment: #{-order.quantity}")
+      Airbrake.notify("ORDER INVENTORY: Product #{id} expected warehouse qty #{expected_warehouse_inventory} but got #{updated_warehouse_inventory}") unless expected_warehouse_inventory == updated_warehouse_inventory
+    else
+      Airbrake.notify("Could not UPDATE warehouse inventory during ORDER for Product: #{id}, Adjustment: #{-order.quantity}")
     end
+  rescue StandardError
+    Airbrake.notify("There was an error UPDATING warehouse inventory during ORDER of Product: #{id}, Adjustment: #{-order.quantity}")
   end
 
   def adjust_inventory_vend(outlet, quantity)
@@ -281,39 +281,37 @@ class Product < ApplicationRecord
   end
 
   def adjust_inventory_fluid(quantity, expected_wholesale_inventory)
-    begin
-      retail_response = ShopifyClient.adjust_inventory(
-        retail_shopify.inventory_item_id,
-        ShopifyInventory.locations['Postworks'],
-        quantity
-      )
-      
-      if ShopifyClient.inventory_item_updated?(retail_response)
-        begin
-          wholesale_response = ShopifyClient.adjust_inventory(
-            wholesale_shopify.inventory_item_id,
-            ShopifyInventory.locations['Postworks ATS'],
-            -quantity,
-            :WHOLESALE
-          )
+    retail_response = ShopifyClient.adjust_inventory(
+      retail_shopify.inventory_item_id,
+      ShopifyInventory.locations['Postworks'],
+      quantity
+    )
 
-          if ShopifyClient.inventory_item_updated?(wholesale_response)
-            updated_wholesale_inventory = wholesale_response['inventory_level']['available']
-            save_inventory_adjustment_fluid(quantity, retail_response['inventory_level']['available'], updated_wholesale_inventory)
+    if ShopifyClient.inventory_item_updated?(retail_response)
+      begin
+        wholesale_response = ShopifyClient.adjust_inventory(
+          wholesale_shopify.inventory_item_id,
+          ShopifyInventory.locations['Postworks ATS'],
+          -quantity,
+          :WHOLESALE
+        )
 
-            Airbrake.notify("Fluid Inventory: expected Wholesale qty #{expected_wholesale_inventory} but got #{updated_wholesale_inventory}") unless expected_wholesale_inventory == updated_wholesale_inventory
-          else
-            Airbrake.notify("Could not UPDATE Wholesale Postworks Warehouse inventory after already adjusting Retail inventory for Product: #{id}, Adjustment: #{-quantity}")
-          end
-        rescue
-          Airbrake.notify("There was an error UPDATING Wholesale Postworks Warehouse inventory after already adjusting Retail inventory for Product: #{id}, Adjustment: #{-quantity}")
+        if ShopifyClient.inventory_item_updated?(wholesale_response)
+          updated_wholesale_inventory = wholesale_response['inventory_level']['available']
+          save_inventory_adjustment_fluid(quantity, retail_response['inventory_level']['available'], updated_wholesale_inventory)
+
+          Airbrake.notify("Fluid Inventory: expected Wholesale qty #{expected_wholesale_inventory} but got #{updated_wholesale_inventory}") unless expected_wholesale_inventory == updated_wholesale_inventory
+        else
+          Airbrake.notify("Could not UPDATE Wholesale Postworks Warehouse inventory after already adjusting Retail inventory for Product: #{id}, Adjustment: #{-quantity}")
         end
-      else
-        Airbrake.notify("Could not UPDATE Retail Postworks Warehouse inventory for Product: #{id}, Adjustment: #{quantity}")
+      rescue StandardError
+        Airbrake.notify("There was an error UPDATING Wholesale Postworks Warehouse inventory after already adjusting Retail inventory for Product: #{id}, Adjustment: #{-quantity}")
       end
-    rescue
-      Airbrake.notify("There was an error UPDATING Retail Postworks Warehouse inventory for Product: #{id}, Adjustment: #{quantity}")
+    else
+      Airbrake.notify("Could not UPDATE Retail Postworks Warehouse inventory for Product: #{id}, Adjustment: #{quantity}")
     end
+  rescue StandardError
+    Airbrake.notify("There was an error UPDATING Retail Postworks Warehouse inventory for Product: #{id}, Adjustment: #{quantity}")
   end
 
   def save_inventory_adjustment_vend(response, quantity, outlet)
@@ -352,16 +350,14 @@ class Product < ApplicationRecord
   end
 
   def connect_inventory_location(outlet = :sf)
-    begin
-      location = ShopifyInventory.locations["Mollusk #{outlet.to_s.upcase}"]
+    location = ShopifyInventory.locations["Mollusk #{outlet.to_s.upcase}"]
 
-      response = ShopifyClient.connect_inventory_location(retail_shopify.inventory_item_id, location)
-      retail_shopify.shopify_inventories << ShopifyInventory.new(location: location, inventory: 0)
+    response = ShopifyClient.connect_inventory_location(retail_shopify.inventory_item_id, location)
+    retail_shopify.shopify_inventories << ShopifyInventory.new(location: location, inventory: 0)
 
-      Airbrake.notify("Could not CONNECT #{outlet.to_s.upcase} inventory location for Product: #{id}") unless ShopifyClient.inventory_item_updated?(response)
-    rescue
-      Airbrake.notify("There was an error CONNECTING #{outlet.to_s.upcase} inventory location for Product: #{id}")
-    end
+    Airbrake.notify("Could not CONNECT #{outlet.to_s.upcase} inventory location for Product: #{id}") unless ShopifyClient.inventory_item_updated?(response)
+  rescue StandardError
+    Airbrake.notify("There was an error CONNECTING #{outlet.to_s.upcase} inventory location for Product: #{id}")
   end
 
   def fluid_inventory_threshold
@@ -373,28 +369,28 @@ class Product < ApplicationRecord
   end
 
   def fluid_inventory
-    if has_retail_and_wholesale_shopify?
-      retail_inventory = retail_shopify.shopify_inventories.find_by(location: 'Postworks')&.inventory
-      wholesale_inventory = wholesale_shopify.shopify_inventories.find_by(location: 'Postworks ATS')&.inventory
+    return unless retail_and_wholesale_shopify?
 
-      if retail_inventory.present?
-        if wholesale_inventory.present?
-          if fluid_inventory_threshold.present?
-            if retail_inventory < fluid_inventory_threshold
-              sufficient_wholesale = (fluid_inventory_threshold - retail_inventory) <= wholesale_inventory
-              adjustment = sufficient_wholesale ? fluid_inventory_threshold - retail_inventory : wholesale_inventory
-              # bails on zero adjustments and negative wholesale inventories
-              adjust_inventory_fluid(adjustment, wholesale_inventory - adjustment) unless adjustment < 1
-            end
-          else
-            Airbrake.notify("Missing fluid inventory threshold for Product Type: #{retail_shopify.product_type} Product: #{id}")
+    retail_inventory = retail_shopify.shopify_inventories.find_by(location: 'Postworks')&.inventory
+    wholesale_inventory = wholesale_shopify.shopify_inventories.find_by(location: 'Postworks ATS')&.inventory
+
+    if retail_inventory.present?
+      if wholesale_inventory.present?
+        if fluid_inventory_threshold.present?
+          if retail_inventory < fluid_inventory_threshold
+            sufficient_wholesale = (fluid_inventory_threshold - retail_inventory) <= wholesale_inventory
+            adjustment = sufficient_wholesale ? fluid_inventory_threshold - retail_inventory : wholesale_inventory
+            # bails on zero adjustments and negative wholesale inventories
+            adjust_inventory_fluid(adjustment, wholesale_inventory - adjustment) unless adjustment < 1
           end
         else
-          Airbrake.notify("Missing WHOLESALE Postworks Inventory for Product: #{id}")
+          Airbrake.notify("Missing fluid inventory threshold for Product Type: #{retail_shopify.product_type} Product: #{id}")
         end
       else
-        Airbrake.notify("Missing RETAIL Postworks Inventory for Product: #{id}")
+        Airbrake.notify("Missing WHOLESALE Postworks Inventory for Product: #{id}")
       end
+    else
+      Airbrake.notify("Missing RETAIL Postworks Inventory for Product: #{id}")
     end
   end
 
@@ -414,7 +410,7 @@ class Product < ApplicationRecord
   def vend_inventory(outlet)
     outlet = LOCATION_NAMES_BY_CODE[outlet]
     inventory = vend_datum.vend_inventories.find_by(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key(outlet))&.inventory.to_i
-    inventory < 0 ? 0 : inventory
+    inventory.negative? ? 0 : inventory
   end
 
   def update_shopify_inventory?(outlet, store = :retail)

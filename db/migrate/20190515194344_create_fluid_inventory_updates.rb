@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateFluidInventoryUpdates < ActiveRecord::Migration[5.2]
   def change
     create_table :fluid_inventory_updates do |t|

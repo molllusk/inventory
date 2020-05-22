@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ShopifyRefundOrder < ApplicationRecord
   belongs_to :shopify_refund, optional: true
 end

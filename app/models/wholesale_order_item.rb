@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 class WholesaleOrderItem < ApplicationRecord
   belongs_to :wholesale_order
 
   def self.sos_items
-    @sos_items ||= SosClient.get_items
+    @sos_items ||= SosClient.items
   end
 
   def self.items_post_data(items)
@@ -26,7 +28,7 @@ class WholesaleOrderItem < ApplicationRecord
     }
 
     defaults[:quantity] = quantity_ordered
-    defaults[:duedate] = wholesale_order.cancel_date.strftime("%Y-%m-%dT%H:%M:%S")
+    defaults[:duedate] = wholesale_order.cancel_date.strftime('%Y-%m-%dT%H:%M:%S')
     defaults[:description] = sos_item['description']
     defaults[:unitprice] = sos_item['salesPrice']
     defaults[:amount] = sos_item['salesPrice'] * quantity_ordered

@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 class ShopifyRefund < ApplicationRecord
   has_many :shopify_refund_orders, dependent: :destroy
 
   def location_cost(location)
-    location_id = ShopifyInventory::locations[location].to_s
+    location_id = ShopifyInventory.locations[location].to_s
     location_costs.present? ? (location_costs[location_id] || 0) : 0
   end
 
@@ -86,14 +88,14 @@ class ShopifyRefund < ApplicationRecord
 
   # kind of hacky workaround for an edgecase where the shipping calc is just shy of 0 due to some significant digit thing
   def shipping_clean
-    (-0.01 < shipping && shipping < 0) ? 0 : shipping
+    shipping > -0.01 && shipping.negative? ? 0 : shipping
   end
 
   def post_to_qbo
-    if shopify_refund_orders.present?
-      qbo = Qbo.create_journal_entry(journal_entry)
-      update_attribute(:qbo_id, qbo.id) unless qbo.blank?
-    end
+    return unless shopify_refund_orders.present?
+
+    qbo = Qbo.create_journal_entry(journal_entry)
+    update_attribute(:qbo_id, qbo.id) unless qbo.blank?
   end
 
   def journal_entry

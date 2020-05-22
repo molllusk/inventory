@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 module ShopifyClient
-  RETAIL_BASE_URL = "https://#{ENV['SHOPIFY_USER']}:#{ENV['SHOPIFY_PASSWORD']}@mollusksurf.myshopify.com".freeze
-  WHOLESALE_BASE_URL = "https://#{ENV['WHOLESALE_SHOPIFY_USER']}:#{ENV['WHOLESALE_SHOPIFY_PASSWORD']}@molluskats.myshopify.com".freeze
-  API_VERSION = '/admin/api/2020-04'.freeze
+  RETAIL_BASE_URL = "https://#{ENV['SHOPIFY_USER']}:#{ENV['SHOPIFY_PASSWORD']}@mollusksurf.myshopify.com"
+  WHOLESALE_BASE_URL = "https://#{ENV['WHOLESALE_SHOPIFY_USER']}:#{ENV['WHOLESALE_SHOPIFY_PASSWORD']}@molluskats.myshopify.com"
+  API_VERSION = '/admin/api/2020-04'
 
   SAVED_PRODUCT_ATTRIBUTES = %i[
     handle
     product_type
     title
     vendor
-  ]
+  ].freeze
 
   SAVED_VARIANT_ATTRIBUTES = %i[
     barcode
@@ -28,7 +30,7 @@ module ShopifyClient
     sku
     weight
     weight_unit
-  ]
+  ].freeze
 
   def self.connection(store = :RETAIL)
     sleep(0.5)
@@ -39,8 +41,8 @@ module ShopifyClient
   end
 
   def self.all_inventory_locations(store = :RETAIL)
-     response = connection(store).get "#{API_VERSION}/locations.json"
-     response.body['locations']
+    response = connection(store).get "#{API_VERSION}/locations.json"
+    response.body['locations']
   end
 
   def self.count(resource, store = :RETAIL)
@@ -67,7 +69,7 @@ module ShopifyClient
     refunds = Hash.new(0)
 
     all_orders(store).each do |order|
-      next if %w(fulfilled restocked).include? order['fulfillment_status']
+      next if %w[fulfilled restocked].include? order['fulfillment_status']
 
       order['refunds'].each do |refund|
         refund['refund_line_items'].each do |refund_line_item|
@@ -76,9 +78,7 @@ module ShopifyClient
       end
 
       order['line_items'].each do |line_item|
-        if line_item['fulfillment_status'].blank?
-          orders[line_item['variant_id']] += line_item['quantity'] - refunds[line_item['id']]
-        end
+        orders[line_item['variant_id']] += line_item['quantity'] - refunds[line_item['id']] if line_item['fulfillment_status'].blank?
       end
     end
     orders
@@ -209,7 +209,7 @@ module ShopifyClient
 
     count_params = {
       status: 'closed',
-      updated_at_min: min_date,
+      updated_at_min: min_date
     }
 
     count_response = connection(store).get "#{API_VERSION}/orders/count.json", count_params
@@ -291,7 +291,7 @@ module ShopifyClient
   end
 
   def self.next_page_link(links)
-    links.split(', ').find { |link| link.include?("rel=\"next\"") }
+    links.split(', ').find { |link| link.include?('rel="next"') }
   end
 
   def self.next_page_url(next_link)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class WholesaleOrdersController < ApplicationController
   before_action :logged_in_user
 
@@ -10,11 +12,11 @@ class WholesaleOrdersController < ApplicationController
   end
 
   def post_to_sos
-    unless WholesaleOrder.ref_number_taken?
+    if WholesaleOrder.ref_number_taken?
+      flash[:warning] = 'The current ref number is already in use. Please update the ref number and click below to try again'
+    else
       SosSalesOrder.perform_async
       flash[:success] = 'Sales Order Successfully Enqueued! Refresh page to monitor progress. Do not click button again for same order'
-    else
-      flash[:warning] = 'The current ref number is already in use. Please update the ref number and click below to try again'
     end
 
     redirect_to action: :index

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DailyVendConsignment < ApplicationRecord
   has_many :vend_consignment_location_costs, dependent: :destroy
   has_many :vend_consignments, dependent: :destroy

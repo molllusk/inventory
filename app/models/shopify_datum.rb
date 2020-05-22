@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ShopifyDatum < ApplicationRecord
   serialize :tags, Array
 
@@ -32,15 +34,15 @@ class ShopifyDatum < ApplicationRecord
   end
 
   def third_party?
-    tags.detect { |tag| tag.strip.downcase == '3rdparty' }.present?
+    tags.find { |tag| tag.strip.downcase == '3rdparty' }.present?
   end
 
   def sale?
-    tags.detect { |tag| tag.strip.downcase == 'sale' }.present?
+    tags.find { |tag| tag.strip.downcase == 'sale' }.present?
   end
 
   def third_party_or_sale?
-    tags.detect { |tag| %w[3rdparty sale].include?(tag.strip.downcase) }.present?
+    tags.find { |tag| %w[3rdparty sale].include?(tag.strip.downcase) }.present?
   end
 
   def get_cost

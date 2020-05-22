@@ -48,21 +48,21 @@
           <% end %>
         </td>
         <td class='<%= 'border-bottom' if last_row %>'>
-          <% if order.has_po? %>
+          <% if order.po? %>
             <a href='<%= daily_order_po_path(order) %>' target='_blank'><%= order.display_po %> <i class='fa fa-external-link-alt'></i></a>
           <% else %>
              -
           <% end %>
         </td>
         <td class='<%= 'border-bottom' if last_row %>'>
-          <% if order.has_po? %>
+          <% if order.po? %>
             <a href='<%= daily_order_po_path(order) %>.pdf'><i class='fa fa-file-pdf'></i> <i class='fa fa-cloud-download-alt'></i></a>
           <% else %>
              -
           <% end %>
         </td>
         <td class='<%= 'border-bottom' if last_row %>'>
-          <% if order.has_po? %>
+          <% if order.po? %>
             <a href='<%= daily_order_po_path(order) %>.csv'><i class='fa fa-file-csv'></i> <i class='fa fa-cloud-download-alt'></i></a>
           <% else %>
              -

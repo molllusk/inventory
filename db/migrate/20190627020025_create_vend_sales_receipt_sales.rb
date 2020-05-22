@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateVendSalesReceiptSales < ActiveRecord::Migration[5.2]
   def change
     create_table :vend_sales_receipt_sales do |t|
@@ -19,4 +21,3 @@ class CreateVendSalesReceiptSales < ActiveRecord::Migration[5.2]
     end
   end
 end
-   

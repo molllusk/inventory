@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class VendSalesCostSale < ApplicationRecord
   belongs_to :daily_vend_cost, optional: true
 

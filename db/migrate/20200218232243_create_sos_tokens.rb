@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateSosTokens < ActiveRecord::Migration[5.2]
   def change
     create_table :sos_tokens do |t|

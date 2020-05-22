@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateVendConsignments < ActiveRecord::Migration[5.2]
   def change
     create_table :vend_consignments do |t|

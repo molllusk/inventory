@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ShopifySalesCost < ApplicationRecord
   has_many :shopify_sales_cost_orders, dependent: :destroy
 
@@ -15,7 +17,7 @@ class ShopifySalesCost < ApplicationRecord
   }
 
   def location_cost(location)
-    location_id = ShopifyInventory::locations[location].to_s
+    location_id = ShopifyInventory.locations[location].to_s
     location_costs.present? ? (location_costs[location_id] || 0) : 0
   end
 
@@ -95,10 +97,10 @@ class ShopifySalesCost < ApplicationRecord
   end
 
   def post_to_qbo
-    if shopify_sales_cost_orders.present?
-      qbo = Qbo.create_journal_entry(journal_entry)
-      update_attribute(:qbo_id, qbo.id) unless qbo.blank?
-    end
+    return unless shopify_sales_cost_orders.present?
+
+    qbo = Qbo.create_journal_entry(journal_entry)
+    update_attribute(:qbo_id, qbo.id) unless qbo.blank?
   end
 
   def journal_entry

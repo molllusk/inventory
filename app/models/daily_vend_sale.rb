@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DailyVendSale < ApplicationRecord
   has_many :vend_sales_receipts, dependent: :destroy
   has_many :vend_sales_receipt_sales, dependent: :destroy
@@ -46,12 +48,12 @@ class DailyVendSale < ApplicationRecord
       {
         item_id: Qbo::CREDIT_CARD_PAYMENT_ID_BY_OUTLET[receipt.outlet_name], # Paypal Payment
         amount: -receipt.credit_payments,
-        description: "Credit Card Payment - #{receipt.outlet_name}",
+        description: "Credit Card Payment - #{receipt.outlet_name}"
       },
       {
         item_id: '172117', # Gift Certificates
         amount: -receipt.gift_card_payments,
-        description: 'Gift Certificate payments',
+        description: 'Gift Certificate payments'
       },
       {
         item_id: '177181', # Over/Short
@@ -86,7 +88,7 @@ class DailyVendSale < ApplicationRecord
           unit_price: details[:amount],
           quantity: 1,
           item_ref: Qbo.base_ref(details[:item_id]),
-          class_ref: Qbo.base_ref(Qbo::CLASS_ID_BY_OUTLET[receipt.outlet_name]),
+          class_ref: Qbo.base_ref(Qbo::CLASS_ID_BY_OUTLET[receipt.outlet_name])
         }
 
         line_item = Qbo.sales_receipt_line_item(line_item_params, sales_receipt_line_detail)

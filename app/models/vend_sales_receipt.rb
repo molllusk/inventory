@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class VendSalesReceipt < ApplicationRecord
   belongs_to :daily_vend_sale, optional: true
 

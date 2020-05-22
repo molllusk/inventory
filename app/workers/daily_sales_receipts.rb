@@ -11,7 +11,7 @@ class DailySalesReceipts
 
     max_date = day.to_time.in_time_zone('Pacific Time (US & Canada)').end_of_day
 
-    puts "Getting orders from #{days_ago} day(s) ago #{min_date.strftime("%m/%d/%Y")}..."
+    puts "Getting orders from #{days_ago} day(s) ago #{min_date.strftime('%m/%d/%Y')}..."
 
     ##########################
     ##### SHOPIFY RETAIL #####
@@ -34,7 +34,7 @@ class DailySalesReceipts
 
     location_sales_costs = Hash.new(0)
     refund_costs_by_location = Hash.new(0)
-        
+
     order_names_by_id = {}
 
     sales_totals_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
@@ -45,14 +45,16 @@ class DailySalesReceipts
       order_names_by_id[order['id']] = order['name']
       costs_by_location = Hash.new(0)
 
-      if %w(refunded partially_refunded).include?(order['financial_status'])
+      if %w[refunded partially_refunded].include?(order['financial_status'])
         ShopifyClient.refunds(order['id']).each do |refund|
           next if Time.parse(refund['created_at']) < min_date || Time.parse(refund['created_at']) > max_date
+
           refunds << refund
         end
       end
 
       next if Time.parse(order['closed_at']) < min_date || Time.parse(order['closed_at']) > max_date
+
       order_name = order['name']
       order_tax = order['tax_lines'].reduce(0) { |sum, tax_line| sum + tax_line['price'].to_f }
 
@@ -68,8 +70,9 @@ class DailySalesReceipts
 
       order['line_items'].each do |line_item|
         next unless line_item['fulfillment_status'].present?
+
         variant_id = line_item['variant_id']
-        fulfillment = fulfillments.detect { |fulfillment| fulfillment['line_items'].detect { |fulfillment_line_item| fulfillment_line_item['variant_id'] == variant_id } }
+        fulfillment = fulfillments.find { |fulfillment_candidate| fulfillment_candidate['line_items'].find { |fulfillment_line_item| fulfillment_line_item['variant_id'] == variant_id } }
         location_id = fulfillment.present? && fulfillment['location_id'].present? ? fulfillment['location_id'] : 'no_location'
 
         cost = 0.0
@@ -108,9 +111,9 @@ class DailySalesReceipts
       transactions = ShopifyClient.transactions(order['id'])
 
       transactions.each do |transaction|
-        next unless %w(capture sale refund).include?(transaction['kind']) && transaction['status'] == 'success'
+        next unless %w[capture sale refund].include?(transaction['kind']) && transaction['status'] == 'success'
 
-        if %w(capture sale).include?(transaction['kind'])
+        if %w[capture sale].include?(transaction['kind'])
           case transaction['gateway']
           when 'gift_card'
             sales_totals_by_order[order_name][:gift_card_payments] += transaction['amount'].to_f
@@ -140,7 +143,7 @@ class DailySalesReceipts
 
       refund_line_items.each do |line_item|
         variant_id = line_item['line_item']['variant_id']
-        fulfillment = fulfillments.detect { |fulfillment| fulfillment['line_items'].detect { |fulfillment_line_item| fulfillment_line_item['variant_id'] == variant_id } }
+        fulfillment = fulfillments.find { |fulfillment_candidate| fulfillment_candidate['line_items'].find { |fulfillment_line_item| fulfillment_line_item['variant_id'] == variant_id } }
         location_id = fulfillment.present? && fulfillment['location_id'].present? ? fulfillment['location_id'] : 'no_location'
 
         refund_cost = 0.0
@@ -212,7 +215,7 @@ class DailySalesReceipts
 
     refunded_amounts[:location_costs] = refund_costs_by_location
     costs_report[:location_costs] = location_sales_costs
-    
+
     shopify_sales_cost = ShopifySalesCost.create!(costs_report)
     shopify_refund = ShopifyRefund.create!(refunded_amounts)
     shopify_sales_receipt = ShopifySalesReceipt.create!(shopify_sales_receipt)
@@ -256,6 +259,7 @@ class DailySalesReceipts
       costs_by_location = Hash.new(0)
 
       next if Time.parse(order['closed_at']) < min_date || Time.parse(order['closed_at']) > max_date
+
       order_name = order['name']
       order_tax = order['tax_lines'].reduce(0) { |sum, tax_line| sum + tax_line['price'].to_f }
 
@@ -271,8 +275,9 @@ class DailySalesReceipts
 
       order['line_items'].each do |line_item|
         next unless line_item['fulfillment_status'].present?
+
         variant_id = line_item['variant_id']
-        fulfillment = fulfillments.detect { |fulfillment| fulfillment['line_items'].detect { |fulfillment_line_item| fulfillment_line_item['variant_id'] == variant_id } }
+        fulfillment = fulfillments.find { |fulfillment_candidate| fulfillment_candidate['line_items'].find { |fulfillment_line_item| fulfillment_line_item['variant_id'] == variant_id } }
         location_id = fulfillment.present? && fulfillment['location_id'].present? ? fulfillment['location_id'] : 'no_location'
 
         cost = 0.0
@@ -311,9 +316,9 @@ class DailySalesReceipts
       transactions = ShopifyClient.transactions(order['id'], :WHOLESALE)
 
       transactions.each do |transaction|
-        next unless %w(capture sale refund).include?(transaction['kind']) && transaction['status'] == 'success'
+        next unless %w[capture sale refund].include?(transaction['kind']) && transaction['status'] == 'success'
 
-        if %w(capture sale).include?(transaction['kind'])
+        if %w[capture sale].include?(transaction['kind'])
           case transaction['gateway']
           when 'gift_card'
             wholesale_sales_totals_by_order[order_name][:gift_card_payments] += transaction['amount'].to_f
@@ -368,15 +373,16 @@ class DailySalesReceipts
 
     vend_sales.each do |sale|
       next unless sale['status'] == 'CLOSED'
+
       outlet = sale['outlet_id']
       sale_id = sale['id']
 
       vend_sales_receipt_by_sale[sale_id][:outlet_id] = outlet
       vend_sales_costs_by_sale[sale_id][:outlet_id] = outlet
-      
+
       vend_sales_receipt_by_sale[sale_id][:sale_at] = sale['sale_date']
       vend_sales_costs_by_sale[sale_id][:sale_at] = sale['sale_date']
-      
+
       vend_sales_receipt_by_sale[sale_id][:receipt_number] = sale['receipt_number']
       vend_sales_costs_by_sale[sale_id][:receipt_number] = sale['receipt_number']
 
@@ -392,22 +398,20 @@ class DailySalesReceipts
         when '0adfd74a-153e-11e6-f182-ae0e9b7d09f8' # Shipping
           vend_sales_receipt[outlet][:shipping] += item['price_total'] + discount
           vend_sales_receipt_by_sale[sale_id][:shipping] += item['price_total'] + discount
-        when '5ddba61e-3598-11e2-b1f5-4040782fde00' #discount
+        when '5ddba61e-3598-11e2-b1f5-4040782fde00' # discount
           vend_sales_receipt[outlet][:discount_sales] += item['price_total'] + discount
           vend_sales_receipt_by_sale[sale_id][:discount_sales] += item['price_total'] + discount
         else
           vend_sales_receipt[outlet][:product_sales] += item['price_total'] + discount
           vend_sales_receipt_by_sale[sale_id][:product_sales] += item['price_total'] + discount
 
-          if VendSalesTax::RENTAL_IDS.include?(item['product_id'])
-            vend_sales_receipt_by_sale[sale_id][:rentals] += item['price_total'] + discount
-          end
+          vend_sales_receipt_by_sale[sale_id][:rentals] += item['price_total'] + discount if VendSalesTax::RENTAL_IDS.include?(item['product_id'])
         end
 
         vend_sales_receipt[outlet][:discount] += discount
         vend_sales_receipt_by_sale[sale_id][:discount] += discount
 
-        vend_sales_receipt[outlet][:sales_tax] += item['tax_total'] 
+        vend_sales_receipt[outlet][:sales_tax] += item['tax_total']
         vend_sales_receipt_by_sale[sale_id][:sales_tax] += item['tax_total']
 
         vend_sales_costs[outlet][:cost] += item['cost_total']
@@ -463,10 +467,11 @@ class DailySalesReceipts
     consignments = VendClient.consignments
     consignments_received_report = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
-    consignments_received = Hash.new { |hash, key| hash[key] = Hash.new }
+    consignments_received = Hash.new { |hash, key| hash[key] = {} }
 
     consignments.each do |consignment|
       next unless consignment['source_outlet_id'].present?
+
       received_at = Time.parse(consignment['received_at'])
       next if received_at < min_date || received_at > max_date
 
@@ -506,50 +511,50 @@ class DailySalesReceipts
 
     begin
       shopify_sales_cost.post_to_qbo
-    rescue
-      Airbrake.notify($!)
+    rescue StandardError
+      Airbrake.notify($ERROR_INFO)
     end
 
     begin
       shopify_refund.post_to_qbo
-    rescue
-      Airbrake.notify($!)
+    rescue StandardError
+      Airbrake.notify($ERROR_INFO)
     end
 
     begin
       shopify_sales_receipt.post_to_qbo
-    rescue
-      Airbrake.notify($!)
+    rescue StandardError
+      Airbrake.notify($ERROR_INFO)
     end
 
     begin
       wholesale_shopify_sales_cost.post_to_qbo
-    rescue
-      Airbrake.notify($!)
+    rescue StandardError
+      Airbrake.notify($ERROR_INFO)
     end
 
     begin
       wholesale_shopify_sales_receipt.post_to_qbo
-    rescue
-      Airbrake.notify($!)
+    rescue StandardError
+      Airbrake.notify($ERROR_INFO)
     end
 
     begin
       vend_costs.post_to_qbo
-    rescue
-      Airbrake.notify($!)
+    rescue StandardError
+      Airbrake.notify($ERROR_INFO)
     end
 
     begin
       vend_sales.post_to_qbo
-    rescue
-      Airbrake.notify($!)
+    rescue StandardError
+      Airbrake.notify($ERROR_INFO)
     end
 
     begin
       daily_vend_consignment.post_to_qbo
-    rescue
-      Airbrake.notify($!)
+    rescue StandardError
+      Airbrake.notify($ERROR_INFO)
     end
   end
 end

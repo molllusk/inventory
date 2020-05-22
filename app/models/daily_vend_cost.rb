@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DailyVendCost < ApplicationRecord
   has_many :vend_sales_costs, dependent: :destroy
   has_many :vend_sales_cost_sales, dependent: :destroy
@@ -12,8 +14,6 @@ class DailyVendCost < ApplicationRecord
   def journal_line_item_details
     details = []
     vend_sales_costs.each do |sales_cost|
-      outlet = sales_cost.outlet_id
-
       details << {
         account_id: '3476', # cost of goods sold
         amount: sales_cost.cost,
@@ -21,7 +21,7 @@ class DailyVendCost < ApplicationRecord
         posting_type: 'Debit',
         class_id: Qbo::CLASS_ID_BY_OUTLET[sales_cost.outlet_name]
       }
-    
+
       details << {
         account_id: Qbo::ACCOUNT_ID_BY_OUTLET[sales_cost.outlet_name], # Location specific Inventory Asset
         amount: sales_cost.cost,
@@ -56,7 +56,7 @@ class DailyVendCost < ApplicationRecord
       }
 
       line_item = Qbo.journal_entry_line_item(line_item_params, journal_entry_line_detail)
-      
+
       journal_entry.line_items << line_item
     end
 

@@ -28,7 +28,7 @@
       <td>
         <% if receipt.sum_check.to_d.truncate(2).to_f == 0.0 %>
           <p style='color: green'><i class="fa fa-check"></i></p>
-        <% elsif receipt.sum_check > 0 %>
+        <% elsif receipt.sum_check.positive? %>
           <p style='color: red'><%= number_to_currency(receipt.sum_check, unit: '$', separator: '.', delimiter: ',') %></p>
         <% else %>
           <p style='color: blue'><%= number_to_currency(receipt.sum_check, unit: '$', separator: '.', delimiter: ',') %></p>

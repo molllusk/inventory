@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class VendConsignment < ApplicationRecord
   belongs_to :daily_vend_consignment, optional: true
 

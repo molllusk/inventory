@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class InventoryUpdatesController < ApplicationController
   before_action :logged_in_user
 

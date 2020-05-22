@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DailyOrderThresholdsController < ApplicationController
   before_action :logged_in_user
 

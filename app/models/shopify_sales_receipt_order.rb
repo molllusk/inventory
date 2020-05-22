@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ShopifySalesReceiptOrder < ApplicationRecord
   belongs_to :shopify_sales_receipt, optional: true
 

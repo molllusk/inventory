@@ -1,17 +1,18 @@
+# frozen_string_literal: true
+
 ruby '2.6.0'
 source 'https://rubygems.org'
 
 git_source(:github) do |repo_name|
-  repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
+  repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?('/')
   "https://github.com/#{repo_name}.git"
 end
 
 gem 'airbrake', '~> 9.5'
 gem 'annotate'
-gem 'bcrypt',         '3.1.12'
+gem 'bcrypt', '3.1.12'
 gem 'bootstrap-daterangepicker-rails'
 gem 'bootstrap-sass', '~> 3.4.1'
-gem 'sassc-rails', '>= 2.1.0'
 gem 'bootstrap-will_paginate', '1.0.0'
 gem 'coffee-rails', '~> 4.2'
 gem 'faraday'
@@ -19,7 +20,6 @@ gem 'faraday_middleware'
 gem 'filterrific'
 gem 'font-awesome-sass'
 gem 'google-api-client', '~> 0.11'
-gem 'quickbooks-ruby', git: 'https://github.com/ruckus/quickbooks-ruby.git', branch: '389-oauth2'
 gem 'hypdf', '~> 1.0.18'
 gem 'jbuilder', '~> 2.5'
 gem 'jquery-rails', '4.3.1'
@@ -27,9 +27,11 @@ gem 'momentjs-rails'
 gem 'oauth2'
 gem 'pg', '0.20.0'
 gem 'puma', '~> 3.12'
+gem 'quickbooks-ruby', git: 'https://github.com/ruckus/quickbooks-ruby.git', branch: '389-oauth2'
 gem 'rails', '~> 5.2.3'
 gem 'rails_12factor'
 gem 'redis'
+gem 'sassc-rails', '>= 2.1.0'
 gem 'sendgrid-ruby'
 gem 'sidekiq', '~> 5.1.3'
 gem 'sidekiq-failures'
@@ -49,11 +51,12 @@ gem 'uglifier', '>= 1.3.0'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
-  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+  gem 'byebug', platforms: %i[mri mingw x64_mingw]
   # Adds support for Capybara system testing and selenium driver
   gem 'capybara', '~> 2.13'
-  gem 'selenium-webdriver'
   gem 'dotenv-rails'
+  gem 'rubocop', '~> 0.84.0', require: false
+  gem 'selenium-webdriver'
 end
 
 group :development do
@@ -66,4 +69,4 @@ group :development do
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]

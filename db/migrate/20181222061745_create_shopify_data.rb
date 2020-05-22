@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 class CreateShopifyData < ActiveRecord::Migration[5.1]
   def change
     create_table :shopify_data do |t|
-
       t.timestamps
       t.string :handle
       t.string :product_type

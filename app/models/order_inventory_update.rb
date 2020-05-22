@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class OrderInventoryUpdate < ApplicationRecord
   belongs_to :order
 
@@ -6,8 +8,7 @@ class OrderInventoryUpdate < ApplicationRecord
   end
 
   # need to add an undo method here
-  def undo
-  end
+  def undo; end
 end
 
 # == Schema Information
