@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 class ShopifyInventory < ApplicationRecord
   belongs_to :shopify_datum
 
-  scope :with_warehouse, -> { where('location = ? AND inventory > 0', ShopifyInventory::locations['Postworks']) }
+  scope :with_warehouse, -> { where('location = ? AND inventory > 0', ShopifyInventory.locations['Postworks']) }
 
   enum location: {
     # retail site

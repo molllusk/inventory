@@ -1,24 +1,26 @@
+# frozen_string_literal: true
+
 class VendLocationSalesTax < ApplicationRecord
   belongs_to :vend_sales_tax
 
-  CSV_HEADERS = [
-    :amount,
-    :shipping,
-    :sales_tax,
-    :id,
-    :provider,
-    :to_zip,
-    :to_state,
-    :to_country,
-    :transaction_date
-  ]
+  CSV_HEADERS = %i[
+    amount
+    shipping
+    sales_tax
+    id
+    provider
+    to_zip
+    to_state
+    to_country
+    transaction_date
+  ].freeze
 
   ZIPS_BY_LOCATION = {
     'San Francisco' => '94122',
     'Santa Barbara' => '93101',
     'Silver Lake' => '90026',
     'Venice Beach' => '90291'
-  }
+  }.freeze
 
   def outlet_name
     VendClient::OUTLET_NAMES_BY_ID[outlet_id]
@@ -54,7 +56,7 @@ class VendLocationSalesTax < ApplicationRecord
       to_zip: to_zip,
       to_state: to_state,
       to_country: to_country,
-      transaction_date: transaction_date.strftime("%Y/%m/%d")
+      transaction_date: transaction_date.strftime('%Y/%m/%d')
     }
 
     CSV_HEADERS.map { |header| data[header] }

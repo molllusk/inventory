@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateWholesaleOrderItems < ActiveRecord::Migration[5.2]
   def change
     create_table :wholesale_order_items do |t|

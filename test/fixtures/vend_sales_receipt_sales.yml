@@ -3,7 +3,6 @@
 one:
   discount: 1.5
   shipping: 1.5
-  vend_sales_receipt_id: 1
   credit_payments: 1.5
   gift_card_payments: 1.5
   cash_or_check_payments: 1.5
@@ -11,12 +10,10 @@ one:
   discount_sales: 1.5
   product_sales: 1.5
   gift_card_sales: 1.5
-  sales_id: 1
 
 two:
   discount: 1.5
   shipping: 1.5
-  vend_sales_receipt_id: 1
   credit_payments: 1.5
   gift_card_payments: 1.5
   cash_or_check_payments: 1.5
@@ -24,7 +21,6 @@ two:
   discount_sales: 1.5
   product_sales: 1.5
   gift_card_sales: 1.5
-  sales_id: 1
 
 # == Schema Information
 #

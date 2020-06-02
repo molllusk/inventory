@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # MONKEY PATCH!!!
 # https://github.com/rails/rails/pull/32296
 #

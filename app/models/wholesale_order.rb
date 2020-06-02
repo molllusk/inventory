@@ -14,7 +14,7 @@ class WholesaleOrder < ApplicationRecord
     'CancelDate' => :cancel_date,
     'ItemName' => :item_name,
     'QuantityOrdered' => :quantity_ordered
-  }
+  }.freeze
 
   def self.pull_sheet
     GoogleClient.sheet_values(GoogleClient::WHOLESALE_ORDERS, GoogleClient::WHOLESALE_ORDER_SHEET).reject { |order| order['RefNumber'].blank? }
@@ -29,7 +29,7 @@ class WholesaleOrder < ApplicationRecord
   end
 
   def self.process_orders
-    orders_by_customer = Hash.new { |h,k| h[k] = [] }
+    orders_by_customer = Hash.new { |h, k| h[k] = [] }
 
     pull_sheet.each do |order|
       orders_by_customer[order['Customer'] + order['RefNumber']] << order
@@ -41,18 +41,17 @@ class WholesaleOrder < ApplicationRecord
   def self.order_attributes(order)
     order_attrs = {}
     order.except('Sales Analysis Name', 'Department', 'ItemName', 'QuantityOrdered', 'TxnDate').each do |header, value|
-      if ['StartShip', 'CancelDate'].include?(header)
-        order_attrs[SAVED_HEADERS[header]] = Date.strptime(value, "%m/%d/%Y")
-      else
-        order_attrs[SAVED_HEADERS[header]] = value
-      end
+      order_attrs[SAVED_HEADERS[header]] = if ['StartShip', 'CancelDate'].include?(header)
+                                             Date.strptime(value, '%m/%d/%Y')
+                                           else
+                                             value
+                                           end
     end
     order_attrs
   end
 
   def self.create_orders
-    wholesale_orders = []
-    process_orders.each do |customer, orders|
+    process_orders.each do |_customer, orders|
       next if orders.blank?
 
       wholesale_order = create(order_attributes(orders.first)) # link customer to wholesale order has_one customer
@@ -62,7 +61,7 @@ class WholesaleOrder < ApplicationRecord
           item_name: order['ItemName'],
           quantity_ordered: order['QuantityOrdered'].to_i
         }
-        
+
         wholesale_order.wholesale_order_items << WholesaleOrderItem.new(item)
       end
       wholesale_order.post_to_sos
@@ -70,7 +69,7 @@ class WholesaleOrder < ApplicationRecord
   end
 
   def customer_data_row
-    @customer_data_row ||= WholesaleOrder.pull_customer_data_sheet.find { |customer_data| customer_data['Name'] == customer } 
+    @customer_data_row ||= WholesaleOrder.pull_customer_data_sheet.find { |customer_data| customer_data['Name'] == customer }
   end
 
   def post_to_sos
@@ -87,23 +86,23 @@ class WholesaleOrder < ApplicationRecord
   end
 
   def sos_location
-    SosClient.get_locations.find { |sos_location| sos_location['name'] == location }
+    SosClient.locations.find { |sos_location| sos_location['name'] == location }
   end
 
   def sos_customer
-    @sos_customer ||= SosClient.get_customers.find { |sos_customer| sos_customer['name'] == customer }
+    @sos_customer ||= SosClient.customers.find { |sos_customer| sos_customer['name'] == customer }
   end
 
   def sos_channel
-    SosClient.get_channels.find { |sos_channel| sos_channel['name'] == customer_data_row['Channel'] }
+    SosClient.channels.find { |sos_channel| sos_channel['name'] == customer_data_row['Channel'] }
   end
 
   def sos_terms
-    SosClient.get_terms.find { |sos_term| sos_term['name'] == customer_data_row['Terms'] }
+    SosClient.terms.find { |sos_term| sos_term['name'] == customer_data_row['Terms'] }
   end
 
   def sos_sales_rep
-    SosClient.get_sales_reps.find { |sos_sales_rep| (sos_sales_rep['lastName'].present? ? "#{sos_sales_rep['firstName']} #{sos_sales_rep['lastName']}" : sos_sales_rep['firstName']) == customer_data_row['Sales Rep'] }
+    SosClient.sales_reps.find { |sos_sales_rep| (sos_sales_rep['lastName'].present? ? "#{sos_sales_rep['firstName']} #{sos_sales_rep['lastName']}" : sos_sales_rep['firstName']) == customer_data_row['Sales Rep'] }
   end
 
   def sos_billing_contact_email
@@ -117,7 +116,7 @@ class WholesaleOrder < ApplicationRecord
   # ask about sales rep
   def compile_post_data
     defaults = {
-      date: Time.now.strftime("%Y-%m-%dT%H:%M:%S"),
+      date: Time.now.strftime('%Y-%m-%dT%H:%M:%S'),
       depositPercent: 0.00000,
       depositAmount: 0.00000,
       subTotal: 0.00000,
@@ -146,8 +145,8 @@ class WholesaleOrder < ApplicationRecord
     }
 
     custom_fields = [
-      { id: 18, name: 'CancelDate', dataType: 'Date', value: cancel_date.strftime("%m/%d/%Y") },
-      { id: 17, name: 'StartShip', dataType: 'Date', value: start_ship.strftime("%m/%d/%Y") }
+      { id: 18, name: 'CancelDate', dataType: 'Date', value: cancel_date.strftime('%m/%d/%Y') },
+      { id: 17, name: 'StartShip', dataType: 'Date', value: start_ship.strftime('%m/%d/%Y') }
     ]
 
     defaults[:customFields] = custom_fields
@@ -186,9 +185,7 @@ class WholesaleOrder < ApplicationRecord
     defaults[:billing][:address] = billing_address
     defaults[:billing][:email] = customer_data_row['BillingEmail']
     defaults[:customerMessage] = customer_data_row['Shipping Method']
-    if customer_data_row['Priority for AOP OCs'].present?
-      defaults[:priority] = { id: customer_data_row['Priority for AOP OCs'].split(' ').first.to_i }
-    end
+    defaults[:priority] = { id: customer_data_row['Priority for AOP OCs'].split(' ').first.to_i } if customer_data_row['Priority for AOP OCs'].present?
 
     defaults[:terms] = { id: sos_terms['id'] }
     defaults[:channel] = { id: sos_channel['id'] }
@@ -209,7 +206,7 @@ class WholesaleOrder < ApplicationRecord
 
   def total_by_department
     totals = Hash.new(0)
-    wholesale_order_items.each  { |item| totals[item.department] += (item.unit_price * item.quantity_ordered) }
+    wholesale_order_items.each { |item| totals[item.department] += (item.unit_price * item.quantity_ordered) }
     totals
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :inventories do
   task pull: :environment do
     VendClient.update_inventories

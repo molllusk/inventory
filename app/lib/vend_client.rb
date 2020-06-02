@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class VendClient
-  BASE_URL = 'https://mollusksurf.vendhq.com/api/2.0'.freeze
+  BASE_URL = 'https://mollusksurf.vendhq.com/api/2.0'
 
   OUTLET_NAMES_BY_ID = {
     '5e234f4e-8eed-11e0-8e09-4040f540b50a' => 'San Francisco',
@@ -27,7 +29,7 @@ class VendClient
     variant_options
     tag_ids
     categories
-  ]
+  ].freeze
 
   def self.connection
     sleep(0.8)
@@ -46,13 +48,14 @@ class VendClient
       retries = 0
       begin
         response = connection.get path, { after: page }
-      rescue
+      rescue StandardError
         if (retries += 1) < 5
           sleep(retries)
           retry
         end
       end
       break if response.body['data'].blank?
+
       data += response.body['data']
       page = response.body['version']['max']
     end
@@ -83,13 +86,14 @@ class VendClient
         retries = 0
         begin
           response = connection.get 'search', { page_size: 1000, type: 'sales', date_from: min_date.iso8601, date_to: end_query_date.iso8601, offset: weekly_data.length }
-        rescue
+        rescue StandardError
           if (retries += 1) < 5
             sleep(retries)
             retry
           end
         end
         break if response.body['data'].blank?
+
         weekly_data += response.body['data']
       end
       full_data += weekly_data
@@ -97,7 +101,7 @@ class VendClient
       break if end_query_date == max_date
 
       min_date = end_query_date
-      end_query_date = end_query_date + 1.week
+      end_query_date += 1.week
       end_query_date = max_date if end_query_date > max_date
     end
     full_data
@@ -115,7 +119,7 @@ class VendClient
       retries = 0
       begin
         response = connection.get 'search', { page_size: 1000, type: 'sales', date_from: min_date.iso8601, date_to: max_date.iso8601, offset: data.length }
-      rescue
+      rescue StandardError
         if (retries += 1) < 5
           sleep(retries)
           retry
@@ -123,6 +127,7 @@ class VendClient
       end
 
       break if response.body['data'].blank?
+
       data += response.body['data']
     end
 
@@ -150,14 +155,14 @@ class VendClient
 
   def self.create_consignment(daily_order)
     body = {
-      type: "SUPPLIER",
-      status: "OPEN",
+      type: 'SUPPLIER',
+      status: 'OPEN',
       name: daily_order.display_po,
       outlet_id: daily_order.outlet_id
     }
 
     response = connection.post do |req|
-      req.url "consignments"
+      req.url 'consignments'
       req.headers['Content-Type'] = 'application/json'
       req.body = body.to_json
     end
@@ -183,7 +188,7 @@ class VendClient
   end
 
   def self.send_consignment(consignment_id)
-    body = { status: "SENT" }
+    body = { status: 'SENT' }
 
     response = connection.put do |req|
       req.url "consignments/#{consignment_id}"
@@ -199,7 +204,7 @@ class VendClient
   end
 
   def self.get_sf_inventory
-    get_inventory.select { |inventory| inventory['outlet_id'] == OUTLET_NAMES_BY_ID.key("San Francisco") }
+    get_inventory.select { |inventory| inventory['outlet_id'] == OUTLET_NAMES_BY_ID.key('San Francisco') }
   end
 
   def self.update_inventories
@@ -208,13 +213,13 @@ class VendClient
     all_inventory_levels.each do |inventory_level|
       vd = VendDatum.find_by(vend_id: inventory_level['product_id'])
 
-      if vd.present?
-        existing_inventory_item = vd.vend_inventories.find_by(outlet_id: inventory_level['outlet_id'])
-        if existing_inventory_item.present?
-          existing_inventory_item.update_attribute(:inventory, inventory_level['inventory_level']) unless existing_inventory_item.inventory == inventory_level['inventory_level']
-        else
-          vd.vend_inventories << VendInventory.create(outlet_id: inventory_level['outlet_id'], inventory: inventory_level['inventory_level'])
-        end
+      next unless vd.present?
+
+      existing_inventory_item = vd.vend_inventories.find_by(outlet_id: inventory_level['outlet_id'])
+      if existing_inventory_item.present?
+        existing_inventory_item.update_attribute(:inventory, inventory_level['inventory_level']) unless existing_inventory_item.inventory == inventory_level['inventory_level']
+      else
+        vd.vend_inventories << VendInventory.create(outlet_id: inventory_level['outlet_id'], inventory: inventory_level['inventory_level'])
       end
     end
   end

@@ -2,15 +2,9 @@
 
 one:
   outlet_id: MyString
-  po_id: MyString
-  qbo_id: 1
-  date: 
 
 two:
   outlet_id: MyString
-  po_id: MyString
-  qbo_id: 1
-  date:
 
 # == Schema Information
 #

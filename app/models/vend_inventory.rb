@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class VendInventory < ApplicationRecord
   belongs_to :vend_datum
 

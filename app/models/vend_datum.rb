@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class VendDatum < ApplicationRecord
   serialize :brand, Hash
   serialize :supplier, Hash
@@ -11,7 +13,7 @@ class VendDatum < ApplicationRecord
 
   def sf_inventory
     san_francisco_inventory = vend_inventories.find { |inv| inv.location == 'San Francisco' }
-    if san_francisco_inventory&.inventory.to_i > 0
+    if san_francisco_inventory&.inventory.to_i.positive?
       san_francisco_inventory.inventory
     else
       0

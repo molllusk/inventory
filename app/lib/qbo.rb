@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Qbo
   # Vend
   ACCOUNT_ID_BY_OUTLET = {
@@ -36,10 +38,10 @@ module Qbo
   }.freeze
 
   # Shopify
-  SHOPIFY_CUSTOMER_ID = 24694.freeze
-  WHOLESALE_SHOPIFY_CUSTOMER_ID = 26037.freeze
+  SHOPIFY_CUSTOMER_ID = 24694
+  WHOLESALE_SHOPIFY_CUSTOMER_ID = 26037
 
-  MOLLUSK_WEST_CLASS = 300000000000824363.freeze  
+  MOLLUSK_WEST_CLASS = 300000000000824363
 
   def self.token
     QboToken.last.refresh_if_necessary

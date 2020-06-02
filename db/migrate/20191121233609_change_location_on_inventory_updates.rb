@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class ChangeLocationOnInventoryUpdates < ActiveRecord::Migration[5.2]
-  def up 
+  def up
     change_column :inventory_updates, :location, :bigint
   end
 end

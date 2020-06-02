@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :products do
   task pull: :environment do
     retail_shopify_products = ShopifyClient.all_products
@@ -60,15 +62,13 @@ namespace :products do
       if existing_vend.present? && existing_vend.product.retail_shopify.present?
         dupes_retail << existing_vend.product
         Airbrake.notify("Issue Importing RETAIL Shopify: recognized as new, but already exists for product: #{existing_vend.product.id}")
-      else
-        if existing_vend.present?
-          existing_vend.product.shopify_data << ShopifyDatum.create(shopify_attrs)
-        elsif vend_attrs.present?
-          new_vend = VendDatum.create(vend_attrs)
-          new_vend.product = Product.create
-          new_vend.product.shopify_data << ShopifyDatum.create(shopify_attrs)
-          new_vend.save
-        end
+      elsif existing_vend.present?
+        existing_vend.product.shopify_data << ShopifyDatum.create(shopify_attrs)
+      elsif vend_attrs.present?
+        new_vend = VendDatum.create(vend_attrs)
+        new_vend.product = Product.create
+        new_vend.product.shopify_data << ShopifyDatum.create(shopify_attrs)
+        new_vend.save
       end
     end
 
@@ -82,15 +82,13 @@ namespace :products do
       if existing_vend.present? && existing_vend.product.wholesale_shopify.present?
         dupes_wholesale << existing_vend.product
         Airbrake.notify("Issue Importing WHOLESALE Shopify: recognized as new, but already exists for product: #{existing_vend.product.id}")
-      else
-        if existing_vend.present?
-          existing_vend.product.shopify_data << ShopifyDatum.create(shopify_attrs)
-        elsif vend_attrs.present?
-          new_vend = VendDatum.create(vend_attrs)
-          new_vend.product = Product.create
-          new_vend.product.shopify_data << ShopifyDatum.create(shopify_attrs)
-          new_vend.save
-        end
+      elsif existing_vend.present?
+        existing_vend.product.shopify_data << ShopifyDatum.create(shopify_attrs)
+      elsif vend_attrs.present?
+        new_vend = VendDatum.create(vend_attrs)
+        new_vend.product = Product.create
+        new_vend.product.shopify_data << ShopifyDatum.create(shopify_attrs)
+        new_vend.save
       end
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateShopifySalesReceiptOrders < ActiveRecord::Migration[5.2]
   def change
     create_table :shopify_sales_receipt_orders do |t|

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'googleauth'
 require 'google/apis/drive_v3'
 require 'google/apis/sheets_v4'
@@ -5,13 +7,13 @@ require 'google/apis/sheets_v4'
 # Auths with ENV vars:
 # "GOOGLE_CLIENT_ID",
 # "GOOGLE_CLIENT_EMAIL",
-# "GOOGLE_ACCOUNT_TYPE", 
+# "GOOGLE_ACCOUNT_TYPE",
 # "GOOGLE_PRIVATE_KEY"
 
 module GoogleClient
   FILL_LEVEL = '1nvT_f86GTC_9-Kcz-_Q8e_VCgV3ppqXNOPC0xtC_iX8'
   RELEASE_SCHEDULE = '1LIW6Fa4VFpP9pFYrHGy_Hv4RbHB8dRYPdjLfKLLqRQ8'
-  WHOLESALE_ORDERS ='1zIIRQOSsmbBqOVuwi96Fxy_KQ1sMBPDmZSXsd1cA7uQ'
+  WHOLESALE_ORDERS = '1zIIRQOSsmbBqOVuwi96Fxy_KQ1sMBPDmZSXsd1cA7uQ'
   WHOLESALE_ORDER_SHEET = 'API Sales Order Import'
   CUSTOMER_DATA_SHEET = 'Customers Data'
   SO_REPORT_SHEET = 'Placed Orders'
@@ -27,7 +29,7 @@ module GoogleClient
   end
 
   def self.drive_files
-    self.drive_service.list_files()
+    drive_service.list_files
   end
 
   def self.sheet_service
@@ -42,13 +44,13 @@ module GoogleClient
 
   def self.append_to_spreadsheet(id, range, row)
     value_range = Google::Apis::SheetsV4::ValueRange.new(values: [row])
-    sheet_service.append_spreadsheet_value(id, range, value_range, {insert_data_option: 'INSERT_ROWS', value_input_option: 'USER_ENTERED'})
+    sheet_service.append_spreadsheet_value(id, range, value_range, { insert_data_option: 'INSERT_ROWS', value_input_option: 'USER_ENTERED' })
   end
 
   def self.sheet_values(id, range = 'Sheet1')
     values = get_sheet(id, range).values
     headers = values.shift
-    rows = values.map do |row|
+    values.map do |row|
       lookup_row = {}
       headers.each_with_index do |header, i|
         lookup_row[header] = row[i]

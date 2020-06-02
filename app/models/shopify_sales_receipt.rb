@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ShopifySalesReceipt < ApplicationRecord
   has_many :shopify_sales_receipt_orders, dependent: :destroy
 
@@ -27,11 +29,11 @@ class ShopifySalesReceipt < ApplicationRecord
   end
 
   def retail?
-    store == "retail"
+    store == 'retail'
   end
 
   def wholesale?
-    store == "wholesale"
+    store == 'wholesale'
   end
 
   def sales_receipt_params
@@ -85,12 +87,12 @@ class ShopifySalesReceipt < ApplicationRecord
       {
         item_id: '175037', # Paypal Payment
         amount: -paypal_payments,
-        description: 'Paypal Payments',
+        description: 'Paypal Payments'
       },
       {
         item_id: '172117', # Gift Certificates
         amount: -gift_card_payments,
-        description: 'Gift Certificate payments',
+        description: 'Gift Certificate payments'
       },
       {
         item_id: '177181', # Over/Short
@@ -120,7 +122,7 @@ class ShopifySalesReceipt < ApplicationRecord
         unit_price: details[:amount],
         quantity: 1,
         item_ref: Qbo.base_ref(details[:item_id]),
-        class_ref: Qbo.base_ref(Qbo::MOLLUSK_WEST_CLASS),
+        class_ref: Qbo.base_ref(Qbo::MOLLUSK_WEST_CLASS)
       }
 
       line_item = Qbo.sales_receipt_line_item(line_item_params, sales_receipt_line_detail)

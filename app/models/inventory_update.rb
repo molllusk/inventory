@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 class InventoryUpdate < ApplicationRecord
   belongs_to :product
 
   filterrific(
     default_filter_params: { sorted_by: 'created_at_desc' },
-    available_filters: [
-      :search_query,
-      :sorted_by
+    available_filters: %i[
+      search_query
+      sorted_by
     ]
   )
 
@@ -18,9 +20,9 @@ class InventoryUpdate < ApplicationRecord
 
     terms = query.to_s.downcase.split(/\s+/)
 
-    terms = terms.map { |e|
+    terms = terms.map do |e|
       ('%' + e + '%').gsub(/%+/, '%')
-    }
+    end
 
     # configure number of OR conditions for provision
     # of interpolation arguments. Adjust this if you
@@ -28,9 +30,9 @@ class InventoryUpdate < ApplicationRecord
     num_or_conds = 4
 
     product_ids = Product.joins(:shopify_data, :vend_datum).where(
-      terms.map { |term|
-        "(LOWER(shopify_data.title) LIKE ? OR LOWER(shopify_data.variant_title) LIKE ? OR LOWER(vend_data.name) LIKE ? OR LOWER(vend_data.variant_name) LIKE ?)"
-      }.join(' AND '),
+      terms.map do |_term|
+        '(LOWER(shopify_data.title) LIKE ? OR LOWER(shopify_data.variant_title) LIKE ? OR LOWER(vend_data.name) LIKE ? OR LOWER(vend_data.variant_name) LIKE ?)'
+      end.join(' AND '),
       *terms.map { |e| [e] * num_or_conds }.flatten
     ).pluck(:id)
 
@@ -39,13 +41,13 @@ class InventoryUpdate < ApplicationRecord
 
   scope :sorted_by, lambda { |sort_option|
     # extract the sort direction from the param value.
-    direction = (sort_option =~ /desc$/) ? 'desc' : 'asc'
+    direction = sort_option =~ /desc$/ ? 'desc' : 'asc'
 
     case sort_option.to_s
     when /^created_at_/
-      order("inventory_updates.created_at #{ direction }")
+      order("inventory_updates.created_at #{direction}")
     else
-      raise(ArgumentError, "Invalid sort option: #{ sort_option.inspect }")
+      raise(ArgumentError, "Invalid sort option: #{sort_option.inspect}")
     end
   }
 

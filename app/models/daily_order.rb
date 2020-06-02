@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DailyOrder < ApplicationRecord
   belongs_to :daily_inventory_transfer
   has_many :orders, dependent: :destroy
@@ -7,25 +9,25 @@ class DailyOrder < ApplicationRecord
     'San Francisco' => 'Mollusk Surf Shop (San Francisco)<br />4500 Irving Street<br />San Francisco, CA 94122-1132',
     'Venice Beach' => 'Mollusk Surf Shop (Venice Beach)<br />1600 Pacific Avenue<br />Venice Beach, CA 90291-9998',
     'Santa Barbara' => 'Mollusk Surf Shop (Santa Barbara)<br />121 E Yanonali Street<br />Santa Barbara, CA 93101'
-  }
+  }.freeze
 
   STREET_ADDRESSES = {
     'San Francisco' => '4500 Irving Street',
     'Venice Beach' => '1600 Pacific Avenue',
     'Santa Barbara' => '121 E Yanonali Street'
-  }
+  }.freeze
 
   CITIES = {
     'San Francisco' => 'San Francisco',
     'Venice Beach' => 'Venice Beach',
     'Santa Barbara' => 'Santa Barbara'
-  }
+  }.freeze
 
   ZIPS = {
     'San Francisco' => '94122-1132',
     'Venice Beach' => '90291-9998',
     'Santa Barbara' => '93101'
-  }
+  }.freeze
 
   def to_pdf
     # create an instance of ActionView, so we can use the render method outside of a controller
@@ -41,9 +43,9 @@ class DailyOrder < ApplicationRecord
     pdf_html = av.render template: 'daily_orders/po.html.erb', layout: nil, locals: { daily_order: self }
 
     HyPDF.htmltopdf(
-        pdf_html,
-        test: ENV['HYPDF_MODE'] == 'test'
-      )[:pdf]
+      pdf_html,
+      test: ENV['HYPDF_MODE'] == 'test'
+    )[:pdf]
   end
 
   def to_csv
@@ -71,9 +73,9 @@ class DailyOrder < ApplicationRecord
       orders.sort_by { |order| order.product.vend_datum.sort_key }.each do |order|
         new_csv << [
           display_po,
-          "Mollusk",
+          'Mollusk',
           outlet_name,
-          "joseph@mollusksurfshop.com",
+          'joseph@mollusksurfshop.com',
           order.product.retail_shopify&.sku,
           order.quantity,
           street_address,
@@ -104,7 +106,7 @@ class DailyOrder < ApplicationRecord
     VendClient::OUTLET_NAMES_BY_ID[outlet_id]
   end
 
-  def has_po?
+  def po?
     po_id.present?
   end
 
@@ -117,32 +119,26 @@ class DailyOrder < ApplicationRecord
   end
 
   def create_consignment
-    begin
-      consignment = VendClient.create_consignment(self)
-      update_attribute(:vend_consignment_id, consignment['id'])
-      add_products_to_consignment
-      send_consignment
-    rescue
-      Airbrake.notify("Could not create Consignment for Daily Order: #{id}")
-    end
+    consignment = VendClient.create_consignment(self)
+    update_attribute(:vend_consignment_id, consignment['id'])
+    add_products_to_consignment
+    send_consignment
+  rescue StandardError
+    Airbrake.notify("Could not create Consignment for Daily Order: #{id}")
   end
 
   def add_products_to_consignment
     orders.each do |order|
-      begin
-        VendClient.add_consignment_product(order)
-      rescue
-        Airbrake.notify("Could not add product to Consignment for Daily Order: #{id} / Product: #{order.product_id}")
-      end
+      VendClient.add_consignment_product(order)
+    rescue StandardError
+      Airbrake.notify("Could not add product to Consignment for Daily Order: #{id} / Product: #{order.product_id}")
     end
   end
 
   def send_consignment
-    begin
-      VendClient.send_consignment(vend_consignment_id)
-    rescue
-      Airbrake.notify("Could not SEND Consignment for Daily Order: #{id}")
-    end
+    VendClient.send_consignment(vend_consignment_id)
+  rescue StandardError
+    Airbrake.notify("Could not SEND Consignment for Daily Order: #{id}")
   end
 
   def ship_to_address

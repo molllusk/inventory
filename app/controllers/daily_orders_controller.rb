@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DailyOrdersController < ApplicationController
   before_action :logged_in_user
 
@@ -9,7 +11,7 @@ class DailyOrdersController < ApplicationController
     @daily_order = DailyOrder.find(params[:daily_order_id])
     respond_to do |format|
       format.html do
-        render :layout => false
+        render layout: false
       end
       format.pdf do
         send_data @daily_order.to_pdf, filename: @daily_order.pdf_filename, type: 'application/pdf; charset=utf-8; header=present'

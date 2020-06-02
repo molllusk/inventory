@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DailyInventoryTransfer < ApplicationRecord
   has_many :daily_orders, dependent: :destroy
 
@@ -28,20 +30,20 @@ class DailyInventoryTransfer < ApplicationRecord
     total_cost = 0
 
     daily_orders.each do |daily_order|
-      if daily_order.orders.count.positive?
-        details << {
-          account_id: Qbo::ACCOUNT_ID_BY_OUTLET[daily_order.outlet_name],
-          amount: daily_order.total_cost,
-          description: "Daily Inventory Transfer Cost of Goods for PO #{daily_order.display_po}",
-          posting_type: 'Debit',
-          class_id: Qbo::CLASS_ID_BY_OUTLET[daily_order.outlet_name]
-        }
-        total_cost += daily_order.total_cost
-        pos << daily_order.display_po
-      end
+      next unless daily_order.orders.count.positive?
+
+      details << {
+        account_id: Qbo::ACCOUNT_ID_BY_OUTLET[daily_order.outlet_name],
+        amount: daily_order.total_cost,
+        description: "Daily Inventory Transfer Cost of Goods for PO #{daily_order.display_po}",
+        posting_type: 'Debit',
+        class_id: Qbo::CLASS_ID_BY_OUTLET[daily_order.outlet_name]
+      }
+      total_cost += daily_order.total_cost
+      pos << daily_order.display_po
     end
 
-    if !total_cost.zero?
+    unless total_cost.zero?
       details << {
         account_id: '3652', # 11137 Finished Goods - Shopify,
         amount: total_cost,
@@ -54,15 +56,15 @@ class DailyInventoryTransfer < ApplicationRecord
     details
   end
 
-  def has_orders?
+  def orders?
     daily_orders.find { |daily_order| daily_order.orders.count.positive? }
   end
 
   def post_to_qbo
-    if has_orders?
-      qbo = Qbo.create_journal_entry(journal_entry)
-      update_attribute(:qbo_id, qbo.id) unless qbo.blank?
-    end
+    return unless orders?
+
+    qbo = Qbo.create_journal_entry(journal_entry)
+    update_attribute(:qbo_id, qbo.id) unless qbo.blank?
   end
 
   def journal_entry

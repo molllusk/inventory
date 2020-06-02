@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class VendSalesTax < ApplicationRecord
   belongs_to :daily_vend_sale
   has_many :vend_location_sales_taxes, dependent: :destroy
@@ -13,10 +15,10 @@ class VendSalesTax < ApplicationRecord
     6991652c-16f4-11e2-b195-4040782fde00
     0adfd74a-153e-11e9-fa42-51ae7eb59c62
     0adfd74a-153e-11e9-fa42-51ae7ec84c09
-  ]
+  ].freeze
 
   def self.csv_file_name
-    "Vend_sales_tax_#{1.month.ago.strftime("%B")}.csv"
+    "Vend_sales_tax_#{1.month.ago.strftime('%B')}.csv"
   end
 
   # maybe have this take an argument of number of months ago and pass that to the 'last_month' scope (default 1)

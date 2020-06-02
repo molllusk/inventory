@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ShopifySalesCostOrder < ApplicationRecord
   belongs_to :shopify_sales_cost, optional: true
 
