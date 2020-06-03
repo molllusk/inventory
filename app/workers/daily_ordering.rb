@@ -132,7 +132,7 @@ class DailyOrdering
               location_order.orders.create(
                 quantity: inventories[:sf_adjustment],
                 product_id: shopify_product.product_id,
-                threshold: fill_level,
+                threshold: fill_levels['San Francisco'].to_i,
                 vend_qty: inventories[:sf_vend],
                 cost: cost,
                 sent_orders: inventories[:sf_outstanding]
@@ -143,7 +143,7 @@ class DailyOrdering
               location_order.orders.create(
                 quantity: inventories[:vb_adjustment],
                 product_id: shopify_product.product_id,
-                threshold: fill_level,
+                threshold: fill_levels['Venice Beach'].to_i,
                 vend_qty: inventories[:vb_vend],
                 cost: cost,
                 sent_orders: inventories[:vb_outstanding]
@@ -154,7 +154,7 @@ class DailyOrdering
               location_order.orders.create(
                   quantity: inventories[:sb_adjustment],
                   product_id: shopify_product.product_id,
-                  threshold: fill_level,
+                  threshold: fill_levels['Santa Barbara'].to_i,
                   vend_qty: inventories[:sb_vend],
                   cost: cost,
                   sent_orders: inventories[:sb_outstanding]
