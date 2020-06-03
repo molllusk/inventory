@@ -22,7 +22,7 @@ class DailyOrdering
 
     todays_orders = {
       'Mollusk SF' => sf,
-      'Mollusk VB' => vb
+      'Mollusk VB' => vb,
       'Mollusk SB' => sb
     }
 
