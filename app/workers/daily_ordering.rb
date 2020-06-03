@@ -109,7 +109,7 @@ class DailyOrdering
         end
       end
 
-      total_adjustments = inventories[:sf_adjustment].to_i + inventories[:vb_adjustment].to_i #+ inventories[:sb_adjustment].to_i
+      total_adjustments = inventories[:sf_adjustment].to_i + inventories[:vb_adjustment].to_i + inventories[:sb_adjustment].to_i
       warehouse_inventory = shopify_product.shopify_inventories.find_by(location: 'Postworks')&.inventory.to_i
       has_adjustment = total_adjustments.positive? && warehouse_inventory.positive?
 
