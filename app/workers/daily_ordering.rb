@@ -35,10 +35,11 @@ class DailyOrdering
     release_date_by_handle = {}
 
     release_schedule.each do |product|
-      release_date_by_handle[product['Handle'].to_s.strip.downcase] = Date.strptime(product['Release Date'], '%m/%d/%Y')
+      clean_product_handle = product['Handle'].to_s.strip.downcase
+      release_date_by_handle[clean_product_handle] = { date: Date.strptime(product['Release Date'], '%m/%d/%Y') }
 
       location_names.each do |location|
-        release_date_by_handle[product['Handle'].to_s.strip.downcase][location] = product[location] == 'TRUE'
+        release_date_by_handle[clean_product_handle][location] = product[location] == 'TRUE'
       end
     end
 
@@ -60,7 +61,7 @@ class DailyOrdering
       next unless vend_product.present?
 
       clean_handle = shopify_product.handle.to_s.strip.downcase
-      product_release_date = release_date_by_handle[clean_handle]
+      product_release_date = release_date_by_handle[clean_handle][:date]
       next if product_release_date.present? && product_release_date > pacific_time
 
       inventories = {}
@@ -77,6 +78,7 @@ class DailyOrdering
 
       vend_product.vend_inventories.where(outlet_id: location_names.map { |location_name| VendClient::OUTLET_NAMES_BY_ID.key(location_name) }).each do |inventory|
 
+        next if !release_date_by_handle[clean_handle][inventory.location]
         fill_level = fill_levels['fill'][inventory.location]
         outstanding_orders = outstanding_orders_by_outlet_id[inventory.outlet_id]
         store_inventory = inventory.inventory.negative? ? 0 : inventory.inventory
