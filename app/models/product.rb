@@ -14,6 +14,10 @@ class Product < ApplicationRecord
     vb: 'Venice Beach'
   }.freeze
 
+  CLOSED_LOCATIONS = ['Silver Lake']
+
+  ORDER_LOCATIONS = LOCATION_NAMES_BY_CODE.values - CLOSED_LOCATIONS
+
   filterrific(
     default_filter_params: { sorted_by: 'created_at_desc' },
     available_filters: %i[
@@ -155,8 +159,9 @@ class Product < ApplicationRecord
     levels = GoogleClient.sheet_values(GoogleClient::FILL_LEVEL).sort_by { |row| row['Category'] }
     levels_by_type_and_size = Hash.new { |types, type_key| types[type_key] = Hash.new { |sizes, size_key| sizes[size_key] = {} } }
     levels.each do |level|
-      levels_by_type_and_size[level['Category'].to_s.strip.downcase][level['Size'].to_s.strip.downcase]['fill'] = level['Fill']
-      levels_by_type_and_size[level['Category'].to_s.strip.downcase][level['Size'].to_s.strip.downcase]['new_release_fill'] = level['New Release Fill']
+      ORDER_LOCATIONS.each do |location|
+        levels_by_type_and_size[level['Category'].to_s.strip.downcase][level['Size'].to_s.strip.downcase][location] = level[location]
+      end
     end
     levels_by_type_and_size
   end
