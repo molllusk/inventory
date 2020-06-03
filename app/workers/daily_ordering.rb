@@ -83,7 +83,7 @@ class DailyOrdering
         next if missing_local_flag && inventory.location == 'Santa Barbara'
         next if !missing_local_flag && !release_date_by_handle[clean_handle][inventory.location]
 
-        fill_level = fill_levels['fill'][inventory.location]
+        fill_level = fill_levels[inventory.location].to_i
         outstanding_orders = outstanding_orders_by_outlet_id[inventory.outlet_id]
         store_inventory = inventory.inventory.negative? ? 0 : inventory.inventory
         complete_inventory = store_inventory + outstanding_orders

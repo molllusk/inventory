@@ -4,15 +4,17 @@
     <tr>
       <th>Product Type</th>
       <th>Size</th>
-      <th>Fill</th>
-      <th>New Release Fill</th>
+      <th>San Francisco</th>
+      <th>Venice Beach</th>
+      <th>Santa Barbara</th>
     </tr>
     <% inventory_thresholds.each do |threshold| %>
       <tr>
         <td><%= threshold['Category'] %></td>
         <td><%= threshold['Size'] %></td>
-        <td><%= threshold['Fill'] %></td>
-        <td><%= threshold['New Release Fill'] %></td>
+        <td><%= threshold['San Francisco'] %></td>
+        <td><%= threshold['Venice Beach'] %></td>
+        <td><%= threshold['Santa Barbara'] %></td>
       </tr>
     <% end %>
   </table>
