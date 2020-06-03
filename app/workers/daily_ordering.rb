@@ -167,17 +167,17 @@ class DailyOrdering
       end
     end
 
-    # todays_orders.each do |_location, daily_order|
-    #   if daily_order.orders.count.positive?
-    #     daily_inventory_transfer.update_attributes(po_id: next_po_number) unless daily_order.po?
-    #     daily_order.create_consignment
-    #   end
-    # end
+    todays_orders.each do |_location, daily_order|
+      if daily_order.orders.count.positive?
+        daily_inventory_transfer.update_attributes(po_id: next_po_number) unless daily_order.po?
+        daily_order.create_consignment
+      end
+    end
 
-    # return unless daily_inventory_transfer.orders?
+    return unless daily_inventory_transfer.orders?
 
-    # daily_inventory_transfer.fluid_inventory
-    # daily_inventory_transfer.post_to_qbo
-    # daily_inventory_transfer.send_po
+    daily_inventory_transfer.fluid_inventory
+    daily_inventory_transfer.post_to_qbo
+    daily_inventory_transfer.send_po
   end
 end
