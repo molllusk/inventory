@@ -32,11 +32,11 @@ class DailyOrdering
 
     release_schedule = Product.get_release_schedule
 
-    release_date_by_handle = {}
+    release_date_by_handle = Hash.new { |hash, key| hash[key] = {} }
 
     release_schedule.each do |product|
       clean_product_handle = product['Handle'].to_s.strip.downcase
-      release_date_by_handle[clean_product_handle] = { date: Date.strptime(product['Release Date'], '%m/%d/%Y') }
+      release_date_by_handle[clean_product_handle][:date] = Date.strptime(product['Release Date'], '%m/%d/%Y')
 
       location_names.each do |location|
         release_date_by_handle[clean_product_handle][location] = product[location] == 'TRUE'
@@ -67,7 +67,7 @@ class DailyOrdering
       inventories = {}
       fill_levels = shopify_product.product.daily_order_inventory_thresholds
 
-      days_since_release = product_release_date.present? ? (pacific_time.to_date - product_release_date).to_i : 420
+      # days_since_release = product_release_date.present? ? (pacific_time.to_date - product_release_date).to_i : 420
       # new_release = days_since_release < 30 && fill_levels['new_release_fill'].present?
 
       # fill_level = (new_release ? fill_levels['new_release_fill'] : fill_levels['fill']).to_i
@@ -78,7 +78,11 @@ class DailyOrdering
 
       vend_product.vend_inventories.where(outlet_id: location_names.map { |location_name| VendClient::OUTLET_NAMES_BY_ID.key(location_name) }).each do |inventory|
 
-        next if !release_date_by_handle[clean_handle][inventory.location]
+        # CONFUSING: if a product is not on the release schedule then skip for Santa Barbara and continue for other locations (unless it is false in the schedule)
+        missing_local_flag = release_date_by_handle[clean_handle][inventory.location].nil?
+        next if missing_local_flag && inventory.location == 'Santa Barbara'
+        next if !missing_local_flag && !release_date_by_handle[clean_handle][inventory.location]
+
         fill_level = fill_levels['fill'][inventory.location]
         outstanding_orders = outstanding_orders_by_outlet_id[inventory.outlet_id]
         store_inventory = inventory.inventory.negative? ? 0 : inventory.inventory
