@@ -8,7 +8,7 @@ class DailyOrder < ApplicationRecord
   PO_ADDRESSES = {
     'San Francisco' => 'Mollusk Surf Shop (San Francisco)<br />4500 Irving Street<br />San Francisco, CA 94122-1132',
     'Venice Beach' => 'Mollusk Surf Shop (Venice Beach)<br />1600 Pacific Avenue<br />Venice Beach, CA 90291-9998',
-    'Santa Barbara' => 'Mollusk Surf Shop (Santa Barbara)<br />121 E Yanonali Street<br />Santa Barbara, CA 93101'
+    'Santa Barbara' => 'Mollusk Surf Shop (Santa Barbara)<br />205-C Santa Barbara Street<br />Santa Barbara, CA 93101'
   }.freeze
 
   STREET_ADDRESSES = {
