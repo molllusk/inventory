@@ -14,7 +14,7 @@ class DailyOrder < ApplicationRecord
   STREET_ADDRESSES = {
     'San Francisco' => '4500 Irving Street',
     'Venice Beach' => '1600 Pacific Avenue',
-    'Santa Barbara' => '121 E Yanonali Street'
+    'Santa Barbara' => '205-C Santa Barbara Street'
   }.freeze
 
   CITIES = {
