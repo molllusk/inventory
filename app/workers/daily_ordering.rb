@@ -36,6 +36,7 @@ class DailyOrdering
 
     release_schedule.each do |product|
       clean_product_handle = product['Handle'].to_s.strip.downcase
+      next if clean_product_handle.blank?
       release_date_by_handle[clean_product_handle][:date] = Date.strptime(product['Release Date'], '%m/%d/%Y')
 
       location_names.each do |location|
