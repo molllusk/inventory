@@ -149,8 +149,7 @@ class VendClient
   end
 
   def self.consignment_products(consignment_id)
-    response = connection.get "consignments/#{consignment_id}/products", { page_size: 500 }
-    response.body['data']
+    paginator("consignments/#{consignment_id}/products")
   end
 
   def self.create_consignment(daily_order)
