@@ -282,6 +282,7 @@ class Product < ApplicationRecord
         updated_warehouse_inventory = response['inventory_level']['available']
         shopify_inventory = retail_shopify.shopify_inventories.find_by(location: 'Postworks')
         expected_warehouse_inventory = shopify_inventory.inventory + order.quantity
+
         shopify_inventory.update_attribute(:inventory, updated_warehouse_inventory)
         order.order_inventory_update.undo
 
