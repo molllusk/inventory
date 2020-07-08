@@ -3,6 +3,14 @@
 class DailyInventoryTransfer < ApplicationRecord
   has_many :daily_orders, dependent: :destroy
 
+  scope :cancelled, lambda {
+    where(cancelled: true)
+  }
+
+  scope :not_cancelled, lambda {
+    where(cancelled: false)
+  }
+
   def self.last_po
     maximum(:po_id).to_i
   end
@@ -88,6 +96,13 @@ class DailyInventoryTransfer < ApplicationRecord
     end
 
     journal_entry
+  end
+
+  def cancel
+    daily_orders.not_cancelled.each do |daily_order|
+      daily_order.cancel
+    end
+    update_attribute(:cancelled, true) if daily_orders.not_cancelled.count.zero?
   end
 end
 

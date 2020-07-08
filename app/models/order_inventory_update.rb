@@ -7,6 +7,10 @@ class OrderInventoryUpdate < ApplicationRecord
     new_jam_qty == (prior_jam_qty - order.quantity)
   end
 
+  def undo
+    update_attribute(:undone, true)
+  end
+
   # need to add an undo method here
   def undo; end
 end

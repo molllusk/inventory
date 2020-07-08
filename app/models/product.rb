@@ -242,30 +242,56 @@ class Product < ApplicationRecord
   end
 
   def adjust_order_inventory(order)
-    response = ShopifyClient.adjust_inventory(
-      retail_shopify.inventory_item_id,
-      ShopifyInventory.locations['Postworks'],
-      -order.quantity
-    )
-
-    if ShopifyClient.inventory_item_updated?(response)
-      updated_warehouse_inventory = response['inventory_level']['available']
-      shopify_inventory = retail_shopify.shopify_inventories.find_by(location: 'Postworks')
-      expected_warehouse_inventory = shopify_inventory.inventory - order.quantity
-
-      order.create_order_inventory_update(
-        new_jam_qty: updated_warehouse_inventory,
-        prior_jam_qty: shopify_inventory.inventory
+    begin
+      response = ShopifyClient.adjust_inventory(
+        retail_shopify.inventory_item_id,
+        ShopifyInventory.locations['Postworks'],
+        -order.quantity
       )
 
-      shopify_inventory.update_attribute(:inventory, updated_warehouse_inventory)
+      if ShopifyClient.inventory_item_updated?(response)
+        updated_warehouse_inventory = response['inventory_level']['available']
+        shopify_inventory = retail_shopify.shopify_inventories.find_by(location: 'Postworks')
+        expected_warehouse_inventory = shopify_inventory.inventory - order.quantity
 
-      Airbrake.notify("ORDER INVENTORY: Product #{id} expected warehouse qty #{expected_warehouse_inventory} but got #{updated_warehouse_inventory}") unless expected_warehouse_inventory == updated_warehouse_inventory
-    else
-      Airbrake.notify("Could not UPDATE warehouse inventory during ORDER for Product: #{id}, Adjustment: #{-order.quantity}")
+        order.create_order_inventory_update(
+          new_jam_qty: updated_warehouse_inventory,
+          prior_jam_qty: shopify_inventory.inventory
+        )
+
+        shopify_inventory.update_attribute(:inventory, updated_warehouse_inventory)
+
+        Airbrake.notify("ORDER INVENTORY: Product #{id} expected warehouse qty #{expected_warehouse_inventory} but got #{updated_warehouse_inventory}") unless expected_warehouse_inventory == updated_warehouse_inventory
+      else
+        Airbrake.notify("Could not UPDATE warehouse inventory during ORDER for Product: #{id}, Adjustment: #{-order.quantity}")
+      end
+    rescue StandardError
+      Airbrake.notify("There was an error UPDATING warehouse inventory during ORDER of Product: #{id}, Adjustment: #{-order.quantity}")
     end
-  rescue StandardError
-    Airbrake.notify("There was an error UPDATING warehouse inventory during ORDER of Product: #{id}, Adjustment: #{-order.quantity}")
+  end
+
+  def undo_adjust_order_inventory(order)
+    begin
+      response = ShopifyClient.adjust_inventory(
+        retail_shopify.inventory_item_id,
+        ShopifyInventory.locations['Postworks'],
+        order.quantity
+      )
+
+      if ShopifyClient.inventory_item_updated?(response)
+        updated_warehouse_inventory = response['inventory_level']['available']
+        shopify_inventory = retail_shopify.shopify_inventories.find_by(location: 'Postworks')
+        expected_warehouse_inventory = shopify_inventory.inventory + order.quantity
+        shopify_inventory.update_attribute(:inventory, updated_warehouse_inventory)
+        order.order_inventory_update.undo
+
+        Airbrake.notify("ORDER INVENTORY UNDO/Cancel: Product #{id} expected warehouse qty #{expected_warehouse_inventory} but got #{updated_warehouse_inventory}") unless expected_warehouse_inventory == updated_warehouse_inventory
+      else
+        Airbrake.notify("Could not UPDATE warehouse inventory during ORDER UNDO/Cancel for Product: #{id}, Adjustment: #{order.quantity}")
+      end
+    rescue
+      Airbrake.notify("There was an error UPDATING warehouse inventory during ORDER UNDO/Cancel of Product: #{id}, Adjustment: #{order.quantity}")
+    end
   end
 
   def adjust_inventory_vend(outlet, quantity)
