@@ -13,6 +13,7 @@ end
 # Table name: orders
 #
 #  id             :bigint(8)        not null, primary key
+#  cancelled      :boolean          default(FALSE)
 #  cost           :float
 #  quantity       :integer
 #  sent_orders    :integer          default(0)

@@ -178,6 +178,7 @@ class DailyOrder < ApplicationRecord
   end
 
   def cancel
+    return if cancelled?
     orders.not_cancelled.each do |order|
       order.cancel
     end
@@ -190,6 +191,7 @@ end
 # Table name: daily_orders
 #
 #  id                          :bigint(8)        not null, primary key
+#  cancelled                   :boolean          default(FALSE)
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
 #  daily_inventory_transfer_id :integer

@@ -10,9 +10,6 @@ class OrderInventoryUpdate < ApplicationRecord
   def undo
     update_attribute(:undone, true)
   end
-
-  # need to add an undo method here
-  def undo; end
 end
 
 # == Schema Information
@@ -22,6 +19,7 @@ end
 #  id            :bigint(8)        not null, primary key
 #  new_jam_qty   :integer
 #  prior_jam_qty :integer
+#  undone        :boolean          default(FALSE)
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #  order_id      :integer

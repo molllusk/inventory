@@ -20,6 +20,7 @@ class Order < ApplicationRecord
   end
 
   def cancel
+    return if cancelled?
     product.undo_adjust_order_inventory(self)
     update_attribute(:cancelled, true) if order_inventory_update.undone?
   end
@@ -34,6 +35,7 @@ end
 # Table name: orders
 #
 #  id             :bigint(8)        not null, primary key
+#  cancelled      :boolean          default(FALSE)
 #  cost           :float
 #  quantity       :integer
 #  sent_orders    :integer          default(0)

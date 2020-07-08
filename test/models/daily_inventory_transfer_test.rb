@@ -13,6 +13,7 @@ end
 # Table name: daily_inventory_transfers
 #
 #  id         :bigint(8)        not null, primary key
+#  cancelled  :boolean          default(FALSE)
 #  date       :datetime
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
