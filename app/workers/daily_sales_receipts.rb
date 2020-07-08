@@ -175,10 +175,22 @@ class DailySalesReceipts
         refunded_amounts[:discount] += refund_discounts
       end
 
-      refunded_shipping = refund['order_adjustments'].reduce(0) { |sum, adjustment| adjustment['kind'] == 'shipping_refund' ? sum + adjustment['amount'].to_f : sum } * -1
+      refunded_shipping = 0
+      arbitrary_discount_from_order_adjustments = 0
+
+      refund['order_adjustments'].each do |adjustment|
+        if adjustment['kind'] == 'shipping_refund'
+          refunded_shipping -= adjustment['amount'].to_f
+        else
+          arbitrary_discount_from_order_adjustments += adjustment['amount'].to_f
+        end
+      end
+
       refunded_amounts[:refunded_shipping] += refunded_shipping
+      refunded_amounts[:arbitrary_discount] += arbitrary_discount_from_order_adjustments
 
       refund_totals_by_order[order_name][:refunded_shipping] = refunded_shipping
+      refund_totals_by_order[order_name][:arbitrary_discount] = arbitrary_discount_from_order_adjustments
       refund_totals_by_order[order_name][:created_at] = refund['created_at']
       refund_totals_by_order[order_name][:order_id] = refund['order_id']
       refund_totals_by_order[order_name][:location_costs] = costs_by_location
