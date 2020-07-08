@@ -3,6 +3,14 @@
 class DailyInventoryTransfer < ApplicationRecord
   has_many :daily_orders, dependent: :destroy
 
+  scope :cancelled, lambda {
+    where(cancelled: true)
+  }
+
+  scope :not_cancelled, lambda {
+    where(cancelled: false)
+  }
+
   def self.last_po
     maximum(:po_id).to_i
   end
@@ -29,7 +37,7 @@ class DailyInventoryTransfer < ApplicationRecord
     pos = []
     total_cost = 0
 
-    daily_orders.each do |daily_order|
+    daily_orders.not_cancelled.each do |daily_order|
       next unless daily_order.orders.count.positive?
 
       details << {
@@ -89,6 +97,23 @@ class DailyInventoryTransfer < ApplicationRecord
 
     journal_entry
   end
+
+  def cancel
+    return if cancelled?
+    daily_orders.not_cancelled.each do |daily_order|
+      daily_order.cancel
+    end
+
+    if daily_orders.not_cancelled.count.zero?
+      delete_qbo_journal_entry
+      update_attribute(:cancelled, true)
+    end
+  end
+
+  def delete_qbo_journal_entry
+    Qbo.delete_journal_entry(qbo_id)
+    update_attribute(:qbo_id, nil)
+  end
 end
 
 # == Schema Information
@@ -96,6 +121,7 @@ end
 # Table name: daily_inventory_transfers
 #
 #  id         :bigint(8)        not null, primary key
+#  cancelled  :boolean          default(FALSE)
 #  date       :datetime
 #  created_at :datetime         not null
 #  updated_at :datetime         not null

@@ -7,8 +7,22 @@ class Order < ApplicationRecord
 
   after_create :reduce_warehouse_inventory
 
+  scope :cancelled, lambda {
+    where(cancelled: true)
+  }
+
+  scope :not_cancelled, lambda {
+    where(cancelled: false)
+  }
+
   def reduce_warehouse_inventory
     product.adjust_order_inventory(self)
+  end
+
+  def cancel
+    return if cancelled?
+    product.undo_adjust_order_inventory(self)
+    update_attribute(:cancelled, true) if order_inventory_update.undone?
   end
 
   def total_cost
@@ -21,6 +35,7 @@ end
 # Table name: orders
 #
 #  id             :bigint(8)        not null, primary key
+#  cancelled      :boolean          default(FALSE)
 #  cost           :float
 #  quantity       :integer
 #  sent_orders    :integer          default(0)

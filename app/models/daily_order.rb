@@ -5,6 +5,14 @@ class DailyOrder < ApplicationRecord
   has_many :orders, dependent: :destroy
   delegate :po_id, to: :daily_inventory_transfer
 
+  scope :cancelled, lambda {
+    where(cancelled: true)
+  }
+
+  scope :not_cancelled, lambda {
+    where(cancelled: false)
+  }
+
   PO_ADDRESSES = {
     'San Francisco' => 'Mollusk Surf Shop (San Francisco)<br />4500 Irving Street<br />San Francisco, CA 94122-1132',
     'Venice Beach' => 'Mollusk Surf Shop (Venice Beach)<br />1600 Pacific Avenue<br />Venice Beach, CA 90291-9998',
@@ -136,9 +144,15 @@ class DailyOrder < ApplicationRecord
   end
 
   def send_consignment
-    VendClient.send_consignment(vend_consignment_id)
+    VendClient.update_consignment_status(vend_consignment_id, 'SENT')
   rescue StandardError
-    Airbrake.notify("Could not SEND Consignment for Daily Order: #{id}")
+    Airbrake.notify("Could not SEND Consignment (#{vend_consignment_id}) for Daily Order: #{id}")
+  end
+
+  def cancel_consignment
+    VendClient.update_consignment_status(vend_consignment_id, 'CANCELLED')
+  rescue StandardError
+    Airbrake.notify("Could not CANCEL Consignment (#{vend_consignment_id}) for Daily Order: #{id}")
   end
 
   def ship_to_address
@@ -168,6 +182,18 @@ class DailyOrder < ApplicationRecord
   def vend_consignment_url
     "https://mollusksurf.vendhq.com/consignment/#{vend_consignment_id}" if vend_consignment_id.present?
   end
+
+  def cancel
+    return if cancelled?
+    orders.not_cancelled.each do |order|
+      order.cancel
+    end
+
+    if orders.not_cancelled.count.zero?
+      cancel_consignment
+      update_attribute(:cancelled, true)
+    end
+  end
 end
 
 # == Schema Information
@@ -175,6 +201,7 @@ end
 # Table name: daily_orders
 #
 #  id                          :bigint(8)        not null, primary key
+#  cancelled                   :boolean          default(FALSE)
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
 #  daily_inventory_transfer_id :integer
