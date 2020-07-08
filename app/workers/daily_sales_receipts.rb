@@ -182,7 +182,7 @@ class DailySalesReceipts
         if adjustment['kind'] == 'shipping_refund'
           refunded_shipping -= adjustment['amount'].to_f
         else
-          arbitrary_discount_from_order_adjustments += adjustment['amount'].to_f
+          arbitrary_discount_from_order_adjustments -= adjustment['amount'].to_f
         end
       end
 
