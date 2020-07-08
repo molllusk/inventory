@@ -37,7 +37,7 @@ class DailyInventoryTransfer < ApplicationRecord
     pos = []
     total_cost = 0
 
-    daily_orders.each do |daily_order|
+    daily_orders.not_cancelled.each do |daily_order|
       next unless daily_order.orders.count.positive?
 
       details << {
