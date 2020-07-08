@@ -111,7 +111,7 @@ class DailyInventoryTransfer < ApplicationRecord
   end
 
   def delete_qbo_journal_entry
-    QBO.delete_journal_entry(qbo_id)
+    Qbo.delete_journal_entry(qbo_id)
     update_attribute(:qbo_id, nil)
   end
 end

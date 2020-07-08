@@ -188,6 +188,7 @@ class DailyOrder < ApplicationRecord
     orders.not_cancelled.each do |order|
       order.cancel
     end
+
     if orders.not_cancelled.count.zero?
       cancel_consignment
       update_attribute(:cancelled, true)

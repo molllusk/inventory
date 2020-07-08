@@ -286,12 +286,12 @@ class Product < ApplicationRecord
         shopify_inventory.update_attribute(:inventory, updated_warehouse_inventory)
         order.order_inventory_update.undo
 
-        Airbrake.notify("ORDER INVENTORY UNDO/Cancel: Product #{id} expected warehouse qty #{expected_warehouse_inventory} but got #{updated_warehouse_inventory}") unless expected_warehouse_inventory == updated_warehouse_inventory
+        Airbrake.notify("ORDER (#{order.id}) INVENTORY UNDO/Cancel: Product #{id} expected warehouse qty #{expected_warehouse_inventory} but got #{updated_warehouse_inventory}") unless expected_warehouse_inventory == updated_warehouse_inventory
       else
-        Airbrake.notify("Could not UPDATE warehouse inventory during ORDER UNDO/Cancel for Product: #{id}, Adjustment: #{order.quantity}")
+        Airbrake.notify("Could not UPDATE warehouse inventory during ORDER (#{order.id}) UNDO/Cancel for Product: #{id}, Adjustment: #{order.quantity}")
       end
     rescue
-      Airbrake.notify("There was an error UPDATING warehouse inventory during ORDER UNDO/Cancel of Product: #{id}, Adjustment: #{order.quantity}")
+      Airbrake.notify("There was an error UPDATING warehouse inventory during ORDER (#{order.id}) UNDO/Cancel of Product: #{id}, Adjustment: #{order.quantity}")
     end
   end
 
