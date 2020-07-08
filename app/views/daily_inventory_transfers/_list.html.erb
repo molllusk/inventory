@@ -26,7 +26,7 @@
     <% daily_inventory_transfer.daily_orders.each_with_index do |order, index| %>
       <% last_row = (index == (daily_inventory_transfer.daily_orders.count - 1)) %>
       <% if index.positive? %>
-        <tr>
+        <tr class='<%= 'cancelled' if order.cancelled? %>'>
       <% end %>
         <td class='<%= 'border-bottom' if last_row %>'>
           <a href='<%= daily_order_path(order) %>' target='_blank'><%= VendClient::OUTLET_NAMES_BY_ID[order.outlet_id] %> <i class='fa fa-external-link-alt'></i></a>
