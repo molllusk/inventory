@@ -186,8 +186,8 @@ class VendClient
     response.body['data']
   end
 
-  def self.send_consignment(consignment_id)
-    body = { status: 'SENT' }
+  def self.update_consignment_status(consignment_id, status)
+    body = { status: status }
 
     response = connection.put do |req|
       req.url "consignments/#{consignment_id}"

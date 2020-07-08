@@ -99,6 +99,12 @@ module Qbo
     service.create(journal_entry)
   end
 
+  def self.delete_journal_entry(journal_entry_id)
+    service = Quickbooks::Service::JournalEntry.new(service_params)
+    journal_entry = service.fetch_by_id(journal_entry_id)
+    service.delete(journal_entry)
+  end
+
   def self.journal_entry_line_item(params, entry_details)
     line = Quickbooks::Model::Line.new(params)
 

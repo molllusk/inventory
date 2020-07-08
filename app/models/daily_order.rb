@@ -144,9 +144,15 @@ class DailyOrder < ApplicationRecord
   end
 
   def send_consignment
-    VendClient.send_consignment(vend_consignment_id)
+    VendClient.update_consignment_status(vend_consignment_id, 'SENT')
   rescue StandardError
-    Airbrake.notify("Could not SEND Consignment for Daily Order: #{id}")
+    Airbrake.notify("Could not SEND Consignment (#{vend_consignment_id}) for Daily Order: #{id}")
+  end
+
+  def cancel_consignment
+    VendClient.update_consignment_status(vend_consignment_id, 'CANCELLED')
+  rescue StandardError
+    Airbrake.notify("Could not CANCEL Consignment (#{vend_consignment_id}) for Daily Order: #{id}")
   end
 
   def ship_to_address
@@ -182,7 +188,10 @@ class DailyOrder < ApplicationRecord
     orders.not_cancelled.each do |order|
       order.cancel
     end
-    update_attribute(:cancelled, true) if orders.not_cancelled.count.zero?
+    if orders.not_cancelled.count.zero?
+      cancel_consignment
+      update_attribute(:cancelled, true)
+    end
   end
 end
 
