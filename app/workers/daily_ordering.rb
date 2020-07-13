@@ -177,7 +177,7 @@ class DailyOrdering
 
     return unless daily_inventory_transfer.orders?
 
-    daily_inventory_transfer.fluid_inventory
+    # daily_inventory_transfer.fluid_inventory
     daily_inventory_transfer.post_to_qbo
     daily_inventory_transfer.send_po
   end

@@ -7,8 +7,6 @@ class ShopifyInventory < ApplicationRecord
 
   enum location: {
     # retail site
-    '4500 Irving St' => 1939009,
-    'EasyPost' => 7662829621,
     'Jam Warehouse Retail' => 7700054069,
     'Mollusk SF' => 49481991,
     'Mollusk SB' => 7702609973,

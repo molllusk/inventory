@@ -103,7 +103,7 @@ class Product < ApplicationRecord
   def self.run_inventory_updates
     retail_orders = ShopifyClient.order_quantities_by_variant
     update_retail_inventories(retail_orders)
-    update_fluid_inventories(retail_orders)
+    # update_fluid_inventories(retail_orders)
   end
 
   def self.update_retail_inventories(retail_orders)
@@ -120,15 +120,15 @@ class Product < ApplicationRecord
     end
   end
 
-  def self.update_fluid_inventories(retail_orders, product_ids = [])
-    query = product_ids.present? ? where(id: product_ids) : all
-    query.find_each do |product|
-      if product.retail_and_wholesale_shopify?
-        # do not update inventory if any order exists for that variant in any location
-        product.fluid_inventory unless product.retail_orders_present?(retail_orders)
-      end
-    end
-  end
+  # def self.update_fluid_inventories(retail_orders, product_ids = [])
+  #   query = product_ids.present? ? where(id: product_ids) : all
+  #   query.find_each do |product|
+  #     if product.retail_and_wholesale_shopify?
+  #       # do not update inventory if any order exists for that variant in any location
+  #       product.fluid_inventory unless product.retail_orders_present?(retail_orders)
+  #     end
+  #   end
+  # end
 
   def self.fluid_inventory_levels
     @fluid_inventory_levels ||= get_inventory_levels
