@@ -282,7 +282,7 @@ module ShopifyClient
   end
 
   def self.cancel_order(order_id, params = {})
-    response = connection(store).put do |req|
+    response = connection(:RETAIL).put do |req|
       req.url "#{API_VERSION}/orders/#{order_id}/cancel.json"
       req.headers['Content-Type'] = 'application/json'
       req.body = params.to_json

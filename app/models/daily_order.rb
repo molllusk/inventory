@@ -193,7 +193,7 @@ class DailyOrder < ApplicationRecord
         order_id = response['order']['id']
         update_attribute(:shopify_order_id, order_id) unless order_id.blank?
       else
-        Airbrake.notify("Could not create Shopify Order for Daily Order: #{id} for #{outlet_name}")
+        Airbrake.notify("Could not create Shopify Order for Daily Order: #{id} for #{outlet_name}: #{response['errors']}")
       end
     rescue StandardError
       Airbrake.notify("There was an ERROR creating Shopify Order for Daily Order: #{id} for #{outlet_name}")
