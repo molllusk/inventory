@@ -45,6 +45,12 @@ class ShopifySalesCost < ApplicationRecord
         amount: location_cost('Postworks ATS').to_f,
         description: 'Total Cost of Sales Wholesale Shopify - Postworks ATS',
         posting_type: 'Credit'
+      },
+      {
+        account_id: '3652', # 11137 Finished Goods - Shopify
+        amount: location_cost('Shopify Fulfillment Network').to_f,
+        description: 'Total Cost of Sales Wholesale Shopify - Shopify Fulfillment Network',
+        posting_type: 'Credit'
       }
       # {
       #   account_id: '3652', # 11137 Finished Goods - Shopify
@@ -89,7 +95,7 @@ class ShopifySalesCost < ApplicationRecord
       },
       {
         account_id: '3652', # 11137 Finished Goods - Shopify
-        amount: location_cost('Shopify Fulfillment Network Retail').to_f,
+        amount: location_cost('Shopify Fulfillment Network').to_f,
         description: 'Total Cost of Sales Shopify - Shopify Fulfillment Network',
         posting_type: 'Credit'
       }

@@ -21,7 +21,7 @@
         <td><%= link_to update.product do %><%= update.product.vend_datum.variant_name %> <i class='fa fa-external-link-alt'></i><% end %></td>
         <td><%= update.product.vend_datum.sku %></td>
         <td><%= ShopifyInventory::locations.key(update.location) %></td>
-        <td><%= ShopifyInventory::locations.key(update.location).include?('Jam ') || ShopifyInventory::locations.key(update.location).include?('Postworks') ? ' - ' : update.vend_qty %></td>
+        <td><%= ShopifyInventory::locations.key(update.location).include?('Jam ') || ShopifyInventory::locations.key(update.location).include?('Postworks') || ShopifyInventory::locations.key(update.location).include?('Shopify Fulfillment Network') ? ' - ' : update.vend_qty %></td>
         <td><%= update.prior_qty %></td>
         <td><%= update.adjustment %></td>
         <td class='<%= 'inventory_failure' unless update.success? %>'><%= update.new_qty %></td>

@@ -222,7 +222,7 @@ class Product < ApplicationRecord
     shopify_data.each do |shopify|
       shopify.shopify_inventories.each do |inventory|
         data[inventory.location] = inventory.inventory
-        data[:total_inventory] += inventory.inventory if ['Postworks', 'Postworks ATS', 'Shopify Fulfillment Network Retail'].include?(inventory.location)
+        data[:total_inventory] += inventory.inventory if ['Postworks', 'Postworks ATS', 'Shopify Fulfillment Network'].include?(inventory.location)
       end
     end
 
@@ -245,13 +245,13 @@ class Product < ApplicationRecord
     begin
       response = ShopifyClient.adjust_inventory(
         retail_shopify.inventory_item_id,
-        ShopifyInventory.locations['Shopify Fulfillment Network Retail'],
+        ShopifyInventory.locations['Shopify Fulfillment Network'],
         -order.quantity
       )
 
       if ShopifyClient.inventory_item_updated?(response)
         updated_warehouse_inventory = response['inventory_level']['available']
-        shopify_inventory = retail_shopify.shopify_inventories.find_by(location: 'Shopify Fulfillment Network Retail')
+        shopify_inventory = retail_shopify.shopify_inventories.find_by(location: 'Shopify Fulfillment Network')
         expected_warehouse_inventory = shopify_inventory.inventory - order.quantity
 
         order.create_order_inventory_update(
@@ -274,13 +274,13 @@ class Product < ApplicationRecord
     begin
       response = ShopifyClient.adjust_inventory(
         retail_shopify.inventory_item_id,
-        ShopifyInventory.locations['Shopify Fulfillment Network Retail'],
+        ShopifyInventory.locations['Shopify Fulfillment Network'],
         order.quantity
       )
 
       if ShopifyClient.inventory_item_updated?(response)
         updated_warehouse_inventory = response['inventory_level']['available']
-        shopify_inventory = retail_shopify.shopify_inventories.find_by(location: 'Shopify Fulfillment Network Retail')
+        shopify_inventory = retail_shopify.shopify_inventories.find_by(location: 'Shopify Fulfillment Network')
         expected_warehouse_inventory = shopify_inventory.inventory + order.quantity
 
         shopify_inventory.update_attribute(:inventory, updated_warehouse_inventory)

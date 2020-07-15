@@ -3,7 +3,7 @@
 class ShopifyInventory < ApplicationRecord
   belongs_to :shopify_datum
 
-  scope :with_warehouse, -> { where('location = ? AND inventory > 0', ShopifyInventory.locations['Postworks']) }
+  scope :with_warehouse, -> { where('location = ? AND inventory > 0', ShopifyInventory.locations['Shopify Fulfillment Network']) }
 
   enum location: {
     # retail site
@@ -12,7 +12,7 @@ class ShopifyInventory < ApplicationRecord
     'Mollusk SB' => 7702609973,
     'Mollusk VB' => 7702577205,
     'Postworks' => 18186895445,
-    'Shopify Fulfillment Network Retail' => 36225056853,
+    'Shopify Fulfillment Network' => 36225056853,
     # wholesale site
     '1283 42nd Ave Wholesale' => 29394010176,
     'Jam Warehouse Wholesale' => 29887823936,
