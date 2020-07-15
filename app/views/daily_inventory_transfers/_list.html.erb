@@ -6,6 +6,7 @@
     <th>Total Orders</th>
     <th>Total Items</th>
     <th>Total Cost of Goods</th>
+    <th>Shopify Order</th>
     <th>Vend Consignment</th>
     <th>PO</th>
     <th>PDF</th>
@@ -39,6 +40,13 @@
         </td>
         <td class='<%= 'border-bottom' if last_row %>'>
           <%= number_to_currency(order.total_cost, unit: '$', separator: '.', delimiter: ',') %>
+        </td>
+        <td class='<%= 'border-bottom' if last_row %>'>
+          <% if order.shopify_order_url %>
+            <a href='<%= order.shopify_order_url %>' target='_blank'>Shopify <i class='fa fa-external-link-alt'></i></a>
+          <% else %>
+             -
+          <% end %>
         </td>
         <td class='<%= 'border-bottom' if last_row %>'>
           <% if order.vend_consignment_url %>

@@ -139,7 +139,7 @@ class DailyOrder < ApplicationRecord
   end
 
   def shopify_order_url
-    "https://mollusksurf.myshopify.com/admin/orders/#{shopify_order_id}"
+    "https://mollusksurf.myshopify.com/admin/orders/#{shopify_order_id}" if shopify_order_id.present?
   end
 
   def shopify_shipping_address
@@ -176,7 +176,7 @@ class DailyOrder < ApplicationRecord
         source_name: 'mollusk_app',
         total_tax: 0,
         total_price: 0,
-        inventory_behaviour: 'decrement_obeying_policy',
+        inventory_behaviour: 'decrement_ignoring_policy',
         customer: { id: shopify_customer_id },
         total_discounts: total_price,
         shipping_address: shopify_shipping_address,

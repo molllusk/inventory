@@ -9,6 +9,7 @@
     <th>Total Orders</th>
     <th>Total Items</th>
     <th>Total Cost of Goods</th>
+    <th>Shopify Order</th>
     <th>Vend Consignment</th>
     <th>PO</th>
     <th>PDF</th>
@@ -30,6 +31,13 @@
     </td>
     <td>
       <%= number_to_currency(@daily_order.total_cost, unit: '$', separator: '.', delimiter: ',') %>
+    </td>
+    <td>
+      <% if @daily_order.shopify_order_url %>
+        <a href='<%= @daily_order.shopify_order_url %>' target='_blank'>Shopify <i class='fa fa-external-link-alt'></i></a>
+      <% else %>
+         -
+      <% end %>
     </td>
     <td>
       <% if @daily_order.vend_consignment_url %>
