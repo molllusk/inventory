@@ -65,7 +65,7 @@ class DailyInventoryTransfer < ApplicationRecord
   end
 
   def orders?
-    daily_orders.find { |daily_order| daily_order.orders.count.positive? }
+    daily_orders.find { |daily_order| daily_order.orders.present? }
   end
 
   def post_to_qbo

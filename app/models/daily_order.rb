@@ -186,6 +186,8 @@ class DailyOrder < ApplicationRecord
   end
 
   def post_to_shopify
+    return unless orders.present?
+
     begin
       response = ShopifyClient.create_order(shopify_order_params)
 
