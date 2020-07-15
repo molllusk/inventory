@@ -363,23 +363,23 @@ class Product < ApplicationRecord
     shopify_inventory.update_attribute(:inventory, new_inventory)
   end
 
-  def save_inventory_adjustment_fluid(quantity, retail_available, wholesale_available)
-    retail_inventory = retail_shopify.shopify_inventories.find_by(location: 'Postworks')
-    wholesale_inventory = wholesale_shopify.shopify_inventories.find_by(location: 'Postworks ATS')
+  # def save_inventory_adjustment_fluid(quantity, retail_available, wholesale_available)
+  #   retail_inventory = retail_shopify.shopify_inventories.find_by(location: 'Postworks')
+  #   wholesale_inventory = wholesale_shopify.shopify_inventories.find_by(location: 'Postworks ATS')
 
-    FluidInventoryUpdate.create(
-      prior_wholesale_qty: wholesale_inventory.inventory,
-      prior_retail_qty: retail_inventory.inventory,
-      threshold: fluid_inventory_threshold,
-      adjustment: quantity,
-      product_id: id,
-      new_wholesale_qty: wholesale_available,
-      new_retail_qty: retail_available
-    )
+  #   FluidInventoryUpdate.create(
+  #     prior_wholesale_qty: wholesale_inventory.inventory,
+  #     prior_retail_qty: retail_inventory.inventory,
+  #     threshold: fluid_inventory_threshold,
+  #     adjustment: quantity,
+  #     product_id: id,
+  #     new_wholesale_qty: wholesale_available,
+  #     new_retail_qty: retail_available
+  #   )
 
-    retail_inventory.update_attribute(:inventory, retail_available)
-    wholesale_inventory.update_attribute(:inventory, wholesale_available)
-  end
+  #   retail_inventory.update_attribute(:inventory, retail_available)
+  #   wholesale_inventory.update_attribute(:inventory, wholesale_available)
+  # end
 
   def connect_inventory_location(outlet = :sf)
     location = ShopifyInventory.locations["Mollusk #{outlet.to_s.upcase}"]
@@ -400,31 +400,31 @@ class Product < ApplicationRecord
     @daily_order_inventory_thresholds ||= Product.daily_order_inventory_levels[retail_shopify.product_type.to_s.strip.downcase]&.[](retail_shopify.option1.to_s.strip.downcase)
   end
 
-  def fluid_inventory
-    return unless retail_and_wholesale_shopify?
+  # def fluid_inventory
+  #   return unless retail_and_wholesale_shopify?
 
-    retail_inventory = retail_shopify.shopify_inventories.find_by(location: 'Postworks')&.inventory
-    wholesale_inventory = wholesale_shopify.shopify_inventories.find_by(location: 'Postworks ATS')&.inventory
+  #   retail_inventory = retail_shopify.shopify_inventories.find_by(location: 'Postworks')&.inventory
+  #   wholesale_inventory = wholesale_shopify.shopify_inventories.find_by(location: 'Postworks ATS')&.inventory
 
-    if retail_inventory.present?
-      if wholesale_inventory.present?
-        if fluid_inventory_threshold.present?
-          if retail_inventory < fluid_inventory_threshold
-            sufficient_wholesale = (fluid_inventory_threshold - retail_inventory) <= wholesale_inventory
-            adjustment = sufficient_wholesale ? fluid_inventory_threshold - retail_inventory : wholesale_inventory
-            # bails on zero adjustments and negative wholesale inventories
-            adjust_inventory_fluid(adjustment, wholesale_inventory - adjustment) unless adjustment < 1
-          end
-        else
-          Airbrake.notify("Missing fluid inventory threshold for Product Type: #{retail_shopify.product_type} Product: #{id}")
-        end
-      else
-        Airbrake.notify("Missing WHOLESALE Postworks Inventory for Product: #{id}")
-      end
-    else
-      Airbrake.notify("Missing RETAIL Postworks Inventory for Product: #{id}")
-    end
-  end
+  #   if retail_inventory.present?
+  #     if wholesale_inventory.present?
+  #       if fluid_inventory_threshold.present?
+  #         if retail_inventory < fluid_inventory_threshold
+  #           sufficient_wholesale = (fluid_inventory_threshold - retail_inventory) <= wholesale_inventory
+  #           adjustment = sufficient_wholesale ? fluid_inventory_threshold - retail_inventory : wholesale_inventory
+  #           # bails on zero adjustments and negative wholesale inventories
+  #           adjust_inventory_fluid(adjustment, wholesale_inventory - adjustment) unless adjustment < 1
+  #         end
+  #       else
+  #         Airbrake.notify("Missing fluid inventory threshold for Product Type: #{retail_shopify.product_type} Product: #{id}")
+  #       end
+  #     else
+  #       Airbrake.notify("Missing WHOLESALE Postworks Inventory for Product: #{id}")
+  #     end
+  #   else
+  #     Airbrake.notify("Missing RETAIL Postworks Inventory for Product: #{id}")
+  #   end
+  # end
 
   def retail_shopify
     shopify_data.find_by(store: :retail)
