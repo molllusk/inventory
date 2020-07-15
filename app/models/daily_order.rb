@@ -186,9 +186,18 @@ class DailyOrder < ApplicationRecord
   end
 
   def post_to_shopify
-    response = ShopifyClient.create_order(shopify_order_params)
-    order_id = response['order']&.[]('id')
-    update_attribute(:shopify_order_id, order_id) unless order_id.blank?
+    begin
+      response = ShopifyClient.create_order(shopify_order_params)
+
+      if response['order'].present?
+        order_id = response['order']['id']
+        update_attribute(:shopify_order_id, order_id) unless order_id.blank?
+      else
+        Airbrake.notify("Could not create Shopify Order for Daily Order: #{id} for #{outlet_name}")
+      end
+    rescue StandardError
+      Airbrake.notify("There was an ERROR creating Shopify Order for Daily Order: #{id} for #{outlet_name}")
+    end
   end
 
   def create_consignment
@@ -221,9 +230,14 @@ class DailyOrder < ApplicationRecord
   end
 
   def cancel_shopify_order
-    result = ShopifyClient.cancel_order(shopify_order_id)
-  rescue StandardError
-    Airbrake.notify("Could not CANCEL Shopify Order (#{shopify_order_id}) for Daily Order: #{id} for #{outlet_name}")
+    begin
+      result = ShopifyClient.cancel_order(shopify_order_id)
+      if response['order'].blank?
+        Airbrake.notify("Could not CANCEL Shopify Order (#{shopify_order_id}) for Daily Order: #{id} for #{outlet_name}")
+      end
+    rescue StandardError
+      Airbrake.notify("ERROR CANCELLING Shopify Order (#{shopify_order_id}) for Daily Order: #{id} for #{outlet_name}")
+    end
   end
 
   def ship_to_address
