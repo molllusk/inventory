@@ -281,15 +281,14 @@ module ShopifyClient
     response.body
   end
 
-  def self.cancel_order(order_id)
-    # params[]
-    # response = connection(store).put do |req|
-    #   req.url "#{API_VERSION}/orders/#{order_id}.json"
-    #   req.headers['Content-Type'] = 'application/json'
-    #   req.body = params.to_json
-    # end
+  def self.cancel_order(order_id, params = {})
+    response = connection(store).put do |req|
+      req.url "#{API_VERSION}/orders/#{order_id}/cancel.json"
+      req.headers['Content-Type'] = 'application/json'
+      req.body = params.to_json
+    end
 
-    # response.body
+    response.body
   end
 
   # Pagination methods https://www.shopify.com/partners/blog/relative-pagination

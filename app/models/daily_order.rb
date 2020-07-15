@@ -43,6 +43,12 @@ class DailyOrder < ApplicationRecord
     'Venice Beach' => 3265924825173
   }
 
+  PHONE_NUMBERS = {
+    'San Francisco' => '415-564-6300',
+    'Santa Barbara' => '805-568-0908',
+    'Venice Beach' => '310-396-1969'
+  }
+
   def to_pdf
     # create an instance of ActionView, so we can use the render method outside of a controller
     av = ActionView::Base.new
@@ -136,6 +142,23 @@ class DailyOrder < ApplicationRecord
     "https://mollusksurf.myshopify.com/admin/orders/#{shopify_order_id}"
   end
 
+  def shopify_shipping_address
+    {
+      first_name: 'Mollusk',
+      last_name: outlet_name,
+      address1: STREET_ADDRESSES[outlet_name],
+      phone: PHONE_NUMBERS[outlet_name],
+      city: CITIES[outlet_name],
+      province: 'California',
+      country: 'United States',
+      zip: ZIPS[outlet_name]
+    }
+  end
+
+  def shopify_customer_id
+    LOCATION_ID_BY_VEND_OUTLET_NAME[outlet_name].to_s
+  end
+
   def shopify_order_line_items
     orders.map(&:shopify_line_item)
   end
@@ -156,13 +179,10 @@ class DailyOrder < ApplicationRecord
         inventory_behaviour: 'decrement_obeying_policy',
         customer: { id: shopify_customer_id },
         total_discounts: total_price,
+        shipping_address: shopify_shipping_address,
         line_items: line_items
       }
     }
-  end
-
-  def shopify_customer_id
-    LOCATION_ID_BY_VEND_OUTLET_NAME[outlet_name].to_s
   end
 
   def post_to_shopify
@@ -197,7 +217,13 @@ class DailyOrder < ApplicationRecord
   def cancel_consignment
     VendClient.update_consignment_status(vend_consignment_id, 'CANCELLED')
   rescue StandardError
-    Airbrake.notify("Could not CANCEL Consignment (#{vend_consignment_id}) for Daily Order: #{id}")
+    Airbrake.notify("Could not CANCEL Consignment (#{vend_consignment_id}) for Daily Order: #{id} for #{outlet_name}")
+  end
+
+  def cancel_shopify_order
+    result = ShopifyClient.cancel_order(shopify_order_id)
+  rescue StandardError
+    Airbrake.notify("Could not CANCEL Shopify Order (#{shopify_order_id}) for Daily Order: #{id} for #{outlet_name}")
   end
 
   def ship_to_address
@@ -235,7 +261,8 @@ class DailyOrder < ApplicationRecord
     end
 
     if orders.not_cancelled.count.zero?
-      cancel_consignment
+      cancel_consignment unless vend_consignment_id.blank?
+      cancel_shopify_order unless shopify_order_id.blank?
       update_attribute(:cancelled, true)
     end
   end
@@ -251,5 +278,6 @@ end
 #  updated_at                  :datetime         not null
 #  daily_inventory_transfer_id :integer
 #  outlet_id                   :string
+#  shopify_order_id            :bigint(8)
 #  vend_consignment_id         :string
 #

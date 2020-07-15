@@ -13,6 +13,7 @@ if Rails.env.development?
     # 'show_indexes'              => 'false',
 
     Annotate.set_defaults(
+      'models' => 'true',
       'routes' => 'false',
       'position_in_routes' => 'after',
       'position_in_class' => 'after',
