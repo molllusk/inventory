@@ -114,6 +114,10 @@ class DailyInventoryTransfer < ApplicationRecord
     Qbo.delete_journal_entry(qbo_id)
     update_attribute(:qbo_id, nil)
   end
+
+  def post_to_shopify
+    daily_orders.each { |order| order.post_to_shopify }
+  end
 end
 
 # == Schema Information

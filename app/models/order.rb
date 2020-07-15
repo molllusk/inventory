@@ -28,6 +28,14 @@ class Order < ApplicationRecord
   def total_cost
     cost * quantity
   end
+
+  def shopify_line_item
+    {
+      variant_id: product.retail_shopify.variant_id,
+      quantity: quantity,
+      price: product.retail_shopify.price
+    }
+  end
 end
 
 # == Schema Information

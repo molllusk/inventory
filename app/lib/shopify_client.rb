@@ -271,6 +271,27 @@ module ShopifyClient
     response.body['refunds'] || []
   end
 
+  def self.create_order(params, store = :RETAIL)
+    response = connection(store).post do |req|
+      req.url "#{API_VERSION}/orders.json"
+      req.headers['Content-Type'] = 'application/json'
+      req.body = params.to_json
+    end
+
+    response.body
+  end
+
+  def self.cancel_order(order_id)
+    # params[]
+    # response = connection(store).put do |req|
+    #   req.url "#{API_VERSION}/orders/#{order_id}.json"
+    #   req.headers['Content-Type'] = 'application/json'
+    #   req.body = params.to_json
+    # end
+
+    # response.body
+  end
+
   # Pagination methods https://www.shopify.com/partners/blog/relative-pagination
   def self.cursor_paginate(resource, params, store = :RETAIL)
     response = connection(store).get "#{API_VERSION}/#{resource}.json", params

@@ -37,6 +37,12 @@ class DailyOrder < ApplicationRecord
     'Santa Barbara' => '93101'
   }.freeze
 
+  LOCATION_ID_BY_VEND_OUTLET_NAME = {
+    'San Francisco' => 3265917026389,
+    'Santa Barbara' => 3265930625109,
+    'Venice Beach' => 3265924825173
+  }
+
   def to_pdf
     # create an instance of ActionView, so we can use the render method outside of a controller
     av = ActionView::Base.new
@@ -124,6 +130,40 @@ class DailyOrder < ApplicationRecord
 
   def display_po
     "#{po_stem} #{po_id}"
+  end
+
+  def shopify_order_line_items
+    orders.map(&:shopify_line_item)
+  end
+
+  def shopify_order_params
+    line_items = shopify_order_line_items
+    total_price = line_items.inject(0.0) { |sum, item| sum + item[:price].to_f }
+    {
+      order: {
+        location_id: 36225056853,
+        financial_status: 'paid',
+        fulfillment_status: nil,
+        taxable: false,
+        note: "Order Number: #{display_po}",
+        source_name: 'mollusk_app',
+        total_tax: 0,
+        total_price: 0,
+        customer: { id: shopify_customer_id },
+        total_discounts: total_price,
+        line_items: line_items
+      }
+    }
+  end
+
+  def shopify_customer_id
+    LOCATION_ID_BY_VEND_OUTLET_NAME[outlet_name].to_s
+  end
+
+  def post_to_shopify
+    response = ShopifyClient.create_order(shopify_order_params)
+    order_id = response['order']&.[]('id')
+    update_attribute(:shopify_order_id, order_id) unless order_id.blank?
   end
 
   def create_consignment
