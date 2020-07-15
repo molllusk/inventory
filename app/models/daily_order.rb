@@ -231,10 +231,7 @@ class DailyOrder < ApplicationRecord
 
   def cancel_shopify_order
     begin
-      result = ShopifyClient.cancel_order(shopify_order_id)
-      if response['order'].blank?
-        Airbrake.notify("Could not CANCEL Shopify Order (#{shopify_order_id}) for Daily Order: #{id} for #{outlet_name}")
-      end
+      ShopifyClient.cancel_order(shopify_order_id)
     rescue StandardError
       Airbrake.notify("ERROR CANCELLING Shopify Order (#{shopify_order_id}) for Daily Order: #{id} for #{outlet_name}")
     end
