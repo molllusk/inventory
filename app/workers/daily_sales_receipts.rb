@@ -20,7 +20,7 @@ class DailySalesReceipts
     orders = ShopifyClient.closed_orders_since(day)
     expected_order_count = ShopifyClient.closed_orders_since_count(day)
 
-    Airbrake.notify("Expected #{expected_order_count} RETAIL orders, but got #{orders.count} while running daily reports") unless orders.count == expected_order_count
+    Airbrake.notify("Expected #{expected_order_count} orders, but got #{orders.count} while running daily reports") unless orders.count == expected_order_count
 
     shopify_sales_receipt = Hash.new(0)
     costs_report = Hash.new(0)
@@ -30,6 +30,7 @@ class DailySalesReceipts
     shopify_sales_receipt[:date] = min_date
     costs_report[:date] = min_date
 
+    wholesale_orders = []
     refunds = []
 
     location_sales_costs = Hash.new(0)
@@ -42,6 +43,15 @@ class DailySalesReceipts
     costs_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
     orders.each do |order|
+      # skip internal orders to the shops
+      next if order['source_name'] == 'mollusk_app'
+
+      # tease out wholesale orders for separate wholesale accounting
+      if order['customer']['tags'].include?('wholesale')
+        wholesale_orders << order
+        next
+      end
+
       order_names_by_id[order['id']] = order['name']
       costs_by_location = Hash.new(0)
 
@@ -251,11 +261,6 @@ class DailySalesReceipts
     ###########################
     #### SHOPIFY WHOLESALE ####
     ###########################
-
-    wholesale_orders = ShopifyClient.closed_orders_since(day, :WHOLESALE)
-    wholesale_expected_order_count = ShopifyClient.closed_orders_since_count(day, :WHOLESALE)
-
-    Airbrake.notify("Expected #{wholesale_expected_order_count} WHOLESALE orders, but got #{wholesale_orders.count} while running daily reports") unless wholesale_orders.count == wholesale_expected_order_count
 
     wholesale_shopify_sales_receipt = Hash.new(0)
     wholesale_costs_report = Hash.new(0)

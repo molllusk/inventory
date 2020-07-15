@@ -4,9 +4,13 @@ Hello,
 Order <%= @daily_inventory_transfer.po_id %> is attached for all stores.
 <br />
 <br />
-Plese see below for links to each order:
+<strong>Plese see below for links to today's orders in Shopify:</strong>
 <br />
 <br />
-Thanks,
+<% @daily_inventory_transfer.daily_orders.each do |order| %>
+  <% next if order.shopify_order_id.blank? %>
+  <%= "#{order.display_po}: #{order.shopify_order_url}" %><br />
+<% end %>
 <br />
-The Mollusk Team
+<br />
+Thanks!

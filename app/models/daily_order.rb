@@ -132,6 +132,10 @@ class DailyOrder < ApplicationRecord
     "#{po_stem} #{po_id}"
   end
 
+  def shopify_order_url
+    "https://mollusksurf.myshopify.com/admin/orders/#{shopify_order_id}"
+  end
+
   def shopify_order_line_items
     orders.map(&:shopify_line_item)
   end
@@ -149,6 +153,7 @@ class DailyOrder < ApplicationRecord
         source_name: 'mollusk_app',
         total_tax: 0,
         total_price: 0,
+        inventory_behaviour: 'decrement_obeying_policy',
         customer: { id: shopify_customer_id },
         total_discounts: total_price,
         line_items: line_items
