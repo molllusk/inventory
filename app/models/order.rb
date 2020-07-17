@@ -33,7 +33,7 @@ class Order < ApplicationRecord
     {
       variant_id: product.retail_shopify.variant_id,
       quantity: quantity,
-      price: product.retail_shopify.price
+      price: product.retail_shopify.price.to_f
     }
   end
 end
