@@ -291,6 +291,16 @@ module ShopifyClient
     response.body
   end
 
+  def self.update_order(order_id, params)
+    response = connection(:RETAIL).put do |req|
+      req.url "#{API_VERSION}/orders/#{order_id}.json"
+      req.headers['Content-Type'] = 'application/json'
+      req.body = params.to_json
+    end
+
+    response.body
+  end
+
   # Pagination methods https://www.shopify.com/partners/blog/relative-pagination
   def self.cursor_paginate(resource, params, store = :RETAIL)
     response = connection(store).get "#{API_VERSION}/#{resource}.json", params
