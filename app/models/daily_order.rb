@@ -165,7 +165,7 @@ class DailyOrder < ApplicationRecord
 
   def shopify_order_params
     line_items = shopify_order_line_items
-    total_price = line_items.inject(0.0) { |sum, item| sum + (item[:price] * item[:quantity] }
+    total_price = line_items.inject(0.0) { |sum, item| sum + (item[:price] * item[:quantity]) }
     {
       order: {
         location_id: 36225056853,
