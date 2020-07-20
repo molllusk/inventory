@@ -31,6 +31,6 @@ class ApplicationMailer < ActionMailer::Base
     end
     @daily_inventory_transfer = daily_inventory_transfer
 
-    mail to: 'joseph@mollusksurfshop.com, john@mollusksurfshop.com, johanna@mollusksurfshop.com, sfmanager@mollusksurfshop.com, daveo@mollusksurfshop.com', cc: 'arvelhernandez@gmail.com', subject: "Mollusk Order #{daily_inventory_transfer.po_id}"
+    mail to: 'joseph@mollusksurfshop.com, john@mollusksurfshop.com, johanna@mollusksurfshop.com, sfmanager@mollusksurfshop.com, daveo@mollusksurfshop.com, maddie@mollusksurfshop.com, beau@mollusksurfshop.com', cc: 'arvelhernandez@gmail.com', subject: "Mollusk Order #{daily_inventory_transfer.po_id}"
   end
 end
