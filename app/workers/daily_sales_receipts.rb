@@ -191,7 +191,7 @@ class DailySalesReceipts
       refund['order_adjustments'].each do |adjustment|
         if adjustment['kind'] == 'shipping_refund'
           refunded_shipping -= adjustment['amount'].to_f
-        else
+        elsif adjustment['amount'].to_f.negative?
           arbitrary_discount_from_order_adjustments -= adjustment['amount'].to_f
         end
       end
