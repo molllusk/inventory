@@ -18,9 +18,9 @@ module Qbo
 
   CUSTOMER_ID_BY_OUTLET = {
     'San Francisco' => 24913,
-    'Santa Barbara' => 24918,
-    'Silver Lake' => 26373,
-    'Venice Beach' => 24914
+    'Santa Barbara' => 26373,
+    'Silver Lake' => 24914,
+    'Venice Beach' => 24918
   }.freeze
 
   TAX_ITEM_ID_BY_OUTLET = {

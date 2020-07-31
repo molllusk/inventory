@@ -228,8 +228,8 @@ class DailySalesReceipts
       end
 
       if refund_line_items.blank?
-        refunded_amounts[:arbitrary_discount] += (refund_totals_by_order[order_name][:total_payments] - refunded_shipping)
-        refund_totals_by_order[order_name][:arbitrary_discount] += (refund_totals_by_order[order_name][:total_payments] - refunded_shipping)
+        refunded_amounts[:arbitrary_discount] += (refund_totals_by_order[order_name][:total_payments] - refunded_shipping - arbitrary_discount_from_order_adjustments)
+        refund_totals_by_order[order_name][:arbitrary_discount] += (refund_totals_by_order[order_name][:total_payments] - refunded_shipping - arbitrary_discount_from_order_adjustments)
       end
     end
 
