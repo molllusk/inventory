@@ -188,6 +188,8 @@ class DailySalesReceipts
       refunded_shipping = 0
       arbitrary_discount_from_order_adjustments = 0
 
+      # Check order adjustments for adjustments that aren't related to line items
+      # If order adjustment is positive is a shipping charge account for elsewhere and we ignore
       refund['order_adjustments'].each do |adjustment|
         if adjustment['kind'] == 'shipping_refund'
           refunded_shipping -= adjustment['amount'].to_f
@@ -288,7 +290,7 @@ class DailySalesReceipts
       wholesale_shopify_sales_receipt[:discount] += order['total_discounts'].to_f
       wholesale_shopify_sales_receipt[:sales_tax] += order_tax
 
-      fulfillments = ShopifyClient.fulfillments(order['id'], :WHOLESALE)
+      fulfillments = ShopifyClient.fulfillments(order['id'])
 
       order['line_items'].each do |line_item|
         next unless line_item['fulfillment_status'].present?
@@ -299,7 +301,7 @@ class DailySalesReceipts
 
         cost = 0.0
         shopify_product = ShopifyDatum.find_by(variant_id: variant_id)
-        raw_cost = shopify_product.present? ? shopify_product.get_cost : ShopifyClient.get_cost(variant_id, :WHOLESALE)
+        raw_cost = shopify_product.present? ? shopify_product.get_cost : ShopifyClient.get_cost(variant_id)
 
         if raw_cost.present?
           cost = raw_cost * line_item['quantity'].to_f
@@ -328,9 +330,9 @@ class DailySalesReceipts
       order_shipping = order['shipping_lines'].reduce(0) { |sum, shipping_line| sum + shipping_line['price'].to_f }
 
       wholesale_sales_totals_by_order[order_name][:shipping] = order_shipping
-      wholesale_shopify_sales_receipt[:shipping] += order_shipping\
+      wholesale_shopify_sales_receipt[:shipping] += order_shipping
 
-      transactions = ShopifyClient.transactions(order['id'], :WHOLESALE)
+      transactions = ShopifyClient.transactions(order['id'])
 
       transactions.each do |transaction|
         next unless %w[capture sale refund].include?(transaction['kind']) && transaction['status'] == 'success'

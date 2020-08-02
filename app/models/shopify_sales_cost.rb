@@ -21,6 +21,10 @@ class ShopifySalesCost < ApplicationRecord
     location_costs.present? ? (location_costs[location_id] || 0) : 0
   end
 
+  def retail_base_url?
+    retail? || (wholesale? && date > Date.new("2020-07-15 00:00:00 UTC"))
+  end
+
   def journal_entry_params
     {
       txn_date: date,
