@@ -29,7 +29,7 @@ class ShopifySalesReceipt < ApplicationRecord
   end
 
   def retail_base_url?
-    retail? || (wholesale? && Date.today > Date.parse("2020-07-15 00:00:00 UTC"))
+    retail? || (wholesale? && date > Date.parse("2020-07-15 00:00:00 UTC"))
   end
 
   def sales_receipt_params
