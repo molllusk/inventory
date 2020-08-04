@@ -64,11 +64,12 @@ module ShopifyClient
   end
 
   # Final order quantity needs to account for refunded items
-  def self.order_quantities_by_variant(store = :RETAIL)
+  def self.web_order_quantities_by_variant(store = :RETAIL)
     orders = Hash.new(0)
     refunds = Hash.new(0)
 
     all_orders(store).each do |order|
+      next if order['source_name'] == 'mollusk_app'
       next if %w[fulfilled restocked].include? order['fulfillment_status']
 
       order['refunds'].each do |refund|
