@@ -180,7 +180,8 @@ class DailyOrder < ApplicationRecord
         customer: { id: shopify_customer_id },
         total_discounts: total_price,
         shipping_address: shopify_shipping_address,
-        line_items: line_items
+        line_items: line_items,
+        shipping_lines: [{title: 'Standard Shipping', code: 'Standard Shipping'}]
       }
     }
   end
