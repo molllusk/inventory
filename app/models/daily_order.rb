@@ -181,7 +181,13 @@ class DailyOrder < ApplicationRecord
         total_discounts: total_price,
         shipping_address: shopify_shipping_address,
         line_items: line_items,
-        shipping_lines: [{title: 'Standard Shipping', code: 'Standard Shipping'}]
+        shipping_lines: [
+          {
+            title: 'Standard Shipping',
+            code: 'Standard Shipping',
+            price: 0
+          }
+        ]
       }
     }
   end
