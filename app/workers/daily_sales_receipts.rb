@@ -47,7 +47,7 @@ class DailySalesReceipts
       next if order['source_name'] == 'mollusk_app'
 
       # tease out wholesale orders for separate wholesale accounting
-      if order['customer']['tags'].include?('wholesale')
+      if order['customer']&.[]('tags')&.include?('wholesale')
         wholesale_orders << order
         next
       end
