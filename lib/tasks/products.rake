@@ -2,11 +2,11 @@
 
 namespace :products do
   task pull: :environment do
-    retail_shopify_products = ShopifyClient.all_products
+    shopify_products = ShopifyClient.all_products
     vend_products = VendClient.active_products
 
     new_vends = []
-    new_retail_shopifys = []
+    new_shopifys = []
 
     vend_products.each do |vend_product|
       vend_attrs = VendClient.product_attributes(vend_product)
@@ -21,7 +21,7 @@ namespace :products do
       end
     end
 
-    retail_shopify_products.each do |shopify_product|
+    shopify_products.each do |shopify_product|
       shopify_attrs_list = ShopifyClient.products_attributes(shopify_product)
       shopify_attrs_list.each do |shopify_attrs|
         shopify_datum = ShopifyDatum.find_by(variant_id: shopify_attrs[:variant_id])
@@ -30,22 +30,19 @@ namespace :products do
           shopify_datum.attributes = shopify_attrs
           shopify_datum.save if shopify_datum.changed?
         else
-          new_retail_shopifys << shopify_attrs
+          new_shopifys << shopify_attrs
         end
       end
     end
 
-    dupes_retail = []
-
     # match vend variant sku to shopify variant barcode
-    new_retail_shopifys.each do |shopify_attrs|
+    new_shopifys.each do |shopify_attrs|
       shopify_attrs[:store] = :retail
       existing_vend = VendDatum.find_by(sku: shopify_attrs[:barcode])
       vend_attrs = new_vends.find { |vend| vend[:sku] == shopify_attrs[:barcode] }
 
       if existing_vend.present? && existing_vend.product.retail_shopify.present?
-        dupes_retail << existing_vend.product
-        Airbrake.notify("Issue Importing RETAIL Shopify: recognized as new, but already exists for product: #{existing_vend.product.id}")
+        Airbrake.notify("Issue Importing Shopify Product: recognized as new, but already exists for product: #{existing_vend.product.id}")
       elsif existing_vend.present?
         existing_vend.product.shopify_data << ShopifyDatum.create(shopify_attrs)
       elsif vend_attrs.present?
