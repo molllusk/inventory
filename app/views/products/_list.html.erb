@@ -10,8 +10,7 @@
       <th>Added  (PST / PDT)</th>
       <th>SKU</th>
       <th>Vend Inventories</th>
-      <th>Shopify Retail Inventories</th>
-      <th>Shopify Wholesale Inventories</th>
+      <th>Shopify Inventories</th>
       <th>3rdParty?</th>
       <th>Sale?</th>
       <th>Links</th>
@@ -19,7 +18,6 @@
     <% products.each do |product| %>
       <% vend = product.vend_datum %>
       <% retail_shopify = product.retail_shopify %>
-      <% wholesale_shopify = product.wholesale_shopify %>
       <tr>
         <td><%= link_to product do %><%= vend.variant_name %> <i class='fa fa-external-link-alt'></i><% end %></td>
         <td><%= product.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
@@ -47,19 +45,6 @@
           <% end %>
         </td>
         <td>
-          <% if wholesale_shopify.present? %>
-            <% if wholesale_shopify.shopify_inventories.present? %>
-              <% wholesale_shopify.shopify_inventories.each do |inventory| %>
-                <strong><%= inventory.location.gsub(' Wholesale', '') %></strong>: <%= inventory.inventory %><br />
-              <% end %>
-            <% else %>
-              none
-            <% end %>
-          <% else %>
-            n/a
-          <% end %>
-        </td>
-        <td>
           <% if retail_shopify.present? %>
             <%= retail_shopify.third_party? %>
           <% else %>
@@ -77,9 +62,6 @@
           <p class='mb-0'><a href='<%= vend.link %>' target='_blank'>Vend <i class='fa fa-external-link-alt'></i></a></p>
           <% if retail_shopify.present? %>
             <p class='mt-2 mb-0'><a href='<%= retail_shopify.link %>' target='_blank'>Retail Shopify <i class='fa fa-external-link-alt'></i></a></p>
-          <% end %>
-          <% if wholesale_shopify.present? %>
-            <p class='mt-2 mb-0'><a href='<%= wholesale_shopify.link %>' target='_blank'>Wholesale Shopify <i class='fa fa-external-link-alt'></i></a></p>
           <% end %>
         </td>
       </tr>

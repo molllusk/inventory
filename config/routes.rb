@@ -58,8 +58,6 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :fluid_inventory_thresholds
-  resources :fluid_inventory_updates
   resources :inventory_updates
 
   resources :products

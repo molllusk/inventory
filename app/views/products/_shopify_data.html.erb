@@ -1,5 +1,5 @@
-<% if retail_shopify.present? || wholesale_shopify.present? %>
-  <% headers = ['store'] + ((retail_shopify || wholesale_shopify).attributes.keys - ['store'])  %>
+<% if retail_shopify.present? %>
+  <% headers = ['store'] + (retail_shopify.attributes.keys - ['store'])  %>
   <hr/>
   <h2 class='center'>Shopify Data:</h2>
   <table class='full_width'>
@@ -22,19 +22,6 @@
             <% end %>
           </td>
         <% end %>
-        <% if wholesale_shopify.present? %>
-          <td>
-            <% if header == 'store' %>
-              <a href='<%= wholesale_shopify.link %>' target='_blank'>WHOLESALE <i class='fa fa-external-link-alt'></i></a>
-            <% elsif wholesale_shopify.send(header).is_a? Array %>
-              <%= wholesale_shopify.send(header).join(', ') %>
-            <% elsif wholesale_shopify.send(header).is_a? String %>
-              <%= wholesale_shopify.send(header).humanize %>
-            <% else %>
-              <%= wholesale_shopify.send(header) %>
-            <% end %>
-          </td>
-        <% end %>
       </tr>
     <% end %>
     <tr>
@@ -50,26 +37,12 @@
           <% end %>
         </td>
       <% end %>
-      <% if wholesale_shopify.present? %>
-        <td>
-          <% if wholesale_shopify.shopify_inventories.present? %>
-            <% wholesale_shopify.shopify_inventories.each do |inventory| %>
-              <strong><%= inventory.location.gsub(' Wholesale', '') %></strong>: <%= inventory.inventory %><br />
-            <% end %>
-          <% end %>
-        </td>
-      <% end %>
     </tr>
     <tr>
       <td></td>
       <% if retail_shopify.present? %>
         <td>
           <%= link_to(raw('<i class="fa fa-trash"></i> delete retail data'), shopify_datum_destroy_path(retail_shopify), method: :delete, data: { confirm: 'Are you sure you want to DELETE RETAIL Shopify Data for this product?' }, class: 'btn btn-sm btn-danger mt-3') %>
-        </td>
-      <% end %>
-      <% if wholesale_shopify.present? %>
-        <td>
-          <%= link_to(raw('<i class="fa fa-trash"></i> delete wholesale data'), shopify_datum_destroy_path(wholesale_shopify), method: :delete, data: { confirm: 'Are you sure you want to DELETE WHOLESALE Shopify Data for this product?' }, class: 'btn btn-sm btn-danger mt-3') %>
         </td>
       <% end %>
     </tr>
