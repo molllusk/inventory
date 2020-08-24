@@ -94,7 +94,7 @@ class GenerateOtbReport
     wholesale_orders = []
 
     query_orders.each do |retail_order|
-      if order['customer']&.[]('tags')&.include?('wholesale')
+      if retail_order['customer']&.[]('tags')&.include?('wholesale')
         wholesale_orders << retail_order
         next
       end
@@ -149,7 +149,7 @@ class GenerateOtbReport
     wholesale_orders = []
 
     query_orders.each do |retail_order|
-      if order['customer']&.[]('tags')&.include?('wholesale')
+      if retail_order['customer']&.[]('tags')&.include?('wholesale')
         wholesale_orders << retail_order
         next
       end
@@ -203,7 +203,7 @@ class GenerateOtbReport
     wholesale_orders = []
 
     query_orders.each do |retail_order|
-      if order['customer']&.[]('tags')&.include?('wholesale')
+      if retail_order['customer']&.[]('tags')&.include?('wholesale')
         wholesale_orders << retail_order
         next
       end
@@ -257,7 +257,7 @@ class GenerateOtbReport
     wholesale_orders = []
 
     query_orders.each do |retail_order|
-      if order['customer']&.[]('tags')&.include?('wholesale')
+      if retail_order['customer']&.[]('tags')&.include?('wholesale')
         wholesale_orders << retail_order
         next
       end
