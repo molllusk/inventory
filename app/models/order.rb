@@ -3,9 +3,6 @@
 class Order < ApplicationRecord
   belongs_to :product
   belongs_to :daily_order
-  has_one    :order_inventory_update, dependent: :destroy
-
-  # after_create :reduce_warehouse_inventory
 
   scope :cancelled, lambda {
     where(cancelled: true)
@@ -15,14 +12,9 @@ class Order < ApplicationRecord
     where(cancelled: false)
   }
 
-  # def reduce_warehouse_inventory
-  #   product.adjust_order_inventory(self)
-  # end
-
   def cancel
     return if cancelled?
-    # product.undo_adjust_order_inventory(self)
-    update_attribute(:cancelled, true) # if order_inventory_update.undone?
+    update_attribute(:cancelled, true)
   end
 
   def total_cost

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_24_031021) do
+ActiveRecord::Schema.define(version: 2020_08_26_191041) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -70,15 +70,6 @@ ActiveRecord::Schema.define(version: 2020_08_24_031021) do
     t.datetime "updated_at"
     t.integer "new_qty"
     t.bigint "location", default: 49481991
-  end
-
-  create_table "order_inventory_updates", force: :cascade do |t|
-    t.integer "prior_jam_qty"
-    t.integer "new_jam_qty"
-    t.integer "order_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.boolean "undone", default: false
   end
 
   create_table "orders", force: :cascade do |t|
