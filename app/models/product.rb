@@ -4,7 +4,6 @@ class Product < ApplicationRecord
   has_one :vend_datum, dependent: :destroy
   has_many :shopify_data, dependent: :destroy
   has_many :inventory_updates, dependent: :destroy
-  has_many :fluid_inventory_updates, dependent: :destroy
   has_many :orders, dependent: :destroy
 
   LOCATION_NAMES_BY_CODE = {
@@ -103,7 +102,6 @@ class Product < ApplicationRecord
   def self.run_inventory_updates
     retail_orders = ShopifyClient.web_order_quantities_by_variant
     update_retail_inventories(retail_orders)
-    # update_fluid_inventories(retail_orders)
   end
 
   def self.update_retail_inventories(retail_orders)
@@ -118,20 +116,6 @@ class Product < ApplicationRecord
       # do not update inventory if any order exists for that variant in any location
       product.update_inventory(retail_orders, outlet) if product.vend_datum&.inventory_at_location(LOCATION_NAMES_BY_CODE[outlet]).present?
     end
-  end
-
-  # def self.update_fluid_inventories(retail_orders, product_ids = [])
-  #   query = product_ids.present? ? where(id: product_ids) : all
-  #   query.find_each do |product|
-  #     if product.retail_and_wholesale_shopify?
-  #       # do not update inventory if any order exists for that variant in any location
-  #       product.fluid_inventory unless product.retail_orders_present?(retail_orders)
-  #     end
-  #   end
-  # end
-
-  def self.fluid_inventory_levels
-    @fluid_inventory_levels ||= get_inventory_levels
   end
 
   def self.daily_order_inventory_levels
@@ -175,7 +159,7 @@ class Product < ApplicationRecord
   end
 
   def self.inventory_csv_headers
-    stem = %i[id product variant type size sku handle shopify_tags vend retail_shopify wholesale_shopify app]
+    stem = %i[id product variant type size sku handle shopify_tags vend retail_shopify app]
     stem + ShopifyInventory.locations.keys + VendClient::OUTLET_NAMES_BY_ID.values + [:total_inventory]
   end
 
@@ -186,16 +170,8 @@ class Product < ApplicationRecord
     end
   end
 
-  def retail_and_wholesale_shopify?
-    retail_shopify.present? && wholesale_shopify.present?
-  end
-
   def retail_orders_present?(retail_orders)
     retail_orders[retail_shopify&.variant_id].positive?
-  end
-
-  def wholesale_orders_present?(wholesale_orders)
-    wholesale_orders[wholesale_shopify&.variant_id].positive?
   end
 
   def adjust_retail_inventory(outlet)
@@ -205,16 +181,15 @@ class Product < ApplicationRecord
   def inventory_csv_row_data
     data = {
       id: id,
-      product: vend_datum&.name || retail_shopify&.title || wholesale_shopify&.title,
-      variant: (retail_shopify&.variant_title || wholesale_shopify&.variant_title || vend_datum&.variant_name).to_s.gsub(/Default(\s+Title)?/i, ''),
-      type: vend_datum&.vend_type&.[]('name') || retail_shopify&.product_type || wholesale_shopify&.product_type,
-      size: retail_shopify&.option1.to_s.strip.downcase || wholesale_shopify&.option1.to_s.strip.downcase,
-      sku: vend_datum&.sku || retail_shopify&.barcode || wholesale_shopify&.barcode,
-      handle: retail_shopify&.handle || wholesale_shopify&.handle,
+      product: vend_datum&.name || retail_shopify&.title,
+      variant: (retail_shopify&.variant_title || vend_datum&.variant_name).to_s.gsub(/Default(\s+Title)?/i, ''),
+      type: vend_datum&.vend_type&.[]('name') || retail_shopify&.product_type,
+      size: retail_shopify&.option1.to_s.strip.downcase,
+      sku: vend_datum&.sku || retail_shopify&.barcode,
+      handle: retail_shopify&.handle,
       shopify_tags: retail_shopify&.tags&.join(', '),
       vend: vend_datum&.link,
       retail_shopify: retail_shopify&.link,
-      wholesale_shopify: wholesale_shopify&.link,
       app: "https://mollusk.herokuapp.com/products/#{id}",
       total_inventory: 0
     }
@@ -241,60 +216,6 @@ class Product < ApplicationRecord
     Product.inventory_csv_headers.map { |header| data[header] }
   end
 
-  def adjust_order_inventory(order)
-    begin
-      response = ShopifyClient.adjust_inventory(
-        retail_shopify.inventory_item_id,
-        ShopifyInventory.locations['Shopify Fulfillment Network'],
-        -order.quantity
-      )
-
-      if ShopifyClient.inventory_item_updated?(response)
-        updated_warehouse_inventory = response['inventory_level']['available']
-        shopify_inventory = retail_shopify.shopify_inventories.find_by(location: 'Shopify Fulfillment Network')
-        expected_warehouse_inventory = shopify_inventory.inventory - order.quantity
-
-        order.create_order_inventory_update(
-          new_jam_qty: updated_warehouse_inventory,
-          prior_jam_qty: shopify_inventory.inventory
-        )
-
-        shopify_inventory.update_attribute(:inventory, updated_warehouse_inventory)
-
-        Airbrake.notify("ORDER INVENTORY: Product #{id} expected warehouse qty #{expected_warehouse_inventory} but got #{updated_warehouse_inventory}") unless expected_warehouse_inventory == updated_warehouse_inventory
-      else
-        Airbrake.notify("Could not UPDATE warehouse inventory during ORDER for Product: #{id}, Adjustment: #{-order.quantity}")
-      end
-    rescue StandardError
-      Airbrake.notify("There was an error UPDATING warehouse inventory during ORDER of Product: #{id}, Adjustment: #{-order.quantity}")
-    end
-  end
-
-  def undo_adjust_order_inventory(order)
-    begin
-      response = ShopifyClient.adjust_inventory(
-        retail_shopify.inventory_item_id,
-        ShopifyInventory.locations['Shopify Fulfillment Network'],
-        order.quantity
-      )
-
-      if ShopifyClient.inventory_item_updated?(response)
-        updated_warehouse_inventory = response['inventory_level']['available']
-        shopify_inventory = retail_shopify.shopify_inventories.find_by(location: 'Shopify Fulfillment Network')
-        expected_warehouse_inventory = shopify_inventory.inventory + order.quantity
-
-        shopify_inventory.update_attribute(:inventory, updated_warehouse_inventory)
-        order.order_inventory_update.undo
-
-        Airbrake.notify("ORDER (#{order.id}) INVENTORY UNDO/Cancel: Product #{id} expected warehouse qty #{expected_warehouse_inventory} but got #{updated_warehouse_inventory}") unless expected_warehouse_inventory == updated_warehouse_inventory
-      else
-        Airbrake.notify("Could not UPDATE warehouse inventory during ORDER (#{order.id}) UNDO/Cancel for Product: #{id}, Adjustment: #{order.quantity}")
-      end
-    rescue
-      Airbrake.notify("There was an error UPDATING warehouse inventory during ORDER (#{order.id}) UNDO/Cancel of Product: #{id}, Adjustment: #{order.quantity}")
-    end
-  end
-
   def adjust_inventory_vend(outlet, quantity)
     location_name = "Mollusk #{outlet.to_s.upcase}"
     location_id = ShopifyInventory.locations[location_name]
@@ -311,40 +232,6 @@ class Product < ApplicationRecord
       Airbrake.notify("There was an error UPDATING #{location_name}:#{location_id} inventory for Product: #{id}, Adjustment: #{quantity} | #{e}")
     end
   end
-
-  # def adjust_inventory_fluid(quantity, expected_wholesale_inventory)
-  #   retail_response = ShopifyClient.adjust_inventory(
-  #     retail_shopify.inventory_item_id,
-  #     ShopifyInventory.locations['Postworks'],
-  #     quantity
-  #   )
-
-  #   if ShopifyClient.inventory_item_updated?(retail_response)
-  #     begin
-  #       wholesale_response = ShopifyClient.adjust_inventory(
-  #         wholesale_shopify.inventory_item_id,
-  #         ShopifyInventory.locations['Postworks ATS'],
-  #         -quantity,
-  #         :WHOLESALE
-  #       )
-
-  #       if ShopifyClient.inventory_item_updated?(wholesale_response)
-  #         updated_wholesale_inventory = wholesale_response['inventory_level']['available']
-  #         save_inventory_adjustment_fluid(quantity, retail_response['inventory_level']['available'], updated_wholesale_inventory)
-
-  #         Airbrake.notify("Fluid Inventory: expected Wholesale qty #{expected_wholesale_inventory} but got #{updated_wholesale_inventory}") unless expected_wholesale_inventory == updated_wholesale_inventory
-  #       else
-  #         Airbrake.notify("Could not UPDATE Wholesale Postworks Warehouse inventory after already adjusting Retail inventory for Product: #{id}, Adjustment: #{-quantity}")
-  #       end
-  #     rescue StandardError
-  #       Airbrake.notify("There was an error UPDATING Wholesale Postworks Warehouse inventory after already adjusting Retail inventory for Product: #{id}, Adjustment: #{-quantity}")
-  #     end
-  #   else
-  #     Airbrake.notify("Could not UPDATE Retail Postworks Warehouse inventory for Product: #{id}, Adjustment: #{quantity}")
-  #   end
-  # rescue StandardError
-  #   Airbrake.notify("There was an error UPDATING Retail Postworks Warehouse inventory for Product: #{id}, Adjustment: #{quantity}")
-  # end
 
   def save_inventory_adjustment_vend(response, quantity, outlet)
     location_id = response['inventory_level']['location_id']
@@ -363,24 +250,6 @@ class Product < ApplicationRecord
     shopify_inventory.update_attribute(:inventory, new_inventory)
   end
 
-  # def save_inventory_adjustment_fluid(quantity, retail_available, wholesale_available)
-  #   retail_inventory = retail_shopify.shopify_inventories.find_by(location: 'Postworks')
-  #   wholesale_inventory = wholesale_shopify.shopify_inventories.find_by(location: 'Postworks ATS')
-
-  #   FluidInventoryUpdate.create(
-  #     prior_wholesale_qty: wholesale_inventory.inventory,
-  #     prior_retail_qty: retail_inventory.inventory,
-  #     threshold: fluid_inventory_threshold,
-  #     adjustment: quantity,
-  #     product_id: id,
-  #     new_wholesale_qty: wholesale_available,
-  #     new_retail_qty: retail_available
-  #   )
-
-  #   retail_inventory.update_attribute(:inventory, retail_available)
-  #   wholesale_inventory.update_attribute(:inventory, wholesale_available)
-  # end
-
   def connect_inventory_location(outlet = :sf)
     location = ShopifyInventory.locations["Mollusk #{outlet.to_s.upcase}"]
 
@@ -392,46 +261,12 @@ class Product < ApplicationRecord
     Airbrake.notify("There was an error CONNECTING #{outlet.to_s.upcase} inventory location for Product: #{id}")
   end
 
-  def fluid_inventory_threshold
-    @fluid_inventory_threshold ||= Product.fluid_inventory_levels[retail_shopify.product_type.to_s.strip.downcase]&.[](retail_shopify.option1.to_s.strip.downcase).to_i
-  end
-
   def daily_order_inventory_thresholds
     @daily_order_inventory_thresholds ||= Product.daily_order_inventory_levels[retail_shopify.product_type.to_s.strip.downcase]&.[](retail_shopify.option1.to_s.strip.downcase)
   end
 
-  # def fluid_inventory
-  #   return unless retail_and_wholesale_shopify?
-
-  #   retail_inventory = retail_shopify.shopify_inventories.find_by(location: 'Postworks')&.inventory
-  #   wholesale_inventory = wholesale_shopify.shopify_inventories.find_by(location: 'Postworks ATS')&.inventory
-
-  #   if retail_inventory.present?
-  #     if wholesale_inventory.present?
-  #       if fluid_inventory_threshold.present?
-  #         if retail_inventory < fluid_inventory_threshold
-  #           sufficient_wholesale = (fluid_inventory_threshold - retail_inventory) <= wholesale_inventory
-  #           adjustment = sufficient_wholesale ? fluid_inventory_threshold - retail_inventory : wholesale_inventory
-  #           # bails on zero adjustments and negative wholesale inventories
-  #           adjust_inventory_fluid(adjustment, wholesale_inventory - adjustment) unless adjustment < 1
-  #         end
-  #       else
-  #         Airbrake.notify("Missing fluid inventory threshold for Product Type: #{retail_shopify.product_type} Product: #{id}")
-  #       end
-  #     else
-  #       Airbrake.notify("Missing WHOLESALE Postworks Inventory for Product: #{id}")
-  #     end
-  #   else
-  #     Airbrake.notify("Missing RETAIL Postworks Inventory for Product: #{id}")
-  #   end
-  # end
-
   def retail_shopify
     shopify_data.find_by(store: :retail)
-  end
-
-  def wholesale_shopify
-    shopify_data.find_by(store: :wholesale)
   end
 
   def shopify_inventory(outlet, store = :retail)

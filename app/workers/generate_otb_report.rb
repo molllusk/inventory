@@ -91,7 +91,14 @@ class GenerateOtbReport
 
     query_orders = ShopifyClient.closed_orders_between(begin_date, start_date - 1.day)
 
+    wholesale_orders = []
+
     query_orders.each do |retail_order|
+      if retail_order['customer']&.[]('tags')&.include?('wholesale')
+        wholesale_orders << retail_order
+        next
+      end
+
       retail_order['line_items'].each do |line_item|
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
@@ -105,9 +112,7 @@ class GenerateOtbReport
       end
     end
 
-    query_orders = ShopifyClient.closed_orders_between(begin_date, start_date - 1.day, :WHOLESALE)
-
-    query_orders.each do |wholesale_order|
+    wholesale_orders.each do |wholesale_order|
       wholesale_order['line_items'].each do |line_item|
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
@@ -141,7 +146,14 @@ class GenerateOtbReport
 
     query_orders = ShopifyClient.closed_orders_between(start_date, end_date)
 
+    wholesale_orders = []
+
     query_orders.each do |retail_order|
+      if retail_order['customer']&.[]('tags')&.include?('wholesale')
+        wholesale_orders << retail_order
+        next
+      end
+
       retail_order['line_items'].each do |line_item|
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
@@ -155,9 +167,7 @@ class GenerateOtbReport
       end
     end
 
-    query_orders = ShopifyClient.closed_orders_between(start_date, end_date, :WHOLESALE)
-
-    query_orders.each do |wholesale_order|
+    wholesale_orders.each do |wholesale_order|
       wholesale_order['line_items'].each do |line_item|
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
@@ -190,7 +200,14 @@ class GenerateOtbReport
 
     query_orders = ShopifyClient.closed_orders_between(ninety_days, today)
 
+    wholesale_orders = []
+
     query_orders.each do |retail_order|
+      if retail_order['customer']&.[]('tags')&.include?('wholesale')
+        wholesale_orders << retail_order
+        next
+      end
+
       retail_order['line_items'].each do |line_item|
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
@@ -204,9 +221,7 @@ class GenerateOtbReport
       end
     end
 
-    query_orders = ShopifyClient.closed_orders_between(ninety_days, today, :WHOLESALE)
-
-    query_orders.each do |wholesale_order|
+    wholesale_orders.each do |wholesale_order|
       wholesale_order['line_items'].each do |line_item|
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
@@ -239,7 +254,14 @@ class GenerateOtbReport
 
     query_orders = ShopifyClient.closed_orders_between(prior_ninety_days, begin_date - 1.day)
 
+    wholesale_orders = []
+
     query_orders.each do |retail_order|
+      if retail_order['customer']&.[]('tags')&.include?('wholesale')
+        wholesale_orders << retail_order
+        next
+      end
+
       retail_order['line_items'].each do |line_item|
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i
@@ -253,9 +275,7 @@ class GenerateOtbReport
       end
     end
 
-    query_orders = ShopifyClient.closed_orders_between(prior_ninety_days, begin_date - 1.day, :WHOLESALE)
-
-    query_orders.each do |wholesale_order|
+    wholesale_orders.each do |wholesale_order|
       wholesale_order['line_items'].each do |line_item|
         product = raw_data_by_sku[ShopifyDatum.find_by(sku: line_item['sku'])&.barcode]
         quantity = line_item['quantity'].to_i

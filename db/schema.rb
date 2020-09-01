@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_15_033047) do
+ActiveRecord::Schema.define(version: 2020_08_26_191041) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -61,18 +61,6 @@ ActiveRecord::Schema.define(version: 2020_07_15_033047) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "fluid_inventory_updates", force: :cascade do |t|
-    t.integer "prior_wholesale_qty"
-    t.integer "prior_retail_qty"
-    t.integer "adjustment"
-    t.integer "product_id"
-    t.integer "new_wholesale_qty"
-    t.integer "new_retail_qty"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "threshold"
-  end
-
   create_table "inventory_updates", force: :cascade do |t|
     t.integer "product_id"
     t.integer "adjustment"
@@ -82,15 +70,6 @@ ActiveRecord::Schema.define(version: 2020_07_15_033047) do
     t.datetime "updated_at"
     t.integer "new_qty"
     t.bigint "location", default: 49481991
-  end
-
-  create_table "order_inventory_updates", force: :cascade do |t|
-    t.integer "prior_jam_qty"
-    t.integer "new_jam_qty"
-    t.integer "order_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.boolean "undone", default: false
   end
 
   create_table "orders", force: :cascade do |t|

@@ -5,7 +5,6 @@
 <hr/>
 
 <%= render partial: 'vend_data' %>
-<%= render partial: 'shopify_data', locals: { retail_shopify: @product.retail_shopify, wholesale_shopify: @product.wholesale_shopify } %>
+<%= render partial: 'shopify_data', locals: { retail_shopify: @product.retail_shopify } %>
 <%= render partial: 'inventory_updates' %>
-<%= render partial: 'fluid_inventory_updates' %>
 <%= render partial: 'orders' %>

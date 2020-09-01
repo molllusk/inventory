@@ -10,12 +10,10 @@
       <th>Sent Orders</th>
       <th>Store Inventory</th>
       <th>Threshold</th>
-      <th>Prior Warehouse Inventory</th>
-      <th>New Warehouse Inventory</th>
     </tr>
 
     <% @orders.sort { |a,b| b.daily_order.daily_inventory_transfer.date <=> a.daily_order.daily_inventory_transfer.date }.each do |order| %>
-      <tr class='<%= 'cancelled' if order.cancelled? && order.order_inventory_update.undone? %>'>
+      <tr class='<%= 'cancelled' if order.cancelled? %>'>
         <td><%= order.daily_order.daily_inventory_transfer.date.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
         <td><a href='<%= daily_order_path(order.daily_order) %>'><%= order.daily_order.outlet_name %> <i class='fa fa-external-link-alt'></i></a></td>
         <td><%= order.cost %></td>
@@ -23,8 +21,6 @@
         <td><%= order.sent_orders %></td>
         <td><%= order.vend_qty %></td>
         <td><%= order.threshold %></td>
-        <td class='<%= 'inventory_failure' unless order.order_inventory_update&.success? %>'><%= order.order_inventory_update&.prior_jam_qty || ' - ' %></td>
-        <td class='<%= 'inventory_failure' unless order.order_inventory_update&.success? %>'><%= order.order_inventory_update&.new_jam_qty || ' - ' %></td>
       </tr>
     <% end %>
   <table>

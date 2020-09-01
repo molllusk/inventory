@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module ShopifyClient
-  RETAIL_BASE_URL = "https://#{ENV['SHOPIFY_USER']}:#{ENV['SHOPIFY_PASSWORD']}@mollusksurf.myshopify.com"
-  WHOLESALE_BASE_URL = "https://#{ENV['WHOLESALE_SHOPIFY_USER']}:#{ENV['WHOLESALE_SHOPIFY_PASSWORD']}@molluskats.myshopify.com"
+  BASE_URL = "https://#{ENV['SHOPIFY_USER']}:#{ENV['SHOPIFY_PASSWORD']}@mollusksurf.myshopify.com"
   API_VERSION = '/admin/api/2020-04'
 
   SAVED_PRODUCT_ATTRIBUTES = %i[
@@ -32,43 +31,43 @@ module ShopifyClient
     weight_unit
   ].freeze
 
-  def self.connection(store = :RETAIL)
+  def self.connection
     sleep(0.5)
-    Faraday.new(url: const_get("#{store.to_s.upcase}_BASE_URL")) do |faraday|
+    Faraday.new(url: BASE_URL) do |faraday|
       faraday.response :json
       faraday.adapter Faraday.default_adapter
     end
   end
 
-  def self.all_inventory_locations(store = :RETAIL)
-    response = connection(store).get "#{API_VERSION}/locations.json"
+  def self.all_inventory_locations
+    response = connection.get "#{API_VERSION}/locations.json"
     response.body['locations']
   end
 
-  def self.count(resource, store = :RETAIL)
-    response = connection(store).get "#{API_VERSION}/#{resource}/count.json"
+  def self.count(resource)
+    response = connection.get "#{API_VERSION}/#{resource}/count.json"
     response.body['count']
   end
 
-  def self.all_products(store = :RETAIL)
-    all_resource('products', store)
+  def self.all_products
+    all_resource('products')
   end
 
-  def self.all_resource(resource, store = :RETAIL)
+  def self.all_resource(resource)
     params = { limit: 250 }
-    cursor_paginate(resource, params, store)
+    cursor_paginate(resource, params)
   end
 
-  def self.all_orders(store = :RETAIL)
-    all_resource('orders', store)
+  def self.all_orders
+    all_resource('orders')
   end
 
   # Final order quantity needs to account for refunded items
-  def self.web_order_quantities_by_variant(store = :RETAIL)
+  def self.web_order_quantities_by_variant
     orders = Hash.new(0)
     refunds = Hash.new(0)
 
-    all_orders(store).each do |order|
+    all_orders.each do |order|
       next if order['source_name'] == 'mollusk_app'
       next if %w[fulfilled restocked].include? order['fulfillment_status']
 
@@ -85,13 +84,13 @@ module ShopifyClient
     orders
   end
 
-  def self.connect_inventory_location(inventory_item_id, location_id, store = :RETAIL)
+  def self.connect_inventory_location(inventory_item_id, location_id)
     body = {
       'location_id': location_id,
       'inventory_item_id': inventory_item_id
     }
 
-    response = connection(store).post do |req|
+    response = connection.post do |req|
       req.url "#{API_VERSION}/inventory_levels/connect.json"
       req.headers['Content-Type'] = 'application/json'
       req.body = body.to_json
@@ -100,50 +99,50 @@ module ShopifyClient
     response.body
   end
 
-  def self.get_inventory_levels_all_locations(inventory_item_ids, store = :RETAIL)
-    response = connection(store).get "#{API_VERSION}/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}&limit=250"
+  def self.get_inventory_levels_all_locations(inventory_item_ids)
+    response = connection.get "#{API_VERSION}/inventory_levels.json?inventory_item_ids=#{inventory_item_ids.join(',')}&limit=250"
     response.body['inventory_levels'] || []
   end
 
-  def self.get_inventory_items(inventory_item_ids, store = :RETAIL)
+  def self.get_inventory_items(inventory_item_ids)
     inventory_items = []
 
     while inventory_item_ids.present?
       id_batch = inventory_item_ids.shift(50)
-      response = connection(store).get "#{API_VERSION}/inventory_items.json?ids=#{id_batch.join(',')}&limit=250"
+      response = connection.get "#{API_VERSION}/inventory_items.json?ids=#{id_batch.join(',')}&limit=250"
       inventory_items << response.body['inventory_items'] unless response.body['inventory_items'].blank?
     end
 
     inventory_items.flatten
   end
 
-  def self.get_inventory_item(inventory_item_id, store = :RETAIL)
-    response = connection(store).get "#{API_VERSION}/inventory_items/#{inventory_item_id}.json"
+  def self.get_inventory_item(inventory_item_id)
+    response = connection.get "#{API_VERSION}/inventory_items/#{inventory_item_id}.json"
     response.body['inventory_item'] || {}
   end
 
-  def self.get_variant(variant_id, store = :RETAIL)
-    response = connection(store).get "#{API_VERSION}/variants/#{variant_id}.json"
+  def self.get_variant(variant_id)
+    response = connection.get "#{API_VERSION}/variants/#{variant_id}.json"
     response.body['variant'] || {}
   end
 
-  def self.get_cost(variant_id, store = :RETAIL)
-    variant = get_variant(variant_id, store)
+  def self.get_cost(variant_id)
+    variant = get_variant(variant_id)
     return unless variant.present?
 
     inventory_item_id = variant['inventory_item_id']
-    inventory_item = get_inventory_item(inventory_item_id, store)
+    inventory_item = get_inventory_item(inventory_item_id)
     return unless inventory_item.present?
 
     inventory_item['cost'].to_f
   end
 
-  def self.update_inventories(store = :RETAIL)
+  def self.update_inventories
     inventory_item_ids = ShopifyDatum.where(store: store.to_s.downcase).pluck(:inventory_item_id)
 
     while inventory_item_ids.present?
       id_batch = inventory_item_ids.shift(50)
-      all_inventory_levels = get_inventory_levels_all_locations(id_batch, store)
+      all_inventory_levels = get_inventory_levels_all_locations(id_batch)
 
       all_inventory_levels.each do |inventory_level|
         sd = ShopifyDatum.find_by(inventory_item_id: inventory_level['inventory_item_id'])
@@ -159,14 +158,14 @@ module ShopifyClient
     end
   end
 
-  def self.adjust_inventory(inventory_item_id, location_id, adjustment, store = :RETAIL)
+  def self.adjust_inventory(inventory_item_id, location_id, adjustment)
     body = {
       'location_id': location_id,
       'inventory_item_id': inventory_item_id,
       'available_adjustment': adjustment
     }
 
-    response = connection(store).post do |req|
+    response = connection.post do |req|
       req.url "#{API_VERSION}/inventory_levels/adjust.json"
       req.headers['Content-Type'] = 'application/json'
       req.body = body.to_json
@@ -205,7 +204,7 @@ module ShopifyClient
     attributes
   end
 
-  def self.closed_orders_since_count(day, store = :RETAIL)
+  def self.closed_orders_since_count(day)
     min_date = day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
 
     count_params = {
@@ -213,11 +212,11 @@ module ShopifyClient
       updated_at_min: min_date
     }
 
-    count_response = connection(store).get "#{API_VERSION}/orders/count.json", count_params
+    count_response = connection.get "#{API_VERSION}/orders/count.json", count_params
     count_response.body['count'].to_i
   end
 
-  def self.closed_orders_since(day, store = :RETAIL)
+  def self.closed_orders_since(day)
     min_date =  day.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
 
     params = {
@@ -226,10 +225,10 @@ module ShopifyClient
       updated_at_min: min_date
     }
 
-    cursor_paginate('orders', params, store)
+    cursor_paginate('orders', params)
   end
 
-  def self.closed_orders_between_count(start_date, end_date, store = :RETAIL)
+  def self.closed_orders_between_count(start_date, end_date)
     min_date = start_date.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
     max_date = end_date.to_time.in_time_zone('Pacific Time (US & Canada)').end_of_day
 
@@ -239,11 +238,11 @@ module ShopifyClient
       created_at_max: max_date
     }
 
-    count_response = connection(store).get "#{API_VERSION}/orders/count.json", count_params
+    count_response = connection.get "#{API_VERSION}/orders/count.json", count_params
     count_response.body['count'].to_i
   end
 
-  def self.closed_orders_between(start_date, end_date, store = :RETAIL)
+  def self.closed_orders_between(start_date, end_date)
     min_date = start_date.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
     max_date = end_date.to_time.in_time_zone('Pacific Time (US & Canada)').end_of_day
 
@@ -254,26 +253,26 @@ module ShopifyClient
       created_at_max: max_date
     }
 
-    cursor_paginate('orders', params, store)
+    cursor_paginate('orders', params)
   end
 
-  def self.transactions(order_id, store = :RETAIL)
-    response = connection(store).get "#{API_VERSION}/orders/#{order_id}/transactions.json"
+  def self.transactions(order_id)
+    response = connection.get "#{API_VERSION}/orders/#{order_id}/transactions.json"
     response.body['transactions'] || []
   end
 
-  def self.fulfillments(order_id, store = :RETAIL)
-    response = connection(store).get "#{API_VERSION}/orders/#{order_id}/fulfillments.json"
+  def self.fulfillments(order_id)
+    response = connection.get "#{API_VERSION}/orders/#{order_id}/fulfillments.json"
     response.body['fulfillments'] || []
   end
 
-  def self.refunds(order_id, store = :RETAIL)
-    response = connection(store).get "#{API_VERSION}/orders/#{order_id}/refunds.json"
+  def self.refunds(order_id)
+    response = connection.get "#{API_VERSION}/orders/#{order_id}/refunds.json"
     response.body['refunds'] || []
   end
 
-  def self.create_order(params, store = :RETAIL)
-    response = connection(store).post do |req|
+  def self.create_order(params)
+    response = connection.post do |req|
       req.url "#{API_VERSION}/orders.json"
       req.headers['Content-Type'] = 'application/json'
       req.body = params.to_json
@@ -283,7 +282,7 @@ module ShopifyClient
   end
 
   def self.cancel_order(order_id, params = {})
-    response = connection(:RETAIL).post do |req|
+    response = connection.post do |req|
       req.url "#{API_VERSION}/orders/#{order_id}/cancel.json"
       req.headers['Content-Type'] = 'application/json'
       req.body = params.to_json
@@ -293,7 +292,7 @@ module ShopifyClient
   end
 
   def self.update_order(order_id, params)
-    response = connection(:RETAIL).put do |req|
+    response = connection.put do |req|
       req.url "#{API_VERSION}/orders/#{order_id}.json"
       req.headers['Content-Type'] = 'application/json'
       req.body = params.to_json
@@ -303,8 +302,8 @@ module ShopifyClient
   end
 
   # Pagination methods https://www.shopify.com/partners/blog/relative-pagination
-  def self.cursor_paginate(resource, params, store = :RETAIL)
-    response = connection(store).get "#{API_VERSION}/#{resource}.json", params
+  def self.cursor_paginate(resource, params)
+    response = connection.get "#{API_VERSION}/#{resource}.json", params
     resources = response.body[resource]
 
     loop do
@@ -314,7 +313,7 @@ module ShopifyClient
       next_link = next_page_link(links)
       break unless next_link.present?
 
-      response = connection(store).get next_page_url(next_link)
+      response = connection.get next_page_url(next_link)
       resources += response.body[resource]
     end
 

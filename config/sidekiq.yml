@@ -20,4 +20,4 @@ max_retries: 3
   # daily_ordering:
   #   cron: '00 12 * * 1-5'
   #   class: 'DailyOrdering'
-  #   description: 'Daily Orders for inventory transfers'
+  #   description: 'Daily Orders for shops (restocks from warehouse)'
