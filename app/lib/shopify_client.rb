@@ -138,7 +138,7 @@ module ShopifyClient
   end
 
   def self.update_inventories
-    inventory_item_ids = ShopifyDatum.where(store: store.to_s.downcase).pluck(:inventory_item_id)
+    inventory_item_ids = ShopifyDatum.pluck(:inventory_item_id)
 
     while inventory_item_ids.present?
       id_batch = inventory_item_ids.shift(50)
