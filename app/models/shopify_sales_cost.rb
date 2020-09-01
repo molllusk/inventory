@@ -46,14 +46,26 @@ class ShopifySalesCost < ApplicationRecord
       },
       {
         account_id: '3652', # 11137 Finished Goods - Shopify
-        amount: location_cost('Postworks ATS').to_f,
-        description: 'Total Cost of Sales Wholesale Shopify - Postworks ATS',
+        amount: location_cost('Shopify Fulfillment Network').to_f,
+        description: 'Total Cost of Wholesale Sales Shopify - Shopify Fulfillment Network',
         posting_type: 'Credit'
       },
       {
         account_id: '3652', # 11137 Finished Goods - Shopify
-        amount: location_cost('Shopify Fulfillment Network').to_f,
-        description: 'Total Cost of Sales Wholesale Shopify - Shopify Fulfillment Network',
+        amount: location_cost('Mollusk SF').to_f,
+        description: 'Total Cost of Wholesale Sales Shopify - San Francisco',
+        posting_type: 'Credit'
+      },
+      {
+        account_id: '3652', # 11137 Finished Goods - Shopify
+        amount: location_cost('Mollusk SB').to_f,
+        description: 'Total Cost of Wholesale Sales Shopify - Santa Barbara',
+        posting_type: 'Credit'
+      },
+      {
+        account_id: '3652', # 11137 Finished Goods - Shopify
+        amount: location_cost('Mollusk VB').to_f,
+        description: 'Total Cost of Wholesale Sales Shopify - Venice Beach',
         posting_type: 'Credit'
       }
     ]
