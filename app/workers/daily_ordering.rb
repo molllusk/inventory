@@ -52,6 +52,17 @@ class DailyOrdering
       end
     end
 
+    draft_orders = ShopifyClient.all_draft_orders('invoice_sent')
+
+    draft_orders_by_variant = Hash.new(0)
+
+    draft_orders.each do |order|
+      order['line_items'].each do |line_item|
+        next unless line_item['variant_id'].present? # some line items are empty?
+        draft_orders_by_variant[line_item['variant_id']] += line_item['quantity']
+      end
+    end
+
     #  Redis.current.set('min_daily_order_version', daily_order.last['version']) if daily_orders.present?
     pacific_time = Time.now.in_time_zone('Pacific Time (US & Canada)').end_of_day
 
@@ -74,6 +85,7 @@ class DailyOrdering
       # fill_level = (new_release ? fill_levels['new_release_fill'] : fill_levels['fill']).to_i
 
       outstanding_orders_by_outlet_id = outstanding_orders_by_product[vend_product.vend_id]
+      outstanding_draft_orders = draft_orders_by_variant[shopify_product.variant_id]
 
       cost = shopify_product.get_cost
 
@@ -111,7 +123,7 @@ class DailyOrdering
       end
 
       total_adjustments = inventories[:sf_adjustment].to_i + inventories[:vb_adjustment].to_i + inventories[:sb_adjustment].to_i
-      warehouse_inventory = shopify_product.shopify_inventories.find_by(location: 'Shopify Fulfillment Network')&.inventory.to_i
+      warehouse_inventory = shopify_product.shopify_inventories.find_by(location: 'Shopify Fulfillment Network')&.inventory.to_i - outstanding_draft_orders
       has_adjustment = total_adjustments.positive? && warehouse_inventory.positive?
 
       if has_adjustment

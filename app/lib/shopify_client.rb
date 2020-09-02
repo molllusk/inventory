@@ -301,6 +301,15 @@ module ShopifyClient
     response.body
   end
 
+  def self.all_draft_orders(status = nil)
+    if (status)
+      params = { limit: 250, status: status }
+      cursor_paginate('draft_orders', params)
+    else
+      all_resource('draft_orders')
+    end
+  end
+
   # Pagination methods https://www.shopify.com/partners/blog/relative-pagination
   def self.cursor_paginate(resource, params)
     response = connection.get "#{API_VERSION}/#{resource}.json", params

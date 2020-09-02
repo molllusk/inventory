@@ -163,22 +163,32 @@ class DailyOrder < ApplicationRecord
     orders.map(&:shopify_line_item)
   end
 
+  def total_price(items)
+    items.inject(0.0) { |sum, item| sum + (item[:price] * item[:quantity]) }
+  end
+
+  def total_line_item_quantities(items)
+    items.inject(0.0) { |sum, item| sum + item[:quantity] }
+  end
+
   def shopify_order_params
     line_items = shopify_order_line_items
-    total_price = line_items.inject(0.0) { |sum, item| sum + (item[:price] * item[:quantity]) }
+    tags = total_line_item_quantities(line_items) > 20 ? 'Wholesale' : ''
+
     {
       order: {
         location_id: 36225056853,
         financial_status: 'paid',
         fulfillment_status: nil,
         taxable: false,
+        tags: tags,
         note: "Order Number: #{display_po}",
         source_name: 'mollusk_app',
         total_tax: 0,
         total_price: 0,
         inventory_behaviour: 'decrement_ignoring_policy',
         customer: { id: shopify_customer_id },
-        total_discounts: total_price,
+        total_discounts: total_price(line_items),
         shipping_address: shopify_shipping_address,
         line_items: line_items,
         shipping_lines: [

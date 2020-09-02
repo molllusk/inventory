@@ -62,6 +62,26 @@ class VendClient
     data
   end
 
+  def self.get_item(resource, id)
+    retries = 0
+    response = nil
+
+    begin
+      response = connection.get resource + '/' + id
+    rescue StandardError
+      if (retries += 1) < 5
+        sleep(retries)
+        retry
+      end
+    end
+
+    if response && response.body
+      response.body['data'] || {}
+    else
+      {}
+    end
+  end
+
   def self.all_products
     paginator('products')
   end
