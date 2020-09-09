@@ -17,7 +17,7 @@ max_retries: 3
     cron: '* * 1 * *'
     class: 'RenewSosToken'
     description: 'Refresh SOS access token once a month'
-  # daily_ordering:
-  #   cron: '00 10 * * 1-5'
-  #   class: 'DailyOrdering'
-  #   description: 'Daily Orders for shops (restocks from warehouse)'
+  daily_ordering:
+    cron: '00 10 * * 1-5'
+    class: 'DailyOrdering'
+    description: 'Daily Orders for shops (restocks from warehouse)'
