@@ -173,15 +173,13 @@ class DailyOrder < ApplicationRecord
 
   def shopify_order_params
     line_items = shopify_order_line_items
-    tags = total_line_item_quantities(line_items) > 20 ? 'Wholesale' : ''
 
-    {
+    params = {
       order: {
         location_id: 36225056853,
         financial_status: 'paid',
         fulfillment_status: nil,
         taxable: false,
-        tags: tags,
         note: "Order Number: #{display_po}",
         source_name: 'mollusk_app',
         total_tax: 0,
@@ -200,6 +198,12 @@ class DailyOrder < ApplicationRecord
         ]
       }
     }
+
+    if total_line_item_quantities(line_items) > 20
+      params[:order][:tags] = 'Wholesale'
+    end
+
+    params
   end
 
   def post_to_shopify
