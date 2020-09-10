@@ -122,8 +122,10 @@ class DailyOrdering
         end
       end
 
+      # Minimum we want to keep in Shopify so that we don't over order.
+      minimum_reserve = 2
       total_adjustments = inventories[:sf_adjustment].to_i + inventories[:vb_adjustment].to_i + inventories[:sb_adjustment].to_i
-      warehouse_inventory = shopify_product.shopify_inventories.find_by(location: 'Shopify Fulfillment Network')&.inventory.to_i - outstanding_draft_orders
+      warehouse_inventory = shopify_product.shopify_inventories.find_by(location: 'Shopify Fulfillment Network')&.inventory.to_i - outstanding_draft_orders - minimum_reserve
       has_adjustment = total_adjustments.positive? && warehouse_inventory.positive?
 
       if has_adjustment
