@@ -13,7 +13,7 @@
     <th>CSV</th>
   </tr>
   <% daily_inventory_transfers.each do |daily_inventory_transfer| %>
-    <tr>
+    <tr class='<%= 'cancelled' if daily_inventory_transfer.cancelled? %>'>
       <td class='border-bottom' rowspan='<%= daily_inventory_transfer.daily_orders.count %>' style='background-color: #FFFFFF'>
         <%= daily_inventory_transfer.date.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %>
       </td>
@@ -29,47 +29,47 @@
       <% if index.positive? %>
         <tr class='<%= 'cancelled' if order.cancelled? %>'>
       <% end %>
-        <td class='<%= 'border-bottom' if last_row %>'>
+        <td class='<%= 'border-bottom' if last_row %> <%= 'cancelled' if order.cancelled? %>'>
           <a href='<%= daily_order_path(order) %>' target='_blank'><%= VendClient::OUTLET_NAMES_BY_ID[order.outlet_id] %> <i class='fa fa-external-link-alt'></i></a>
         </td>
-        <td class='<%= 'border-bottom' if last_row %>'>
+        <td class='<%= 'border-bottom' if last_row %> <%= 'cancelled' if order.cancelled? %>'>
           <%= order.orders.count %>
         </td>
-        <td class='<%= 'border-bottom' if last_row %>'>
+        <td class='<%= 'border-bottom' if last_row %> <%= 'cancelled' if order.cancelled? %>'>
           <%= order.total_items %>
         </td>
-        <td class='<%= 'border-bottom' if last_row %>'>
+        <td class='<%= 'border-bottom' if last_row %> <%= 'cancelled' if order.cancelled? %>'>
           <%= number_to_currency(order.total_cost, unit: '$', separator: '.', delimiter: ',') %>
         </td>
-        <td class='<%= 'border-bottom' if last_row %>'>
+        <td class='<%= 'border-bottom' if last_row %> <%= 'cancelled' if order.cancelled? %>'>
           <% if order.shopify_order_url %>
             <a href='<%= order.shopify_order_url %>' target='_blank'>Shopify <i class='fa fa-external-link-alt'></i></a>
           <% else %>
              -
           <% end %>
         </td>
-        <td class='<%= 'border-bottom' if last_row %>'>
+        <td class='<%= 'border-bottom' if last_row %> <%= 'cancelled' if order.cancelled? %>'>
           <% if order.vend_consignment_url %>
             <a href='<%= order.vend_consignment_url %>' target='_blank'>Vend <i class='fa fa-external-link-alt'></i></a>
           <% else %>
              -
           <% end %>
         </td>
-        <td class='<%= 'border-bottom' if last_row %>'>
+        <td class='<%= 'border-bottom' if last_row %> <%= 'cancelled' if order.cancelled? %>'>
           <% if order.po? %>
             <a href='<%= daily_order_po_path(order) %>' target='_blank'><%= order.display_po %> <i class='fa fa-external-link-alt'></i></a>
           <% else %>
              -
           <% end %>
         </td>
-        <td class='<%= 'border-bottom' if last_row %>'>
+        <td class='<%= 'border-bottom' if last_row %> <%= 'cancelled' if order.cancelled? %>'>
           <% if order.po? %>
             <a href='<%= daily_order_po_path(order) %>.pdf'><i class='fa fa-file-pdf'></i> <i class='fa fa-cloud-download-alt'></i></a>
           <% else %>
              -
           <% end %>
         </td>
-        <td class='<%= 'border-bottom' if last_row %>'>
+        <td class='<%= 'border-bottom' if last_row %> <%= 'cancelled' if order.cancelled? %>'>
           <% if order.po? %>
             <a href='<%= daily_order_po_path(order) %>.csv'><i class='fa fa-file-csv'></i> <i class='fa fa-cloud-download-alt'></i></a>
           <% else %>
