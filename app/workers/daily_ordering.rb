@@ -79,8 +79,6 @@ class DailyOrdering
       inventories = {}
       fill_levels = shopify_product.product.daily_order_inventory_thresholds
 
-      # Previously new releases shipped at a different rate in the first 30 days of their release and fill levels weren't store based.
-
       # days_since_release = product_release_date.present? ? (pacific_time.to_date - product_release_date).to_i : 420
       # new_release = days_since_release < 30 && fill_levels['new_release_fill'].present?
 
