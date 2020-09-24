@@ -100,21 +100,22 @@ class Product < ApplicationRecord
   }
 
   def self.run_inventory_updates
-    retail_orders = ShopifyClient.web_order_quantities_by_variant
-    update_retail_inventories(retail_orders)
+    orders = ShopifyClient.web_order_quantities_by_variant
+    update_inventories(orders)
   end
 
-  def self.update_retail_inventories(retail_orders)
+  def self.update_inventories(orders)
+    # We'll make this store.where(sync_inventory: true) make it a scope then
     %i[sf vb sb].each do |outlet|
       # do not update inventory if any order exists for that variant in any location
-      update_entire_retail_store_inventory(retail_orders, outlet)
+      update_entire_store_inventory(orders, outlet)
     end
   end
 
-  def self.update_entire_retail_store_inventory(retail_orders, outlet = :sf)
+  def self.update_entire_store_inventory(orders, outlet = :sf)
     with_retail_shopify.find_each do |product|
       # do not update inventory if any order exists for that variant in any location
-      product.update_inventory(retail_orders, outlet) if product.vend_datum&.inventory_at_location(LOCATION_NAMES_BY_CODE[outlet]).present?
+      product.update_inventory(orders, outlet) if product.vend_datum&.inventory_at_location(LOCATION_NAMES_BY_CODE[outlet]).present?
     end
   end
 
@@ -159,22 +160,22 @@ class Product < ApplicationRecord
   end
 
   def self.inventory_csv_headers
-    stem = %i[id product variant type size sku handle shopify_tags vend retail_shopify app]
+    stem = %i[id product variant type size sku handle shopify_tags vend shopify app]
     stem + ShopifyInventory.locations.keys + VendClient::OUTLET_NAMES_BY_ID.values + [:total_inventory]
   end
 
-  def update_inventory(retail_orders, outlet)
+  def update_inventory(orders, outlet)
+    connect_inventory_location(outlet) if missing_inventory_location?(outlet)
     if update_shopify_inventory?(outlet)
-      connect_inventory_location(outlet) if missing_retail_inventory_location?(outlet)
-      adjust_retail_inventory(outlet) unless retail_orders_present?(retail_orders)
+      adjust_inventory(outlet) unless orders_present?(orders)
     end
   end
 
-  def retail_orders_present?(retail_orders)
-    retail_orders[retail_shopify&.variant_id].positive?
+  def orders_present?(orders)
+    orders[retail_shopify&.variant_id].positive?
   end
 
-  def adjust_retail_inventory(outlet)
+  def adjust_inventory(outlet)
     adjust_inventory_vend(outlet, inventory_adjustment(outlet))
   end
 
@@ -269,9 +270,8 @@ class Product < ApplicationRecord
     shopify_data.find_by(store: :retail)
   end
 
-  def shopify_inventory(outlet, store = :retail)
-    outlet = "Mollusk #{outlet.to_s.upcase}"
-    send("#{store}_shopify").shopify_inventories.find_by(location: outlet)&.inventory.to_i
+  def shopify_inventory(outlet)
+    inventory_location(outlet)&.inventory.to_i
   end
 
   def vend_inventory(outlet)
@@ -280,16 +280,20 @@ class Product < ApplicationRecord
     inventory.negative? ? 0 : inventory
   end
 
-  def update_shopify_inventory?(outlet, store = :retail)
-    shopify_inventory(outlet, store) != vend_inventory(outlet)
+  def update_shopify_inventory?(outlet)
+    shopify_inventory(outlet) != vend_inventory(outlet)
   end
 
-  def inventory_adjustment(outlet, store = :retail)
-    vend_inventory(outlet) - shopify_inventory(outlet, store)
+  def inventory_adjustment(outlet)
+    vend_inventory(outlet) - shopify_inventory(outlet)
   end
 
-  def missing_retail_inventory_location?(outlet)
-    retail_shopify.shopify_inventories.find_by(location: "Mollusk #{outlet.to_s.upcase}").nil?
+  def missing_inventory_location?(outlet)
+    inventory_location(outlet).blank?
+  end
+
+  def inventory_location(outlet)
+    retail_shopify.shopify_inventories.find_by(location: "Mollusk #{outlet.to_s.upcase}")
   end
 end
 
