@@ -190,7 +190,7 @@ class Product < ApplicationRecord
       handle: retail_shopify&.handle,
       shopify_tags: retail_shopify&.tags&.join(', '),
       vend: vend_datum&.link,
-      retail_shopify: retail_shopify&.link,
+      shopify: retail_shopify&.link,
       app: "https://mollusk.herokuapp.com/products/#{id}",
       total_inventory: 0
     }
