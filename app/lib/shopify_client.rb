@@ -184,7 +184,7 @@ module ShopifyClient
     cleaned = {
       shopify_created_at: product['created_at'],
       shopify_product_id: product['id'],
-      tags: product['tags'].split(',')
+      tags: product['tags'].split(',').map(&:strip)
     }
 
     SAVED_PRODUCT_ATTRIBUTES.each { |saved_attribute| cleaned[saved_attribute] = product[saved_attribute.to_s] }
