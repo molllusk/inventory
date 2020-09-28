@@ -55,7 +55,7 @@ class ShopifyDatum < ApplicationRecord
   end
 
   def link
-    "https://#{store == 'retail' ? 'mollusksurf' : 'molluskats'}.myshopify.com/admin/products/#{shopify_product_id}/variants/#{variant_id}"
+    "https://mollusksurf.myshopify.com/admin/products/#{shopify_product_id}/variants/#{variant_id}"
   end
 end
 

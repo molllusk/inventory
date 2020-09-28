@@ -46,11 +46,17 @@ namespace :products do
         product = existing_vend.product
         existing_shopify = product.retail_shopify
         existing_shopify_variant_id = existing_shopify.variant_id
+        existing_shopify_product_id = existing_shopify.shopify_product_id
         shopify_variant = ShopifyClient.get_variant(existing_shopify_variant_id)
 
         if shopify_variant.blank? # delete
           if existing_shopify.destroy
-            product.shopify_deletions << ShopifyDeletion.create(deleted_variant_id: existing_shopify_variant_id, new_variant_id: shopify_attrs[:variant_id])
+            product.shopify_deletions << ShopifyDeletion.create(
+              deleted_variant_id: existing_shopify_variant_id,
+              new_variant_id: shopify_attrs[:variant_id],
+              deleted_shopify_product_id: existing_shopify_product_id,
+              new_shopify_product_id: shopify_attrs[:shopify_product_id]
+            )
           end
         else # duplicate
           existing_shopify_duplicate = product.shopify_duplicates.find_by(original_variant_id: existing_shopify_variant_id, duplicate_variant_id: shopify_attrs[:variant_id])
@@ -58,7 +64,12 @@ namespace :products do
           if existing_shopify_duplicate.present?
             existing_shopify_duplicate.touch
           else
-            product.shopify_duplicates << ShopifyDuplicate.create(original_variant_id: existing_shopify_variant_id, duplicate_variant_id: shopify_attrs[:variant_id])
+            product.shopify_duplicates << ShopifyDuplicate.create(
+              original_variant_id: existing_shopify_variant_id,
+              duplicate_variant_id: shopify_attrs[:variant_id],
+              original_shopify_product_id: existing_shopify_product_id,
+              duplicate_shopify_product_id: shopify_attrs[:shopify_product_id]
+            )
           end
         end
         Airbrake.notify("Issue Importing Shopify Product: recognized as new, but already exists for product: #{product.id}")
