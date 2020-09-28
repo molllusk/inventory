@@ -45,17 +45,18 @@ namespace :products do
       if existing_vend.present? && existing_shopify.present?
         # Get the shopify product from shopify.
         existing_shopify_variant_id = existing_shopify.variant_id
-        shopify_variant = ShopifyClient.get_variant()
+        shopify_variant = ShopifyClient.get_variant(existing_shopify_variant_id)
 
         if shopify_variant.blank?
           # delete
-          if (existing_shopify.destroy)
+          if existing_shopify.destroy
             existing_vend.product << ShopifyDeletion.new(deleted_variant_id: existing_shopify_variant_id, new_variant_id: shopify_attrs[:variant_id])
           end
         else
           # duplicate
           existing_duplicate = existing_vend.product.duplicate.where(original_variant_id: existing_shopify_variant_id, duplicate_variant_id: shopify_attrs[:variant_id])
-          if (existing_duplicate)
+          
+          if existing_duplicate.present?
             existing_duplicate.touch
           else
             existing_vend.product << ShopifyDuplicate.new(original_variant_id: existing_shopify_variant_id, duplicate_variant_id: shopify_attrs[:variant_id])
