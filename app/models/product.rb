@@ -5,6 +5,8 @@ class Product < ApplicationRecord
   has_many :shopify_data, dependent: :destroy
   has_many :inventory_updates, dependent: :destroy
   has_many :orders, dependent: :destroy
+  has_many :shopify_duplicates, dependent: :destroy
+  has_many :shopify_deletions, dependent: :destroy
 
   LOCATION_NAMES_BY_CODE = {
     sf: 'San Francisco',

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_26_191041) do
+ActiveRecord::Schema.define(version: 2020_09_28_010910) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -130,6 +130,22 @@ ActiveRecord::Schema.define(version: 2020_08_26_191041) do
     t.string "option1"
     t.string "option2"
     t.string "option3"
+  end
+
+  create_table "shopify_deletions", force: :cascade do |t|
+    t.integer "product_id"
+    t.bigint "deleted_variant_id"
+    t.bigint "new_variant_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "shopify_duplicates", force: :cascade do |t|
+    t.integer "product_id"
+    t.bigint "original_variant_id"
+    t.bigint "duplicate_variant_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "shopify_inventories", force: :cascade do |t|

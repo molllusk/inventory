@@ -40,18 +40,26 @@ namespace :products do
       shopify_attrs[:store] = :retail
       existing_vend = VendDatum.find_by(sku: shopify_attrs[:barcode])
       vend_attrs = new_vends.find { |vend| vend[:sku] == shopify_attrs[:barcode] }
+      existing_shopify = existing_vend.product.retail_shopify
 
-      if existing_vend.present? && existing_vend.product.retail_shopify.present?
+      if existing_vend.present? && existing_shopify.present?
         # Get the shopify product from shopify.
-        shopify_variant = ShopifyClient.get_variant(existing_vend.product.retail_shopify.variant_id)
+        existing_shopify_variant_id = existing_shopify.variant_id
+        shopify_variant = ShopifyClient.get_variant()
+
         if shopify_variant.blank?
           # delete
-          # create delete record: Product, deleted variant id, new variant id
-          # existing_vend.product.retail_shopify.destroy
-          # existing_vend.product.shopify_data << ShopifyDatum.create(shopify_attrs)
+          if (existing_shopify.destroy)
+            existing_vend.product << ShopifyDeletion.new(deleted_variant_id: existing_shopify_variant_id, new_variant_id: shopify_attrs[:variant_id])
+          end
         else
           # duplicate
-          # create duplicate record: Product, original variant ID, duplicate variant id
+          existing_duplicate = existing_vend.product.duplicate.where(original_variant_id: existing_shopify_variant_id, duplicate_variant_id: shopify_attrs[:variant_id])
+          if (existing_duplicate)
+            existing_duplicate.touch
+          else
+            existing_vend.product << ShopifyDuplicate.new(original_variant_id: existing_shopify_variant_id, duplicate_variant_id: shopify_attrs[:variant_id])
+          end
         end
         Airbrake.notify("Issue Importing Shopify Product: recognized as new, but already exists for product: #{existing_vend.product.id}")
       elsif existing_vend.present?

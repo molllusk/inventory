@@ -1,0 +1,23 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  product_id: 1
+  deleted_variant_id: 
+  new_variant_id: 
+
+two:
+  product_id: 1
+  deleted_variant_id: 
+  new_variant_id:
+
+# == Schema Information
+#
+# Table name: shopify_deletions
+#
+#  id                 :bigint(8)        not null, primary key
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  deleted_variant_id :bigint(8)
+#  new_variant_id     :bigint(8)
+#  product_id         :integer
+#
