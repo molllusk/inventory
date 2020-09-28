@@ -40,11 +40,11 @@ namespace :products do
       shopify_attrs[:store] = :retail
       existing_vend = VendDatum.find_by(sku: shopify_attrs[:barcode])
       vend_attrs = new_vends.find { |vend| vend[:sku] == shopify_attrs[:barcode] }
-      product = existing_vend.product
-      existing_shopify = product.retail_shopify
 
       if existing_vend.present? && existing_shopify.present?
         # Get the shopify product from shopify.
+        product = existing_vend.product
+        existing_shopify = product.retail_shopify
         existing_shopify_variant_id = existing_shopify.variant_id
         shopify_variant = ShopifyClient.get_variant(existing_shopify_variant_id)
 
@@ -63,7 +63,7 @@ namespace :products do
         end
         Airbrake.notify("Issue Importing Shopify Product: recognized as new, but already exists for product: #{product.id}")
       elsif existing_vend.present?
-        product.shopify_data << ShopifyDatum.create(shopify_attrs)
+        existing_vend.product.shopify_data << ShopifyDatum.create(shopify_attrs)
       elsif vend_attrs.present?
         new_vend = VendDatum.create(vend_attrs)
         new_vend.product = Product.create
