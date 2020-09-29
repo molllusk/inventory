@@ -60,7 +60,7 @@ class Product < ApplicationRecord
   }
 
   scope :with_shopify, lambda {
-    joins(:shopify_data).distinct
+    joins(:shopify_datum).distinct
   }
 
   scope :search_query, lambda { |query|
