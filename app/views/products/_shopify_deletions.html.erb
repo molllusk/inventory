@@ -1,0 +1,19 @@
+<% if @product.shopify_deletions.present? %>
+  <hr/>
+  <h2 class='center'>Shopify Deletions:</h2>
+  <table class='full_width'>
+    <tr>
+      <th>When?</th>
+      <th>Deleted Variant</th>
+      <th>New Variant</th>
+    </tr>
+
+    <% @product.shopify_deletions.sort { |a,b| b.created_at <=> a.created_at }.each do |deletion| %>
+      <tr>
+        <td><%= deletion.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
+        <td><a href='<%= deletion.deleted_shopify_link %>'>Deleted Variant <i class='fa fa-external-link-alt'></i></a></td>
+        <td><a href='<%= deletion.new_shopify_link %>'>New Variant <i class='fa fa-external-link-alt'></i></a></td>
+      </tr>
+    <% end %>
+  <table>
+<% end %>
