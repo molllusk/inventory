@@ -37,18 +37,19 @@ namespace :products do
 
     # match vend variant sku to shopify variant barcode
     new_shopifys.each do |shopify_attrs|
+      shopify_attrs[:store] = :retail
       existing_vend = VendDatum.find_by(sku: shopify_attrs[:barcode])
       vend_attrs = new_vends.find { |vend| vend[:sku] == shopify_attrs[:barcode] }
 
-      if existing_vend.present? && existing_vend.product.shopify_datum.present?
-        # This is either a duplicate or a replacement product
+      if existing_vend.present? && existing_vend.product.retail_shopify.present?
+        # Get the shopify product from shopify.
         product = existing_vend.product
-        existing_shopify = product.shopify_datum
+        existing_shopify = product.retail_shopify
         existing_shopify_variant_id = existing_shopify.variant_id
         existing_shopify_product_id = existing_shopify.shopify_product_id
         shopify_variant = ShopifyClient.get_variant(existing_shopify_variant_id)
 
-        if shopify_variant.blank? # delete and replace
+        if shopify_variant.blank? # delete
           if existing_shopify.destroy
             product.shopify_deletions << ShopifyDeletion.create(
               deleted_variant_id: existing_shopify_variant_id,
@@ -57,7 +58,7 @@ namespace :products do
               new_shopify_product_id: shopify_attrs[:shopify_product_id]
             )
 
-            product.shopify_data << ShopifyDatum.create(shopify_attrs)
+            product.create_shopify_datum(shopify_attrs)
           end
         else # duplicate
           existing_shopify_duplicate = product.shopify_duplicates.find_by(original_variant_id: existing_shopify_variant_id, duplicate_variant_id: shopify_attrs[:variant_id])
@@ -74,12 +75,11 @@ namespace :products do
           end
         end
       elsif existing_vend.present?
-        existing_vend.product.shopify_data << ShopifyDatum.create(shopify_attrs)
+        existing_vend.product.create_shopify_datum(shopify_attrs)
       elsif vend_attrs.present?
-        new_vend = VendDatum.create(vend_attrs)
-        new_vend.product = Product.create
-        new_vend.product.shopify_data << ShopifyDatum.create(shopify_attrs)
-        new_vend.save
+        product = Product.create
+        product.create_vend_datum(vend_attrs)
+        product.create_shopify_datum(shopify_attrs)
       end
     end
   end
