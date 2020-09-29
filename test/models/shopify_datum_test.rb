@@ -30,7 +30,6 @@ end
 #  requires_shipping      :string
 #  shopify_created_at     :datetime
 #  sku                    :string
-#  store                  :integer
 #  tags                   :text
 #  title                  :string
 #  variant_created_at     :datetime

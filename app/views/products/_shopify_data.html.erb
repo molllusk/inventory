@@ -1,7 +1,7 @@
-<% if retail_shopify.present? %>
-  <% headers = ['store'] + (retail_shopify.attributes.keys - ['store'])  %>
+<% if shopify.present? %>
+  <% headers = shopify.attributes.keys  %>
   <hr/>
-  <h2 class='center'>Shopify Data:</h2>
+  <h2 class='center'>Shopify Data <a href='<%= shopify.link %>' target='_blank'><i class='fa fa-external-link-alt'></i></a>:</h2>
   <table class='full_width'>
     <% headers.each do |header| %>
       <% next if %w[product_id vendor compare_at_price fulfillment_service grams inventory_management inventory_policy requires_shipping weight weight_unit shopify_created_at inventory_quantity old_inventory_quantity].include?(header) %>
@@ -9,42 +9,34 @@
         <td>
           <strong><%= header.humanize %></strong>
         </td>
-        <% if retail_shopify.present? %>
-          <td>
-            <% if header == 'store' %>
-              <a href='<%= retail_shopify.link %>' target='_blank'>RETAIL <i class='fa fa-external-link-alt'></i></a>
-            <% elsif retail_shopify.send(header).is_a? Array %>
-              <%= retail_shopify.send(header).join(', ') %>
-            <% elsif retail_shopify.send(header).is_a? String %>
-              <%= retail_shopify.send(header).humanize %>
-            <% else %>
-              <%= retail_shopify.send(header) %>
-            <% end %>
-          </td>
-        <% end %>
+        <td>
+          <% if shopify.send(header).is_a? Array %>
+            <%= shopify.send(header).join(', ') %>
+          <% elsif shopify.send(header).is_a? String %>
+            <%= shopify.send(header).humanize %>
+          <% else %>
+            <%= shopify.send(header) %>
+          <% end %>
+        </td>
       </tr>
     <% end %>
     <tr>
       <td>
         <strong>Inventory</strong>
       </td>
-      <% if retail_shopify.present? %>
-        <td>
-          <% if retail_shopify.shopify_inventories.present? %>
-            <% retail_shopify.shopify_inventories.each do |inventory| %>
-              <strong><%= inventory.location.gsub(' Retail', '') %></strong>: <%= inventory.inventory %><br />
-            <% end %>
+      <td>
+        <% if shopify.shopify_inventories.present? %>
+          <% shopify.shopify_inventories.each do |inventory| %>
+            <strong><%= inventory.location.gsub(' Retail', '') %></strong>: <%= inventory.inventory %><br />
           <% end %>
-        </td>
-      <% end %>
+        <% end %>
+      </td>
     </tr>
     <tr>
       <td></td>
-      <% if retail_shopify.present? %>
-        <td>
-          <%= link_to(raw('<i class="fa fa-trash"></i> delete retail data'), shopify_datum_destroy_path(retail_shopify), method: :delete, data: { confirm: 'Are you sure you want to DELETE Shopify Data for this product?' }, class: 'btn btn-sm btn-danger mt-3') %>
-        </td>
-      <% end %>
+      <td>
+        <%= link_to(raw('<i class="fa fa-trash"></i> delete Shopify data'), shopify_datum_destroy_path(shopify), method: :delete, data: { confirm: 'Are you sure you want to DELETE Shopify Data for this product?' }, class: 'btn btn-sm btn-danger mt-3') %>
+      </td>
     </tr>
   <table>
 <% end %>

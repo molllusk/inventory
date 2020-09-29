@@ -17,7 +17,7 @@
     </tr>
     <% products.each do |product| %>
       <% vend = product.vend_datum %>
-      <% retail_shopify = product.retail_shopify %>
+      <% shopify = product.shopify_datum %>
       <tr>
         <td><%= link_to product do %><%= vend.variant_name %> <i class='fa fa-external-link-alt'></i><% end %></td>
         <td><%= product.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
@@ -32,9 +32,9 @@
           <% end %>
         </td>
         <td>
-          <% if retail_shopify.present? %>
-            <% if retail_shopify.shopify_inventories.present? %>
-              <% retail_shopify.shopify_inventories.each do |inventory| %>
+          <% if shopify.present? %>
+            <% if shopify.shopify_inventories.present? %>
+              <% shopify.shopify_inventories.each do |inventory| %>
                 <strong><%= inventory.location.gsub(' Retail', '') %></strong>: <%= inventory.inventory %><br />
               <% end %>
             <% else %>
@@ -45,23 +45,23 @@
           <% end %>
         </td>
         <td>
-          <% if retail_shopify.present? %>
-            <%= retail_shopify.third_party? %>
+          <% if shopify.present? %>
+            <%= shopify.third_party? %>
           <% else %>
             n/a
           <% end %>
         </td>
         <td>
-          <% if retail_shopify.present? %>
-            <%= retail_shopify.sale? %>
+          <% if shopify.present? %>
+            <%= shopify.sale? %>
           <% else %>
             n/a
           <% end %>
         </td>
         <td>
           <p class='mb-0'><a href='<%= vend.link %>' target='_blank'>Vend <i class='fa fa-external-link-alt'></i></a></p>
-          <% if retail_shopify.present? %>
-            <p class='mt-2 mb-0'><a href='<%= retail_shopify.link %>' target='_blank'>Shopify <i class='fa fa-external-link-alt'></i></a></p>
+          <% if shopify.present? %>
+            <p class='mt-2 mb-0'><a href='<%= shopify.link %>' target='_blank'>Shopify <i class='fa fa-external-link-alt'></i></a></p>
           <% end %>
         </td>
       </tr>

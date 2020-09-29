@@ -125,7 +125,7 @@
         <% @daily_order.orders.sort_by { |order| order.product.vend_datum.sort_key }.each do |order| %>
           <tr>
             <% vend_product = order.product.vend_datum %>
-            <td><%= order.product.retail_shopify&.sku %></td>
+            <td><%= order.product.shopify_datum&.sku %></td>
             <td><%= vend_product.name %></td>
             <td><%= vend_product.vend_type&.[]('name') %></td>
             <td><%= vend_product.variant_options.find { |vo| vo['name'] == 'Color' }&.[]('value') %></td>
