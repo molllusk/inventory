@@ -37,7 +37,6 @@ namespace :products do
 
     # match vend variant sku to shopify variant barcode
     new_shopifys.each do |shopify_attrs|
-      shopify_attrs[:store] = :retail
       existing_vend = VendDatum.find_by(sku: shopify_attrs[:barcode])
       vend_attrs = new_vends.find { |vend| vend[:sku] == shopify_attrs[:barcode] }
 
