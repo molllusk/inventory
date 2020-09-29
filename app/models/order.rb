@@ -23,9 +23,9 @@ class Order < ApplicationRecord
 
   def shopify_line_item
     {
-      variant_id: product.retail_shopify.variant_id,
+      variant_id: product.shopify_datum.variant_id,
       quantity: quantity,
-      price: product.retail_shopify.price.to_f
+      price: product.shopify_datum.price.to_f
     }
   end
 end

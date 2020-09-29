@@ -41,15 +41,15 @@ namespace :products do
       existing_vend = VendDatum.find_by(sku: shopify_attrs[:barcode])
       vend_attrs = new_vends.find { |vend| vend[:sku] == shopify_attrs[:barcode] }
 
-      if existing_vend.present? && existing_vend.product.retail_shopify.present?
-        # Get the shopify product from shopify.
+      if existing_vend.present? && existing_vend.product.shopify_datum.present?
+        # This is either a duplicate or a replacement product
         product = existing_vend.product
-        existing_shopify = product.retail_shopify
+        existing_shopify = product.shopify_datum
         existing_shopify_variant_id = existing_shopify.variant_id
         existing_shopify_product_id = existing_shopify.shopify_product_id
         shopify_variant = ShopifyClient.get_variant(existing_shopify_variant_id)
 
-        if shopify_variant.blank? # delete
+        if shopify_variant.blank? # delete and replace
           if existing_shopify.destroy
             product.shopify_deletions << ShopifyDeletion.create(
               deleted_variant_id: existing_shopify_variant_id,

@@ -96,7 +96,7 @@ class DailyOrder < ApplicationRecord
           'Mollusk',
           outlet_name,
           'joseph@mollusksurfshop.com',
-          order.product.retail_shopify&.sku,
+          order.product.shopify_datum&.sku,
           order.quantity,
           street_address,
           nil,

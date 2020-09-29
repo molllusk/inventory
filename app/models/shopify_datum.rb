@@ -6,16 +6,7 @@ class ShopifyDatum < ApplicationRecord
   belongs_to :product, optional: true
   has_many :shopify_inventories, dependent: :destroy
 
-  enum store: {
-    retail: 0,
-    wholesale: 1
-  }
-
-  scope :retail, lambda {
-    where(store: :retail)
-  }
-
-  scope :with_warehouse, -> { retail.joins(:shopify_inventories).merge(ShopifyInventory.with_warehouse) }
+  scope :with_warehouse, -> { joins(:shopify_inventories).merge(ShopifyInventory.with_warehouse) }
 
   def inventory_at_location(location = 'Mollusk SF')
     shopify_inventories.find_by(location: location)
@@ -81,7 +72,6 @@ end
 #  requires_shipping      :string
 #  shopify_created_at     :datetime
 #  sku                    :string
-#  store                  :integer
 #  tags                   :text
 #  title                  :string
 #  variant_created_at     :datetime

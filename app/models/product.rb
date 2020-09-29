@@ -2,7 +2,7 @@
 
 class Product < ApplicationRecord
   has_one :vend_datum, dependent: :destroy
-  has_many :shopify_data, dependent: :destroy
+  has_one :shopify_datum, dependent: :destroy
   has_many :inventory_updates, dependent: :destroy
   has_many :orders, dependent: :destroy
   has_many :shopify_duplicates, dependent: :destroy
@@ -28,17 +28,17 @@ class Product < ApplicationRecord
   )
 
   scope :third_party, lambda {
-    where('shopify_data.store = ? AND LOWER(shopify_data.tags) like ?', ShopifyDatum.stores[:retail], '%3rdparty%')
+    where('LOWER(shopify_data.tags) like ?', '%3rdparty%')
       .joins(:shopify_data)
   }
 
   scope :sale, lambda {
-    where('shopify_data.store = ? AND LOWER(shopify_data.tags) like ?', ShopifyDatum.stores[:retail], '%sale%')
+    where('LOWER(shopify_data.tags) like ?', '%sale%')
       .joins(:shopify_data)
   }
 
   scope :third_party_or_sale, lambda {
-    where('shopify_data.store = ? AND (LOWER(shopify_data.tags) like ? OR LOWER(shopify_data.tags) like ?)', ShopifyDatum.stores[:retail], '%3rdparty%', '%sale%')
+    where('LOWER(shopify_data.tags) like ? OR LOWER(shopify_data.tags) like ?', '%3rdparty%', '%sale%')
       .joins(:shopify_data)
   }
 
@@ -59,8 +59,8 @@ class Product < ApplicationRecord
     where('LOWER(shopify_data.product_type) = ?', 'surfboard').joins(:shopify_data)
   }
 
-  scope :with_retail_shopify, lambda {
-    where('shopify_data.store = ?', ShopifyDatum.stores[:retail]).joins(:shopify_data).distinct
+  scope :with_shopify, lambda {
+    joins(:shopify_data).distinct
   }
 
   scope :search_query, lambda { |query|
@@ -115,7 +115,7 @@ class Product < ApplicationRecord
   end
 
   def self.update_entire_store_inventory(orders, outlet = :sf)
-    with_retail_shopify.find_each do |product|
+    with_shopify.find_each do |product|
       # do not update inventory if any order exists for that variant in any location
       product.update_inventory(orders, outlet) if product.vend_datum&.inventory_at_location(LOCATION_NAMES_BY_CODE[outlet]).present?
     end
@@ -174,7 +174,7 @@ class Product < ApplicationRecord
   end
 
   def orders_present?(orders)
-    orders[retail_shopify&.variant_id].positive?
+    orders[shopify_datum&.variant_id].positive?
   end
 
   def adjust_inventory(outlet)
@@ -184,15 +184,15 @@ class Product < ApplicationRecord
   def inventory_csv_row_data
     data = {
       id: id,
-      product: vend_datum&.name || retail_shopify&.title,
-      variant: (retail_shopify&.variant_title || vend_datum&.variant_name).to_s.gsub(/Default(\s+Title)?/i, ''),
-      type: vend_datum&.vend_type&.[]('name') || retail_shopify&.product_type,
-      size: retail_shopify&.option1.to_s.strip.downcase,
-      sku: vend_datum&.sku || retail_shopify&.barcode,
-      handle: retail_shopify&.handle,
-      shopify_tags: retail_shopify&.tags&.join(', '),
+      product: vend_datum&.name || shopify_datum&.title,
+      variant: (shopify_datum&.variant_title || vend_datum&.variant_name).to_s.gsub(/Default(\s+Title)?/i, ''),
+      type: vend_datum&.vend_type&.[]('name') || shopify_datum&.product_type,
+      size: shopify_datum&.option1.to_s.strip.downcase,
+      sku: vend_datum&.sku || shopify_datum&.barcode,
+      handle: shopify_datum&.handle,
+      shopify_tags: shopify_datum&.tags&.join(', '),
       vend: vend_datum&.link,
-      shopify: retail_shopify&.link,
+      shopify: shopify_datum&.link,
       app: "https://mollusk.herokuapp.com/products/#{id}",
       total_inventory: 0
     }
@@ -224,7 +224,7 @@ class Product < ApplicationRecord
     location_id = ShopifyInventory.locations[location_name]
 
     begin
-      response = ShopifyClient.adjust_inventory(retail_shopify.inventory_item_id, location_id, quantity)
+      response = ShopifyClient.adjust_inventory(shopify_datum.inventory_item_id, location_id, quantity)
 
       if ShopifyClient.inventory_item_updated?(response)
         save_inventory_adjustment_vend(response, quantity, outlet)
@@ -238,7 +238,7 @@ class Product < ApplicationRecord
 
   def save_inventory_adjustment_vend(response, quantity, outlet)
     location_id = response['inventory_level']['location_id']
-    shopify_inventory = retail_shopify.inventory_at_location(location_id)
+    shopify_inventory = shopify_datum.inventory_at_location(location_id)
     new_inventory = response['inventory_level']['available']
 
     InventoryUpdate.create(
@@ -256,8 +256,8 @@ class Product < ApplicationRecord
   def connect_inventory_location(outlet = :sf)
     location = ShopifyInventory.locations["Mollusk #{outlet.to_s.upcase}"]
 
-    response = ShopifyClient.connect_inventory_location(retail_shopify.inventory_item_id, location)
-    retail_shopify.shopify_inventories << ShopifyInventory.new(location: location, inventory: 0)
+    response = ShopifyClient.connect_inventory_location(shopify_datum.inventory_item_id, location)
+    shopify_datum.shopify_inventories << ShopifyInventory.new(location: location, inventory: 0)
 
     Airbrake.notify("Could not CONNECT #{outlet.to_s.upcase} inventory location for Product: #{id}") unless ShopifyClient.inventory_item_updated?(response)
   rescue StandardError
@@ -265,11 +265,7 @@ class Product < ApplicationRecord
   end
 
   def daily_order_inventory_thresholds
-    @daily_order_inventory_thresholds ||= Product.daily_order_inventory_levels[retail_shopify.product_type.to_s.strip.downcase]&.[](retail_shopify.option1.to_s.strip.downcase)
-  end
-
-  def retail_shopify
-    shopify_data.find_by(store: :retail)
+    @daily_order_inventory_thresholds ||= Product.daily_order_inventory_levels[shopify_datum.product_type.to_s.strip.downcase]&.[](shopify_datum.option1.to_s.strip.downcase)
   end
 
   def shopify_inventory(outlet)
@@ -295,7 +291,7 @@ class Product < ApplicationRecord
   end
 
   def inventory_location(outlet)
-    retail_shopify.shopify_inventories.find_by(location: "Mollusk #{outlet.to_s.upcase}")
+    shopify_datum.shopify_inventories.find_by(location: "Mollusk #{outlet.to_s.upcase}")
   end
 end
 
