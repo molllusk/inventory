@@ -29,34 +29,17 @@ class Product < ApplicationRecord
 
   scope :third_party, lambda {
     where('LOWER(shopify_data.tags) like ?', '%3rdparty%')
-      .joins(:shopify_data)
+      .joins(:shopify_datum)
   }
 
   scope :sale, lambda {
     where('LOWER(shopify_data.tags) like ?', '%sale%')
-      .joins(:shopify_data)
+      .joins(:shopify_datum)
   }
 
   scope :third_party_or_sale, lambda {
     where('LOWER(shopify_data.tags) like ? OR LOWER(shopify_data.tags) like ?', '%3rdparty%', '%sale%')
-      .joins(:shopify_data)
-  }
-
-  # Surfboard scopes not currently in use
-  scope :venice_boards, lambda {
-    where('LOWER(shopify_data.product_type) = ?', 'venice surfboard').joins(:shopify_data)
-  }
-
-  scope :silverlake_boards, lambda {
-    where('LOWER(shopify_data.product_type) = ?', 'silver lake surfboards').joins(:shopify_data)
-  }
-
-  scope :santa_barabara_boards, lambda {
-    where('LOWER(shopify_data.product_type) = ?', 'santa barbara surfboard').joins(:shopify_data)
-  }
-
-  scope :boards, lambda {
-    where('LOWER(shopify_data.product_type) = ?', 'surfboard').joins(:shopify_data)
+      .joins(:shopify_datum)
   }
 
   scope :with_shopify, lambda {
@@ -81,7 +64,7 @@ class Product < ApplicationRecord
     # change the number of OR conditions.
     num_or_conds = 4
 
-    joins(:shopify_data, :vend_datum).where(
+    joins(:shopify_datum, :vend_datum).where(
       terms.map do |_term|
         '(LOWER(shopify_data.title) LIKE ? OR LOWER(shopify_data.variant_title) LIKE ? OR LOWER(vend_data.name) LIKE ? OR LOWER(vend_data.variant_name) LIKE ?)'
       end.join(' AND '),
@@ -197,8 +180,8 @@ class Product < ApplicationRecord
       total_inventory: 0
     }
 
-    shopify_data.each do |shopify|
-      shopify.shopify_inventories.each do |inventory|
+    if shopify_datum.present?
+      shopify_datum.shopify_inventories.each do |inventory|
         data[inventory.location] = inventory.inventory
         data[:total_inventory] += inventory.inventory if ['Postworks', 'Postworks ATS', 'Shopify Fulfillment Network'].include?(inventory.location)
       end
