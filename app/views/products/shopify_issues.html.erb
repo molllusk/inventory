@@ -1,0 +1,50 @@
+<% provide(:title, 'Shopify Issues') %>
+
+<% if @shopify_duplicates.present? %>
+  <h2 class='center'>Shopify Duplicates:</h2>
+  <table class='full_width'>
+    <tr>
+      <th>When?</th>
+      <th>Product</th>
+      <th>Original Variant</th>
+      <th>Duplicate Variant</th>
+    </tr>
+
+    <% @shopify_duplicates.each do |duplicate| %>
+      <tr>
+        <td><%= duplicate.updated_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
+        <td><a href='<%= product_path(duplicate.product) %>'><%= duplicate.product.vend_datum.variant_name.to_s.gsub(/Default(\s+Title)?/i, '') %></td>
+        <td><a href='<%= duplicate.original_shopify_link %>'>Original Variant <i class='fa fa-external-link-alt'></i></a></td>
+        <td><a href='<%= duplicate.duplicate_shopify_link %>'>Duplicate Variant <i class='fa fa-external-link-alt'></i></a></td>
+      </tr>
+    <% end %>
+  <table>
+  <div class='center'>
+    <%= will_paginate @shopify_duplicates, param_name: 'shopify_duplicates_page' %>
+  </div>
+<% end %>
+
+<% if @shopify_deletions.present? %>
+  <hr/>
+  <h2 class='center'>Shopify Deletions:</h2>
+  <table class='full_width'>
+    <tr>
+      <th>When?</th>
+      <th>Product</th>
+      <th>Deleted Variant</th>
+      <th>New Variant</th>
+    </tr>
+
+    <% @shopify_deletions.each do |deletion| %>
+      <tr>
+        <td><%= deletion.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
+        <td><a href='<%= product_path(deletion.product) %>'><%= deletion.product.vend_datum.variant_name.to_s.gsub(/Default(\s+Title)?/i, '') %></td>
+        <td><a href='<%= deletion.deleted_shopify_link %>'>Deleted Variant <i class='fa fa-external-link-alt'></i></a></td>
+        <td><a href='<%= deletion.new_shopify_link %>'>New Variant <i class='fa fa-external-link-alt'></i></a></td>
+      </tr>
+    <% end %>
+  <table>
+  <div class='center'>
+    <%= will_paginate @shopify_deletions, param_name: 'shopify_deletions_page' %>
+  </div>
+<% end %>

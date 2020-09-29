@@ -20,4 +20,9 @@ class ProductsController < ApplicationController
     # sort { |a,b| b.daily_order.daily_inventory_transfer.date <=> a.daily_order.daily_inventory_transfer.date }
     @orders = @product.orders.order('created_at DESC').paginate(page: params[:orders_page], per_page: 8)
   end
+
+  def shopify_issues
+    @shopify_duplicates = ShopifyDuplicate.order('updated_at DESC').paginate(page: params[:shopify_duplicates_page], per_page: 15)
+    @shopify_deletions = ShopifyDeletion.order('created_at DESC').paginate(page: params[:shopify_deletions_page], per_page: 15)
+  end
 end

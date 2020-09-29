@@ -3,7 +3,18 @@
     <a class="nav-link" href="/inventory_updates">Vend Inventory Updates</a>
   </li>
   <li class="<%= "highlighted" if params[:controller] == "products" %> nav-item">
-    <a class="nav-link" href="/products">Products</a>
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Daily Shop Orders <b class="caret"></b></a>
+    <ul class="dropdown-menu">
+      <li>
+        <a href="/products">Thresholds</a>
+      </li>
+      <li>
+        <a href="/products/shopify_issues">Orders</a>
+      </li>
+    </ul>
+  </li>
+  <li class="<%= "highlighted" if params[:controller] == "products" %> nav-item">
+    <a class="nav-link" href="products/shopify_issues">Shopify Issues</a>
   </li>
   <li class="dropdown <%= "highlighted" if ['daily_order_thresholds', 'daily_inventory_transfers'].include?(params[:controller]) %> nav-item">
     <a class="dropdown-toggle" data-toggle="dropdown" href="#">Daily Shop Orders <b class="caret"></b></a>

@@ -60,7 +60,11 @@ Rails.application.routes.draw do
 
   resources :inventory_updates
 
-  resources :products
+  resources :products do
+    collection do
+      get :shopify_issues
+    end
+  end
 
   resources :reports do
     collection do
