@@ -1,5 +1,5 @@
 <div class='center'>
-  <h2>Daily Order for <%= VendClient::OUTLET_NAMES_BY_ID[@daily_order.outlet_id] %> on <%= @daily_order.daily_inventory_transfer.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%Y") %> <% if @daily_order.daily_inventory_transfer.qbo_id.present? %>(<a href='https://c3.qbo.intuit.com/app/journal?txnId=<%= @daily_order.daily_inventory_transfer.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a>)<% end %></h2>
+  <h2>Daily Order for <%= VendClient::OUTLET_NAMES_BY_ID[@daily_order.outlet_id] %> on <%= @daily_order.daily_inventory_transfer.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%Y") %> <% if @daily_order.daily_inventory_transfer.qbo_id.present? %>(<a href='https://c3.qbo.intuit.com/app/journal?txnId=<%= @daily_order.daily_inventory_transfer.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a>)<% end %> <%= link_to(raw('<i class="fa fa-ban"></i> Cancel Order'), daily_order_cancel_path(@daily_order), method: :put, data: { confirm: "Are you sure you want to CANCEL order #{@daily_order.display_po}? This cannot be undone!" }, class: 'btn btn-sm btn-danger') %></h2>
 </div>
 
 <table class="products full_width">

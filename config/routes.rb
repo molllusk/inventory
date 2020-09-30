@@ -32,6 +32,7 @@ Rails.application.routes.draw do
 
   resources :daily_orders do
     get :po
+    put :cancel
   end
   resources :daily_order_thresholds
 
