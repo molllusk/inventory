@@ -222,10 +222,6 @@ class VendClient
     paginator('inventory')
   end
 
-  def self.get_sf_inventory
-    get_inventory.select { |inventory| inventory['outlet_id'] == OUTLET_NAMES_BY_ID.key('San Francisco') }
-  end
-
   def self.update_inventories
     all_inventory_levels = get_inventory
 

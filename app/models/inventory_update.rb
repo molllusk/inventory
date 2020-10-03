@@ -29,7 +29,7 @@ class InventoryUpdate < ApplicationRecord
     # change the number of OR conditions.
     num_or_conds = 4
 
-    product_ids = Product.joins(:shopify_data, :vend_datum).where(
+    product_ids = Product.joins(:shopify_datum, :vend_datum).where(
       terms.map do |_term|
         '(LOWER(shopify_data.title) LIKE ? OR LOWER(shopify_data.variant_title) LIKE ? OR LOWER(vend_data.name) LIKE ? OR LOWER(vend_data.variant_name) LIKE ?)'
       end.join(' AND '),
