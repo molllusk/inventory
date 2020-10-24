@@ -7,14 +7,6 @@ class ShopifySalesCostOrder < ApplicationRecord
     retail: 0,
     wholesale: 1
   }
-
-  scope :retail, lambda {
-    where(store: :retail)
-  }
-
-  scope :wholesale, lambda {
-    where(store: :wholesale)
-  }
 end
 
 # == Schema Information

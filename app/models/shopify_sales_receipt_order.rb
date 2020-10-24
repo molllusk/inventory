@@ -8,14 +8,6 @@ class ShopifySalesReceiptOrder < ApplicationRecord
     wholesale: 1
   }
 
-  scope :retail, lambda {
-    where(store: :retail)
-  }
-
-  scope :wholesale, lambda {
-    where(store: :wholesale)
-  }
-
   def credits
     discount.round(2) + shopify_payments.round(2) + paypal_payments.round(2) + gift_card_payments.round(2)
   end
