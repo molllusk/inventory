@@ -101,12 +101,6 @@ class ShopifySalesCost < ApplicationRecord
         description: 'Total Cost of Sales Shopify - Shopify Fulfillment Network',
         posting_type: 'Credit'
       }
-      # {
-      #   account_id: '3652', # 11137 Finished Goods - Shopify
-      #   amount: location_cost('Jam Warehouse Retail').to_f,
-      #   description: 'Total Cost of Sales Shopify - Jam Warehouse',
-      #   posting_type: 'Credit'
-      # }
     ]
   end
 

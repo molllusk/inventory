@@ -97,14 +97,14 @@ class ShopifySalesReceipt < ApplicationRecord
     else
       default_items += [
         {
-          item_id: '172114', # Taxable Retail Sales
+          item_id: '175030', # Wholesale Sales
           amount: product_sales,
-          description: 'Taxable Retail Sales'
+          description: 'Wholesale Sales'
         },
         {
-          item_id: '181577', # Discount
+          item_id: '175030', # Wholesale Sales (Discount)
           amount: -discount,
-          description: 'Discount'
+          description: 'Wholesale Sales'
         }
       ]
     end
