@@ -8,14 +8,6 @@ class ShopifySalesReceipt < ApplicationRecord
     wholesale: 1
   }
 
-  scope :retail, lambda {
-    where(store: :retail)
-  }
-
-  scope :wholesale, lambda {
-    where(store: :wholesale)
-  }
-
   def credits
     discount.round(2) + shopify_payments.round(2) + paypal_payments.round(2) + gift_card_payments.round(2)
   end
@@ -48,13 +40,10 @@ class ShopifySalesReceipt < ApplicationRecord
     end
   end
 
+  # "Wholesale Sales" (41000 Sales - Wholesale) 3482
+
   def sales_receipt_line_item_details
-    [
-      {
-        item_id: '172114', # Taxable Retail Sales
-        amount: product_sales,
-        description: 'Taxable Retail Sales'
-      },
+    default_items = [
       {
         item_id: '172117', # Gift Certificates
         amount: gift_card_sales,
@@ -69,11 +58,6 @@ class ShopifySalesReceipt < ApplicationRecord
         item_id: '172116', # San Francisco (sales tax)
         amount: sales_tax,
         description: 'San Francisco Sales Tax'
-      },
-      {
-        item_id: '181577', # Discount
-        amount: -discount,
-        description: 'Discount'
       },
       {
         item_id: '174882', # Shopify Payments
@@ -96,6 +80,34 @@ class ShopifySalesReceipt < ApplicationRecord
         description: 'Over/Short'
       }
     ]
+
+    if retail?
+      default_items += [
+        {
+          item_id: '172114', # Taxable Retail Sales
+          amount: product_sales,
+          description: 'Taxable Retail Sales'
+        },
+        {
+          item_id: '181577', # Discount
+          amount: -discount,
+          description: 'Discount'
+        }
+      ]
+    else
+      default_items += [
+        {
+          item_id: '175030', # Wholesale Sales
+          amount: product_sales,
+          description: 'Wholesale Sales'
+        },
+        {
+          item_id: '175030', # Wholesale Sales (Discount)
+          amount: -discount,
+          description: 'Wholesale Sales'
+        }
+      ]
+    end
   end
 
   def post_to_qbo

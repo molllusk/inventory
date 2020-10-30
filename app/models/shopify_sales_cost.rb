@@ -8,14 +8,6 @@ class ShopifySalesCost < ApplicationRecord
     wholesale: 1
   }
 
-  scope :retail, lambda {
-    where(store: :retail)
-  }
-
-  scope :wholesale, lambda {
-    where(store: :wholesale)
-  }
-
   def location_cost(location)
     location_id = ShopifyInventory.locations[location].to_s
     location_costs.present? ? (location_costs[location_id] || 0) : 0
@@ -109,12 +101,6 @@ class ShopifySalesCost < ApplicationRecord
         description: 'Total Cost of Sales Shopify - Shopify Fulfillment Network',
         posting_type: 'Credit'
       }
-      # {
-      #   account_id: '3652', # 11137 Finished Goods - Shopify
-      #   amount: location_cost('Jam Warehouse Retail').to_f,
-      #   description: 'Total Cost of Sales Shopify - Jam Warehouse',
-      #   posting_type: 'Credit'
-      # }
     ]
   end
 
