@@ -10,8 +10,8 @@
     <th>Supplier</th>
   </tr>
   <% if has_consignments %>
-    <% receiving_location_costs = @daily_vend_consignment.vend_consignment_location_costs.receiving.sort_by(&:cost) %>
-    <% supplying_location_costs = @daily_vend_consignment.vend_consignment_location_costs.supplying.sort_by(&:cost) %>
+    <% receiving_location_costs = @daily_vend_consignment.vend_consignment_location_costs.receiver.sort_by(&:cost) %>
+    <% supplying_location_costs = @daily_vend_consignment.vend_consignment_location_costs.supplier.sort_by(&:cost) %>
 
     <% receiving_location_costs.each_with_index do |receiving_location_cost, index| %>
       <tr>
