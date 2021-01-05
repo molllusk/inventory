@@ -18,8 +18,8 @@
       </td>
 
       <% if has_consignments %>
-        <% receiving_location_costs = inventory_transfer.vend_consignment_location_costs.receiving.sort_by(&:cost) %>
-        <% supplying_location_costs = inventory_transfer.vend_consignment_location_costs.supplying.sort_by(&:cost) %>
+        <% receiving_location_costs = inventory_transfer.vend_consignment_location_costs.receiver.sort_by(&:cost) %>
+        <% supplying_location_costs = inventory_transfer.vend_consignment_location_costs.supplier.sort_by(&:cost) %>
 
         <% receiving_location_costs.each_with_index do |receiving_location_cost, index| %>
           <% last_row = (index == (receiving_location_costs.count - 1)) %>
