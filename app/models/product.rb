@@ -91,7 +91,7 @@ class Product < ApplicationRecord
 
   def self.update_inventories(orders)
     # We'll make this store.where(sync_inventory: true) make it a scope then
-    %i[sf vb sb].each do |outlet|
+    %i[vb sb].each do |outlet|
       # do not update inventory if any order exists for that variant in any location
       update_entire_store_inventory(orders, outlet)
     end

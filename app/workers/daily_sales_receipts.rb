@@ -45,6 +45,8 @@ class DailySalesReceipts
     orders.each do |order|
       # skip internal orders to the shops
       next if order['source_name'] == 'mollusk_app'
+      next if order['source_name'] == 'pos'
+      next if order['payment_gateway_names'] == 'exchange-credit'
 
       # tease out wholesale orders for separate wholesale accounting
       if order['customer']&.[]('tags')&.include?('wholesale')
