@@ -36,4 +36,9 @@ class InventoryPlannerClient
     response = connection.get('api/v1/purchase-orders')
     response.body
   end
+
+  def self.send_purchase_order
+    response = connection.post('api/v1/purchase-orders')
+    response.body
+  end
 end

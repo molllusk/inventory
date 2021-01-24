@@ -28,6 +28,15 @@ class Order < ApplicationRecord
       price: product.shopify_datum.price.to_f
     }
   end
+
+  def ip_line_item
+    {
+      id: "c18098_#{product.shopify_datum.variant_id}",
+      replenishment: quantity,
+      sku: product.shopify_datum.sku,
+      title: "#{product.shopify_datum.title} #{product.shopify_datum.variant_title}"
+    }
+  end
 end
 
 # == Schema Information

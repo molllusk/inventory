@@ -223,6 +223,23 @@ class DailyOrder < ApplicationRecord
     end
   end
 
+  def create_ip_purchase_order
+    data = {
+      "purchase-order": {
+        "reference": display_po,
+        "vendor": "mollusk",
+        "warehouse": InventoryPlannerClient::SF_WAREHOUSE,
+        "currency": "USD",
+        "status": "sent",
+        "items": orders.map(&:ip_line_item)
+      }
+    }
+
+    InventoryPlannerClient.send_purchase_order(data)
+  rescue StandardError
+    Airbrake.notify("Could not create Consignment for Daily Order: #{id}")
+  end
+
   def create_consignment
     consignment = VendClient.create_consignment(self)
     update_attribute(:vend_consignment_id, consignment['id'])
