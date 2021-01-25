@@ -237,7 +237,7 @@ class DailyOrder < ApplicationRecord
 
     InventoryPlannerClient.send_purchase_order(data)
   rescue StandardError
-    Airbrake.notify("Could not create Consignment for Daily Order: #{id}")
+    Airbrake.notify("Could not create Inventory Planner Purchase order for Daily Order: #{id}")
   end
 
   def create_consignment
