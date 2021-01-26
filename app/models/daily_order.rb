@@ -231,6 +231,7 @@ class DailyOrder < ApplicationRecord
         "warehouse": InventoryPlannerClient::SF_WAREHOUSE,
         "currency": "USD",
         "status": "sent",
+        "expected_date": 3.days.from_now.strftime("%Y-%m-%d"),
         "items": orders.map(&:ip_line_item)
       }
     }
