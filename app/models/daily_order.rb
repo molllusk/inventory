@@ -308,6 +308,10 @@ class DailyOrder < ApplicationRecord
     "https://mollusksurf.vendhq.com/consignment/#{vend_consignment_id}" if vend_consignment_id.present?
   end
 
+  def inventory_planner_url
+    "https://app.inventory-planner.com/#/po/#{inventory_planner_id}?a=a7477" if inventory_planner_id.present?
+  end
+
   def cancel
     return if cancelled?
     orders.not_cancelled.each do |order|
@@ -331,7 +335,7 @@ end
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
 #  daily_inventory_transfer_id :integer
-#  inventory_planner_id        :integer
+#  inventory_planner_id        :string
 #  outlet_id                   :string
 #  shopify_order_id            :bigint(8)
 #  vend_consignment_id         :string

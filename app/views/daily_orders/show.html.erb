@@ -11,6 +11,7 @@
     <th>Total Cost of Goods</th>
     <th>Shopify Order</th>
     <th>Vend Consignment</th>
+    <th>Inventory Planner</th>
     <th>PO</th>
     <th>PDF</th>
     <th>CSV</th>
@@ -42,6 +43,13 @@
     <td>
       <% if @daily_order.vend_consignment_url %>
         <a href='<%= @daily_order.vend_consignment_url %>' target='_blank'>Vend <i class='fa fa-external-link-alt'></i></a>
+      <% else %>
+         -
+      <% end %>
+    </td>
+    <td>
+      <% if @daily_order.inventory_planner_url %>
+        <a href='<%= @daily_order.inventory_planner_url %>' target='_blank'>Inventory Planner <i class='fa fa-external-link-alt'></i></a>
       <% else %>
          -
       <% end %>

@@ -39,7 +39,7 @@ ActiveRecord::Schema.define(version: 2021_01_26_012953) do
     t.integer "daily_inventory_transfer_id"
     t.boolean "cancelled", default: false
     t.bigint "shopify_order_id"
-    t.integer "inventory_planner_id"
+    t.string "inventory_planner_id"
   end
 
   create_table "daily_vend_consignments", force: :cascade do |t|
