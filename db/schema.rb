@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_29_013849) do
+ActiveRecord::Schema.define(version: 2021_01_26_012953) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -39,6 +39,7 @@ ActiveRecord::Schema.define(version: 2020_09_29_013849) do
     t.integer "daily_inventory_transfer_id"
     t.boolean "cancelled", default: false
     t.bigint "shopify_order_id"
+    t.integer "inventory_planner_id"
   end
 
   create_table "daily_vend_consignments", force: :cascade do |t|

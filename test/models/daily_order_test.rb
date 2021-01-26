@@ -17,6 +17,7 @@ end
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
 #  daily_inventory_transfer_id :integer
+#  inventory_planner_id        :integer
 #  outlet_id                   :string
 #  shopify_order_id            :bigint(8)
 #  vend_consignment_id         :string

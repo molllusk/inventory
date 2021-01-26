@@ -236,7 +236,10 @@ class DailyOrder < ApplicationRecord
       }
     }
 
-    InventoryPlannerClient.send_purchase_order(data)
+    response = InventoryPlannerClient.send_purchase_order(data)
+
+    
+    update_attribute(:inventory_planner_id, response['purchase-order']['id']) if response['purchase-order'].present?
   rescue StandardError
     Airbrake.notify("Could not create Inventory Planner Purchase order for Daily Order: #{id}")
   end
@@ -329,6 +332,7 @@ end
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
 #  daily_inventory_transfer_id :integer
+#  inventory_planner_id        :integer
 #  outlet_id                   :string
 #  shopify_order_id            :bigint(8)
 #  vend_consignment_id         :string
