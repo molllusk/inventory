@@ -58,7 +58,8 @@ class DailyOrdering
       daily_orders_ip.each do |daily_order|
         if daily_order['warehouse'] == InventoryPlannerClient::SF_WAREHOUSE
           daily_order['items'].each do |item|
-            product_id = VendDatum.find_by(sku: item['barcode'])&.vend_id
+            product_id = ShopifyDatum.find_by(sku: item['sku'])&.product&.vend_datum&.vend_id
+
             outstanding_orders_by_product[product_id][VendClient::OUTLET_NAMES_BY_ID.key('San Francisco')] += item['replenishment'].to_f if product_id.present?
           end
         end
