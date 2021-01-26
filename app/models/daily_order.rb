@@ -309,7 +309,7 @@ class DailyOrder < ApplicationRecord
   end
 
   def inventory_planner_url
-    "https://app.inventory-planner.com/#/po/#{inventory_planner_id}?a=a7477" if inventory_planner_id.present?
+    "https://app.inventory-planner.com/#/po/view/#{inventory_planner_id}?a=a7477" if inventory_planner_id.present?
   end
 
   def cancel
