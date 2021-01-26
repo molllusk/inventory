@@ -52,13 +52,15 @@ class DailyOrdering
       end
     end
 
-    daily_orders_ip = InventoryPlannerClient.open_store_purchase_orders['purchase_orders']
+    daily_orders_ip = InventoryPlannerClient.open_store_purchase_orders['purchase-orders']
 
-    daily_orders_ip.each do |daily_order|
-      if daily_order['warehouse'] == InventoryPlannerClient::SF_WAREHOUSE
-        daily_order.items.each do |item|
-          product_id = VendDatum.find_by(sku: item['barcode'])&.vend_id
-          outstanding_orders_by_product[product_id][VendClient::OUTLET_NAMES_BY_ID.key('San Francisco')] += item['total_ordered'].to_f if product_id.present?
+    if daily_orders_ip.present?
+      daily_orders_ip.each do |daily_order|
+        if daily_order['warehouse'] == InventoryPlannerClient::SF_WAREHOUSE
+          daily_order['items'].each do |item|
+            product_id = VendDatum.find_by(sku: item['barcode'])&.vend_id
+            outstanding_orders_by_product[product_id][VendClient::OUTLET_NAMES_BY_ID.key('San Francisco')] += item['replenishment'].to_f if product_id.present?
+          end
         end
       end
     end

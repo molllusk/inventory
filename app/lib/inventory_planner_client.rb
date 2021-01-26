@@ -38,7 +38,11 @@ class InventoryPlannerClient
   end
 
   def self.send_purchase_order(data)
-    response = connection.post('api/v1/purchase-orders', data)
+    response = connection.post do |req|
+      req.url 'api/v1/purchase-orders'
+      req.headers['Content-Type'] = 'application/json'
+      req.body = data.to_json
+    end
     response.body
   end
 end
