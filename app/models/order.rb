@@ -34,6 +34,7 @@ class Order < ApplicationRecord
       id: "c18098_#{product.shopify_datum.variant_id}",
       replenishment: quantity,
       sku: product.shopify_datum.sku,
+      barcode: product.shopify_datum.barcode,
       title: "#{product.shopify_datum.title} #{product.shopify_datum.variant_title}"
     }
   end
