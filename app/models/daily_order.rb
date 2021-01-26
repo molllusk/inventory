@@ -238,7 +238,6 @@ class DailyOrder < ApplicationRecord
 
     response = InventoryPlannerClient.send_purchase_order(data)
 
-    
     update_attribute(:inventory_planner_id, response['purchase-order']['id']) if response['purchase-order'].present?
   rescue StandardError
     Airbrake.notify("Could not create Inventory Planner Purchase order for Daily Order: #{id}")
