@@ -272,6 +272,39 @@ class DailyOrder < ApplicationRecord
     Airbrake.notify("Could not CANCEL Consignment (#{vend_consignment_id}) for Daily Order: #{id} for #{outlet_name}")
   end
 
+  def refund_line_items
+    order = ShopifyClient.get_order(shopify_order_id)
+
+    order['line_items'].map do |item|
+      {
+        "line_item_id": item['id'],
+        "quantity": item['quantity'],
+        "restock_type": 'cancel',
+        "location_id": 36225056853 #SFN
+      }
+    end
+  end
+
+  def refund_shopify_order
+    params = {
+      "refund": {
+        "currency": "USD",
+        "notify": false,
+        "note": "Canceled Shop Order",
+        "shipping": {
+          "full_refund": true
+        },
+        "refund_line_items": refund_line_items
+      }
+    }
+
+    begin
+      ShopifyClient.refund_order(shopify_order_id, params)
+    rescue StandardError
+      Airbrake.notify("ERROR RESTOCKING Shopify Order (#{shopify_order_id}) via Refund for Daily Order: #{id} for #{outlet_name}")
+    end
+  end
+
   def cancel_shopify_order
     begin
       ShopifyClient.cancel_order(shopify_order_id)

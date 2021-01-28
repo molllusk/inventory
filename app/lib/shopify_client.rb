@@ -281,6 +281,11 @@ module ShopifyClient
     response.body
   end
 
+  def self.get_order(order_id)
+    response = connection.get "#{API_VERSION}/orders/#{order_id}.json"
+    response.body['order'] || {}
+  end
+
   def self.cancel_order(order_id, params = {})
     response = connection.post do |req|
       req.url "#{API_VERSION}/orders/#{order_id}/cancel.json"
@@ -294,6 +299,16 @@ module ShopifyClient
   def self.update_order(order_id, params)
     response = connection.put do |req|
       req.url "#{API_VERSION}/orders/#{order_id}.json"
+      req.headers['Content-Type'] = 'application/json'
+      req.body = params.to_json
+    end
+
+    response.body
+  end
+
+  def self.refund_order(order_id, params)
+    response = connection.put do |req|
+      req.url "#{API_VERSION}/orders/#{order_id}/refunds.json"
       req.headers['Content-Type'] = 'application/json'
       req.body = params.to_json
     end
