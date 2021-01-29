@@ -2,7 +2,7 @@
 
 module ShopifyClient
   BASE_URL = "https://#{ENV['SHOPIFY_USER']}:#{ENV['SHOPIFY_PASSWORD']}@mollusksurf.myshopify.com"
-  API_VERSION = '/admin/api/2020-04'
+  API_VERSION = '/admin/api/2021-01'
 
   SAVED_PRODUCT_ATTRIBUTES = %i[
     handle
