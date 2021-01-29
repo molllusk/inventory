@@ -45,4 +45,13 @@ class InventoryPlannerClient
     end
     response.body
   end
+
+  def self.cancel_purchase_order(inventory_planner_id)
+    response = connection.patch do |req|
+      req.url "api/v1/purchase-orders/#{inventory_planner_id}"
+      req.headers['Content-Type'] = 'application/json'
+      req.body = { "purchase-order": {  "status": "CANCELLED" }}.to_json
+    end
+    response.body
+  end
 end

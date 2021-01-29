@@ -226,13 +226,13 @@ class DailyOrder < ApplicationRecord
   def create_ip_purchase_order
     data = {
       "purchase-order": {
-        "reference": display_po,
-        "vendor": "mollusk",
-        "warehouse": InventoryPlannerClient::SF_WAREHOUSE,
-        "currency": "USD",
-        "status": "sent",
-        "expected_date": 3.days.from_now.strftime("%Y-%m-%d"),
-        "items": orders.map(&:ip_line_item)
+        reference: display_po,
+        vendor: 'mollusk',
+        warehouse: InventoryPlannerClient::SF_WAREHOUSE,
+        currency: 'USD',
+        status: 'sent',
+        expected_date: 3.days.from_now.strftime("%Y-%m-%d"),
+        items: orders.map(&:ip_line_item)
       }
     }
 
@@ -277,24 +277,24 @@ class DailyOrder < ApplicationRecord
 
     order['line_items'].map do |item|
       {
-        "line_item_id": item['id'],
-        "quantity": item['quantity'],
-        "restock_type": 'cancel',
-        "location_id": 36225056853 #SFN
+        line_item_id: item['id'],
+        quantity: item['quantity'],
+        restock_type: 'cancel',
+        location_id: 36225056853 #SFN
       }
     end
   end
 
   def refund_shopify_order
     params = {
-      "refund": {
-        "currency": "USD",
-        "notify": false,
-        "note": "Canceled Shop Order",
-        "shipping": {
-          "full_refund": true
+      refund: {
+        currency: 'USD',
+        notify: false,
+        note: 'Canceled Shop Order',
+        shipping: {
+          full_refund: true
         },
-        "refund_line_items": refund_line_items
+        refund_line_items: refund_line_items
       }
     }
 
@@ -310,6 +310,14 @@ class DailyOrder < ApplicationRecord
       ShopifyClient.cancel_order(shopify_order_id)
     rescue StandardError
       Airbrake.notify("ERROR CANCELLING Shopify Order (#{shopify_order_id}) for Daily Order: #{id} for #{outlet_name}")
+    end
+  end
+
+  def cancel_inventory_planner_po
+    begin
+      InventoryPlannerClient.cancel_purchase_order(inventory_planner_id)
+    rescue StandardError
+      Airbrake.notify("ERROR CANCELLING Inventory Planner PO (#{inventory_planner_id}) for Daily Order: #{id} for #{outlet_name}")
     end
   end
 
@@ -354,6 +362,7 @@ class DailyOrder < ApplicationRecord
     if orders.not_cancelled.count.zero?
       cancel_consignment unless vend_consignment_id.blank?
       cancel_shopify_order unless shopify_order_id.blank?
+      cancel_inventory_planner_po unless inventory_planner_id.blank?
       update_attribute(:cancelled, true)
     end
   end
