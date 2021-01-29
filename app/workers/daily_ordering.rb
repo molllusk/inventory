@@ -200,8 +200,11 @@ class DailyOrdering
     todays_orders.each do |_location, daily_order|
       if daily_order.orders.count.positive?
         daily_inventory_transfer.update_attributes(po_id: next_po_number) unless daily_order.po?
-        daily_order.create_consignment #if daily_order.outlet_name != 'San Francisco'
-        daily_order.create_ip_purchase_order if daily_order.outlet_name == 'San Francisco'
+        if daily_order.outlet_name == 'San Francisco'
+          daily_order.create_ip_purchase_order
+        else
+          daily_order.create_consignment
+        end
       end
     end
 
