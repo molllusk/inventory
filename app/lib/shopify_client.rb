@@ -307,7 +307,7 @@ module ShopifyClient
   end
 
   def self.refund_order(order_id, params)
-    response = connection.put do |req|
+    response = connection.post do |req|
       req.url "#{API_VERSION}/orders/#{order_id}/refunds.json"
       req.headers['Content-Type'] = 'application/json'
       req.body = params.to_json

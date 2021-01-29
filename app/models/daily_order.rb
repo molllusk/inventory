@@ -225,7 +225,7 @@ class DailyOrder < ApplicationRecord
 
   def create_ip_purchase_order
     data = {
-      "purchase-order": {
+      'purchase-order': {
         reference: display_po,
         vendor: 'mollusk',
         warehouse: InventoryPlannerClient::SF_WAREHOUSE,
