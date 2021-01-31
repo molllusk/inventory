@@ -28,7 +28,9 @@ Rails.application.routes.draw do
     get '/quickbooks/oauth_callback', to: 'quickbooks#oauth_callback'
   end
 
-  resources :daily_inventory_transfers
+  resources :daily_inventory_transfers do
+    put :cancel
+  end
 
   resources :daily_orders do
     get :po
