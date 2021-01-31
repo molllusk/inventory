@@ -113,7 +113,14 @@ class DailyOrdering
 
         fill_level = fill_levels[inventory.location].to_i
         outstanding_orders = outstanding_orders_by_outlet_id[inventory.outlet_id]
+
+        if inventory.location == 'San Francisco'
+          inventory = shopify_product.shopify_inventories.where(location: 'Mollusk SF')
+          next unless inventory.present?
+        end
+
         store_inventory = inventory.inventory.negative? ? 0 : inventory.inventory
+
         complete_inventory = store_inventory + outstanding_orders
 
         # fill_level = fill_levels['fill'].to_i if new_release && inventory.location == 'Santa Barbara'
@@ -122,15 +129,15 @@ class DailyOrdering
         next unless adjustment.positive?
 
         case inventory.location
-        when 'San Francisco'
+        when 'San Francisco', 'Mollusk SF'
           inventories[:sf_outstanding] = outstanding_orders
           inventories[:sf_vend] = inventory.inventory
           inventories[:sf_adjustment] = adjustment
-        when 'Santa Barbara'
+        when 'Santa Barbara', 'Mollusk SB'
           inventories[:sb_outstanding] = outstanding_orders
           inventories[:sb_vend] = inventory.inventory
           inventories[:sb_adjustment] = adjustment
-        when 'Venice Beach'
+        when 'Venice Beach', 'Mollusk VB'
           inventories[:vb_outstanding] = outstanding_orders
           inventories[:vb_vend] = inventory.inventory
           inventories[:vb_adjustment] = adjustment
