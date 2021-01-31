@@ -5,6 +5,7 @@ class ShopifyInventory < ApplicationRecord
 
   scope :with_warehouse, -> { where('location = ? AND inventory > 0', ShopifyInventory.locations['Shopify Fulfillment Network']) }
   scope :exclude_dead_locations, -> { where.not(location: DEAD_LOCATIONS) }
+  scope :order_by_location, -> { order(:location) }
 
   enum location: {
     # retail site
