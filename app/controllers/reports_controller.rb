@@ -17,7 +17,7 @@ class ReportsController < ApplicationController
 
   def generate_products
     GenerateProductsReport.perform_async
-    flash[:success] = 'The Product Inventory Report is generating and will be emailed to John and Joseph when it finishes'
+    flash[:success] = 'The Product Inventory Report is generating and will be emailed to Johanna, John, and Joseph when it finishes'
 
     redirect_to action: :index
   end

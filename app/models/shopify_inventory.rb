@@ -18,6 +18,10 @@ class ShopifyInventory < ApplicationRecord
   }
 
   DEAD_LOCATIONS = ['Jam Warehouse Retail', 'Postworks']
+
+  def self.active_locations
+    locations.keys - DEAD_LOCATIONS
+  end
 end
 
 # == Schema Information
