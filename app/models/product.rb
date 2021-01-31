@@ -172,6 +172,7 @@ class Product < ApplicationRecord
       type: vend_datum&.vend_type&.[]('name') || shopify_datum&.product_type,
       size: shopify_datum&.option1.to_s.strip.downcase,
       sku: vend_datum&.sku || shopify_datum&.barcode,
+      product_sku: shopify_datum&.sku,
       handle: shopify_datum&.handle,
       shopify_tags: shopify_datum&.tags&.join(', '),
       vend: vend_datum&.link,
@@ -181,9 +182,9 @@ class Product < ApplicationRecord
     }
 
     if shopify_datum.present?
-      shopify_datum.shopify_inventories.each do |inventory|
+      shopify_datum.shopify_inventories.exclude_dead_locations.each do |inventory|
         data[inventory.location] = inventory.inventory
-        data[:total_inventory] += inventory.inventory if ['Postworks', 'Postworks ATS', 'Shopify Fulfillment Network'].include?(inventory.location)
+        data[:total_inventory] += inventory.inventory if ['Postworks', 'Shopify Fulfillment Network'].include?(inventory.location)
       end
     end
 

@@ -4,6 +4,7 @@ class ShopifyInventory < ApplicationRecord
   belongs_to :shopify_datum
 
   scope :with_warehouse, -> { where('location = ? AND inventory > 0', ShopifyInventory.locations['Shopify Fulfillment Network']) }
+  scope :exclude_dead_locations, -> { where.not(location: DEAD_LOCATIONS) }
 
   enum location: {
     # retail site
@@ -14,6 +15,8 @@ class ShopifyInventory < ApplicationRecord
     'Postworks' => 18186895445,
     'Shopify Fulfillment Network' => 36225056853
   }
+
+  DEAD_LOCATIONS = ['Jam Warehouse Retail', 'Postworks']
 end
 
 # == Schema Information

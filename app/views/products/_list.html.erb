@@ -33,8 +33,8 @@
         </td>
         <td>
           <% if shopify.present? %>
-            <% if shopify.shopify_inventories.present? %>
-              <% shopify.shopify_inventories.each do |inventory| %>
+            <% if shopify.shopify_inventories.exclude_dead_locations.present? %>
+              <% shopify.shopify_inventories.exclude_dead_locations.each do |inventory| %>
                 <strong><%= inventory.location.gsub(' Retail', '') %></strong>: <%= inventory.inventory %><br />
               <% end %>
             <% else %>
