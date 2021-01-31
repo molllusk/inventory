@@ -16,7 +16,7 @@
   <% daily_inventory_transfers.each do |daily_inventory_transfer| %>
     <tr class='<%= 'cancelled' if daily_inventory_transfer.cancelled? %>'>
       <td class='border-bottom' rowspan='<%= daily_inventory_transfer.daily_orders.count %>' style='background-color: #FFFFFF'>
-        <%= daily_inventory_transfer.date.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %><br />
+        <%= daily_inventory_transfer.date.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %><br /><br />
         <%= link_to(raw('<i class="fa fa-ban"></i> Cancel All Orders'), daily_inventory_transfer_cancel_path(daily_inventory_transfer), method: :put, data: { confirm: "Are you sure you want to CANCEL all orders associated with this Daily Inventory Transfer? This cannot be undone!" }, class: 'red') %>
       </td>
       <td class='border-bottom' rowspan='<%= daily_inventory_transfer.daily_orders.count %>' style='background-color: #FFFFFF'>
