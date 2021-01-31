@@ -24,7 +24,7 @@
         <td><%= vend.sku %></td>
         <td>
           <% if vend.vend_inventories.present? %>
-            <% vend.vend_inventories.each do |inventory| %>
+            <% vend.vend_inventories.exclude_dead_locations.each do |inventory| %>
               <strong><%= inventory.location %></strong>: <%= inventory.inventory %><br />
             <% end %>
           <% else %>

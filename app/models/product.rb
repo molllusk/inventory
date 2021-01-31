@@ -146,7 +146,7 @@ class Product < ApplicationRecord
 
   def self.inventory_csv_headers
     stem = %i[id product variant type size sku handle shopify_tags vend shopify app]
-    stem + ShopifyInventory.active_locations + VendClient::OUTLET_NAMES_BY_ID.values + [:total_inventory]
+    stem + ShopifyInventory.active_locations + VendInventory.active_locations + [:total_inventory]
   end
 
   def update_inventory(orders, outlet)
@@ -184,12 +184,12 @@ class Product < ApplicationRecord
     if shopify_datum.present?
       shopify_datum.shopify_inventories.exclude_dead_locations.each do |inventory|
         data[inventory.location] = inventory.inventory
-        data[:total_inventory] += inventory.inventory if inventory.location == 'Shopify Fulfillment Network'
+        data[:total_inventory] += inventory.inventory if ['Shopify Fulfillment Network', 'Mollusk SF'].include?(inventory.location)
       end
     end
 
     if vend_datum.present?
-      vend_datum.vend_inventories.each do |inventory|
+      vend_datum.vend_inventories.exclude_dead_locations.each do |inventory|
         data[inventory.location] = inventory.inventory
         data[:total_inventory] += inventory.inventory
       end
