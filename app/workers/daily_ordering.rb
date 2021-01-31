@@ -115,7 +115,7 @@ class DailyOrdering
         outstanding_orders = outstanding_orders_by_outlet_id[inventory.outlet_id]
 
         if inventory.location == 'San Francisco'
-          inventory = shopify_product.shopify_inventories.where(location: 'Mollusk SF')
+          inventory = shopify_product.shopify_inventories.find_by(location: 'Mollusk SF')
           next unless inventory.present?
         end
 
