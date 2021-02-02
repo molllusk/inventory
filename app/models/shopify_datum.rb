@@ -33,13 +33,13 @@ class ShopifyDatum < ApplicationRecord
   end
 
   def get_cost
+    return cost if cost.present?
+
     vend_product = product.vend_datum
+
     if vend_product.present?
       vend_product.supply_price.to_f
     else
-      cost = inventory_item['cost']
-      return cost unless cost.blank?
-
       Airbrake.notify("COST MISSING: Item in shopify order, shopify product exists without Vend Product and Cost is missing in Shopify: { barcode: #{barcode}, product_id: #{shopify_product_id}, variant_id: #{variant_id} }")
       0.0
     end

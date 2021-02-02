@@ -136,13 +136,14 @@ class Product < ApplicationRecord
     levels_by_type_and_size
   end
 
-  def self.update_shopify_costs
-    inventory_item_ids = ShopifyDatum.pluck(:inventory_item_id)
+  def self.update_shopify_costs(inventory_item_ids = nil)
+    inventory_item_ids ||= ShopifyDatum.pluck(:inventory_item_id)
 
     inventory_items = ShopifyClient.get_inventory_items(inventory_item_ids)
 
     inventory_items.each do |inventory_item|
       shopify_variant = ShopifyDatum.find_by(inventory_item_id: inventory_item['id'])
+      next if shopify_variant.cost.to_f == inventory_item['cost'].to_f
       shopify_variant.update_attribute(:cost, inventory_item['cost'])
     end
   end

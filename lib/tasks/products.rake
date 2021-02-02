@@ -8,6 +8,8 @@ namespace :products do
     new_vends = []
     new_shopifys = []
 
+    newly_created_shopifys = []
+
     vend_products.each do |vend_product|
       vend_attrs = VendClient.product_attributes(vend_product)
       vend_datum = VendDatum.find_by(vend_id: vend_attrs[:vend_id])
@@ -46,6 +48,9 @@ namespace :products do
         existing_shopify = product.shopify_datum
         existing_shopify_variant_id = existing_shopify.variant_id
         existing_shopify_product_id = existing_shopify.shopify_product_id
+
+        # when a shopify product with a duplicate sku shows up check to see if the original still exists in shopify
+        # if not, delete and replace it in the app
         shopify_variant = ShopifyClient.get_variant(existing_shopify_variant_id)
 
         if shopify_variant.blank? # delete
@@ -57,7 +62,7 @@ namespace :products do
               new_shopify_product_id: shopify_attrs[:shopify_product_id]
             )
 
-            product.create_shopify_datum(shopify_attrs)
+            newly_created_shopifys << product.create_shopify_datum(shopify_attrs)
           end
         else # duplicate
           existing_shopify_duplicate = product.shopify_duplicates.find_by(original_variant_id: existing_shopify_variant_id, duplicate_variant_id: shopify_attrs[:variant_id])
@@ -74,12 +79,14 @@ namespace :products do
           end
         end
       elsif existing_vend.present?
-        existing_vend.product.create_shopify_datum(shopify_attrs)
+        newly_created_shopifys << existing_vend.product.create_shopify_datum(shopify_attrs)
       elsif vend_attrs.present?
         product = Product.create
         product.create_vend_datum(vend_attrs)
-        product.create_shopify_datum(shopify_attrs)
+        newly_created_shopifys << product.create_shopify_datum(shopify_attrs)
       end
     end
+
+    Product.update_shopify_costs(newly_created_shopifys.map(&:inventory_item_id)) if newly_created_shopifys.present?
   end
 end
