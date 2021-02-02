@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_26_012953) do
+ActiveRecord::Schema.define(version: 2021_02_02_024855) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -130,6 +130,7 @@ ActiveRecord::Schema.define(version: 2021_01_26_012953) do
     t.string "option1"
     t.string "option2"
     t.string "option3"
+    t.float "cost", default: 0.0
   end
 
   create_table "shopify_deletions", force: :cascade do |t|

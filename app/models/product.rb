@@ -136,6 +136,17 @@ class Product < ApplicationRecord
     levels_by_type_and_size
   end
 
+  def self.update_shopify_costs
+    inventory_item_ids = ShopifyDatum.pluck(:inventory_item_id)
+
+    inventory_items = ShopifyClient.get_inventory_items(inventory_item_ids)
+
+    inventory_items.each do |inventory_item|
+      shopify_variant = ShopifyDatum.find_by(inventory_item_id: inventory_item['id'])
+      shopify_variant.update_attribute(:cost, inventory_item['cost'])
+    end
+  end
+
   def self.inventory_csv
     CSV.generate(headers: inventory_csv_headers, write_headers: true) do |new_csv|
       find_each do |product|
@@ -145,8 +156,8 @@ class Product < ApplicationRecord
   end
 
   def self.inventory_csv_headers
-    stem = %i[id product variant type size sku handle shopify_tags vend shopify app]
-    stem + ShopifyInventory.active_locations + VendInventory.active_locations + [:total_inventory]
+    stem = %i[id product variant type size sku handle shopify_tags vend shopify app supplier_name]
+    stem + ShopifyInventory.active_locations + VendInventory.active_locations + [:total_inventory] + ShopifyInventory.active_locations.map { |loc| "Inventory Value (#{loc})" }
   end
 
   def update_inventory(orders, outlet)
@@ -178,12 +189,14 @@ class Product < ApplicationRecord
       vend: vend_datum&.link,
       shopify: shopify_datum&.link,
       app: "https://mollusk.herokuapp.com/products/#{id}",
+      supplier_name: shopify_datum&.vendor,
       total_inventory: 0
     }
 
     if shopify_datum.present?
       shopify_datum.shopify_inventories.exclude_dead_locations.each do |inventory|
         data[inventory.location] = inventory.inventory
+        data["Inventory Value (#{inventory.location})"] = shopify_datum&.vendor == 'Consignee' ? 0 : inventory.inventory * shopify_datum.cost
         data[:total_inventory] += inventory.inventory if ['Shopify Fulfillment Network', 'Mollusk SF'].include?(inventory.location)
       end
     end

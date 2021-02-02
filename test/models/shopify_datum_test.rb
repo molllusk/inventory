@@ -15,6 +15,7 @@ end
 #  id                     :bigint(8)        not null, primary key
 #  barcode                :string
 #  compare_at_price       :string
+#  cost                   :float            default(0.0)
 #  fulfillment_service    :string
 #  grams                  :integer
 #  handle                 :string
