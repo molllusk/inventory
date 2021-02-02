@@ -196,7 +196,7 @@ class Product < ApplicationRecord
     if shopify_datum.present?
       shopify_datum.shopify_inventories.exclude_dead_locations.each do |inventory|
         data[inventory.location] = inventory.inventory
-        data["Inventory Value (#{inventory.location})"] = shopify_datum&.vendor == 'Consignee' ? 0 : inventory.inventory * shopify_datum.cost
+        data["Inventory Value (#{inventory.location})"] = shopify_datum&.vendor == 'Consignee' ? 0 : inventory.inventory * shopify_datum.cost.to_f
         data[:total_inventory] += inventory.inventory if ['Shopify Fulfillment Network', 'Mollusk SF'].include?(inventory.location)
       end
     end
