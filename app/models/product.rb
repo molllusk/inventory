@@ -156,7 +156,7 @@ class Product < ApplicationRecord
   end
 
   def self.inventory_csv_headers
-    stem = %i[id product variant type size sku handle shopify_tags vend shopify app supplier_name]
+    stem = %i[id product variant type size sku handle shopify_tags vend shopify app supplier_name supply_price]
     stem + ShopifyInventory.active_locations + VendInventory.active_locations + [:total_inventory] + ShopifyInventory.active_locations.map { |loc| "Inventory Value (#{loc})" }
   end
 
@@ -190,6 +190,7 @@ class Product < ApplicationRecord
       shopify: shopify_datum&.link,
       app: "https://mollusk.herokuapp.com/products/#{id}",
       supplier_name: shopify_datum&.vendor,
+      supply_price: shopify_datum&.cost,
       total_inventory: 0
     }
 
