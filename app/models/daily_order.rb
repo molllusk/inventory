@@ -361,7 +361,10 @@ class DailyOrder < ApplicationRecord
 
     if orders.not_cancelled.count.zero?
       cancel_consignment unless vend_consignment_id.blank?
-      cancel_shopify_order unless shopify_order_id.blank?
+      if shopify_order_id.present?
+        cancel_shopify_order
+        refund_shopify_order
+      end
       cancel_inventory_planner_po unless inventory_planner_id.blank?
       update_attribute(:cancelled, true)
     end
