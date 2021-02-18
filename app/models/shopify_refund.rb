@@ -75,13 +75,13 @@ class ShopifyRefund < ApplicationRecord
         account_id: '3476', # 50000 Cost of Goods Sold
         amount: cost,
         description: 'Returned COGS',
-        posting_type: 'Debit'
+        posting_type: 'Credit'
       },
       {
         account_id: Qbo::ACCOUNT_ID_BY_OUTLET['San Francisco'],
         amount: location_costs.values.reduce(0) { |cost, sum| cost.to_f + sum.to_f },
         description: 'Costs by SF Location (includes cost of returns from all locations)',
-        posting_type: 'Credit'
+        posting_type: 'Debit'
       }
     ]
   end
