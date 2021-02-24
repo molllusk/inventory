@@ -2,7 +2,7 @@ class ShopifyPosSalesCost < ApplicationRecord
   belongs_to :daily_shopify_pos_cost, optional: true
 
   def outlet_name
-    # VendClient::OUTLET_NAMES_BY_ID[outlet_id]
+    ShopifyClient::OUTLET_NAMES_BY_ID[location]
   end
 end
 

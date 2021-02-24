@@ -40,7 +40,7 @@ class DailyShopifyPosSale < ApplicationRecord
       },
       {
         item_id: '181527', # Cash/Check Payment - Retail
-        amount: -receipt.cash_or_check_payments,
+        amount: -receipt.cash_payments,
         description: 'Cash or Check Payments'
       },
       {
@@ -62,7 +62,7 @@ class DailyShopifyPosSale < ApplicationRecord
   end
 
   def post_to_qbo
-    if vend_sales_receipt_sales.present?
+    if shopify_pos_sales_receipt_sales.present?
       sales_receipts.each do |receipt_pair|
         qbo = Qbo.create_sales_receipt(receipt_pair.last)
         receipt_pair.first.update_attribute(:qbo_id, qbo.id) unless qbo.blank?
@@ -73,7 +73,7 @@ class DailyShopifyPosSale < ApplicationRecord
   def sales_receipts
     receipts = []
 
-    vend_sales_receipts.each do |receipt|
+    shopify_pos_sales_receipts.each do |receipt|
       sales_receipt = Qbo.sales_receipt(sales_receipt_params(receipt))
 
       sales_receipt_line_item_details(receipt).each do |details|

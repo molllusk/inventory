@@ -11,7 +11,7 @@ class DailyShopifyPosCost < ApplicationRecord
 
   def journal_line_item_details
     details = []
-    vend_sales_costs.each do |sales_cost|
+    shopify_pos_sales_costs.each do |sales_cost|
       details << {
         account_id: '3476', # cost of goods sold
         amount: sales_cost.cost,
@@ -32,7 +32,7 @@ class DailyShopifyPosCost < ApplicationRecord
   end
 
   def post_to_qbo
-    if vend_sales_cost_sales.present?
+    if shopify_pos_sales_cost_sales.present?
       qbo = Qbo.create_journal_entry(journal_entry)
       update_attribute(:qbo_id, qbo.id) unless qbo.blank?
     end

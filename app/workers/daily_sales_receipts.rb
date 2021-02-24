@@ -414,61 +414,89 @@ class DailySalesReceipts
 
       ###########
 
-      outlet = sale['outlet_id']
-      sale_id = sale['id']
+      outlet = sale['outlet_id'] # needs to be shopify location
+      sale_id = sale['id'] # needs to be order ID or order name
 
-      vend_sales_receipt_by_sale[sale_id][:outlet_id] = outlet
-      vend_sales_costs_by_sale[sale_id][:outlet_id] = outlet
+      pos_sales_receipt_by_sale[sale_id][:location] = outlet
+      pos_sales_cost_by_sale[sale_id][:location] = outlet
 
-      vend_sales_receipt_by_sale[sale_id][:sale_at] = sale['sale_date']
-      vend_sales_costs_by_sale[sale_id][:sale_at] = sale['sale_date']
+      pos_sales_receipt_by_sale[sale_id][:sale_at] = sale['sale_date']
+      pos_sales_cost_by_sale[sale_id][:sale_at] = sale['sale_date']
 
-      vend_sales_receipt_by_sale[sale_id][:receipt_number] = sale['receipt_number']
-      vend_sales_costs_by_sale[sale_id][:receipt_number] = sale['receipt_number']
+      pos_sales_receipt_by_sale[sale_id][:receipt_number] = sale['receipt_number']
+      pos_sales_cost_by_sale[sale_id][:receipt_number] = sale['receipt_number']
 
       sale['line_items'].each do |item|
         discount = item['discount_total'].negative? ? 0 : item['discount_total']
 
         case item['product_id']
         when '801eea1d-3e65-11e2-b1f5-4040782fde00' # Gift Cards
-          vend_sales_receipt[outlet][:gift_card_sales] += item['price_total'] + discount
-          vend_sales_receipt_by_sale[sale_id][:gift_card_sales] += item['price_total'] + discount
+          pos_sales_receipt[outlet][:gift_card_sales] += item['price_total'] + discount
+          pos_sales_receipt_by_sale[sale_id][:gift_card_sales] += item['price_total'] + discount
         when '0adfd74a-153e-11e6-f182-ae0e9b7d09f8' # Shipping
-          vend_sales_receipt[outlet][:shipping] += item['price_total'] + discount
-          vend_sales_receipt_by_sale[sale_id][:shipping] += item['price_total'] + discount
+          pos_sales_receipt[outlet][:shipping] += item['price_total'] + discount
+          pos_sales_receipt_by_sale[sale_id][:shipping] += item['price_total'] + discount
         when '5ddba61e-3598-11e2-b1f5-4040782fde00' # discount
-          vend_sales_receipt[outlet][:discount_sales] += item['price_total'] + discount
-          vend_sales_receipt_by_sale[sale_id][:discount_sales] += item['price_total'] + discount
+          pos_sales_receipt[outlet][:discount_sales] += item['price_total'] + discount
+          pos_sales_receipt_by_sale[sale_id][:discount_sales] += item['price_total'] + discount
         else
-          vend_sales_receipt[outlet][:product_sales] += item['price_total'] + discount
-          vend_sales_receipt_by_sale[sale_id][:product_sales] += item['price_total'] + discount
+          pos_sales_receipt[outlet][:product_sales] += item['price_total'] + discount
+          pos_sales_receipt_by_sale[sale_id][:product_sales] += item['price_total'] + discount
 
-          vend_sales_receipt_by_sale[sale_id][:rentals] += item['price_total'] + discount if VendSalesTax::RENTAL_IDS.include?(item['product_id'])
+          pos_sales_receipt_by_sale[sale_id][:rentals] += item['price_total'] + discount if ShopifyPosSalesTax::RENTAL_TYPES.include?(item['product_id']) ### NEED TO DO PRODUCT TYPE HERE
         end
 
-        vend_sales_receipt[outlet][:discount] += discount
-        vend_sales_receipt_by_sale[sale_id][:discount] += discount
+        pos_sales_receipt[outlet][:discount] += discount
+        pos_sales_receipt_by_sale[sale_id][:discount] += discount
 
-        vend_sales_receipt[outlet][:sales_tax] += item['tax_total']
-        vend_sales_receipt_by_sale[sale_id][:sales_tax] += item['tax_total']
+        pos_sales_receipt[outlet][:sales_tax] += item['tax_total']
+        pos_sales_receipt_by_sale[sale_id][:sales_tax] += item['tax_total']
 
-        vend_sales_costs[outlet][:cost] += item['cost_total']
-        vend_sales_costs_by_sale[sale_id][:cost] += item['cost_total']
+        pos_sales_receipt[outlet][:cost] += item['cost_total']
+        pos_sales_cost_by_sale[sale_id][:cost] += item['cost_total']
       end
 
       sale['payments'].each do |payment|
         case payment['retailer_payment_type_id']
         when '0adfd74a-153e-11e9-ef2a-7cd37d28240d', 'eb021256-8eed-11e0-8e09-4040f540b50a' # credit sf, credit other locations
-          vend_sales_receipt[outlet][:credit_payments] += payment['amount']
-          vend_sales_receipt_by_sale[sale_id][:credit_payments] += payment['amount']
+          pos_sales_receipt[outlet][:credit_payments] += payment['amount']
+          pos_sales_receipt_by_sale[sale_id][:credit_payments] += payment['amount']
         when '5e4b6218-8eed-11e0-8e09-4040f540b50a' # cash or check
-          vend_sales_receipt[outlet][:cash_or_check_payments] += payment['amount']
-          vend_sales_receipt_by_sale[sale_id][:cash_or_check_payments] += payment['amount']
+          pos_sales_receipt[outlet][:cash_payments] += payment['amount']
+          pos_sales_receipt_by_sale[sale_id][:cash_payments] += payment['amount']
         when 'd1477a96-a0f8-11e0-8317-4040f540b50a' # gift card
-          vend_sales_receipt[outlet][:gift_card_payments] += payment['amount']
-          vend_sales_receipt_by_sale[sale_id][:gift_card_payments] += payment['amount']
+          pos_sales_receipt[outlet][:gift_card_payments] += payment['amount']
+          pos_sales_receipt_by_sale[sale_id][:gift_card_payments] += payment['amount']
         end
       end
+    end
+
+
+    pos_sales = DailyShopifyPosSale.create!(date: min_date)
+
+    pos_sales_receipt.each do |location, receipt|
+      receipt[:location] = location
+      pos_sales.shopify_pos_sales_receipts << ShopifyPosSalesReceipt.create!(receipt)
+    end
+
+    pos_sales_receipt_by_sale.each do |sale_id, receipt|
+      receipt[:sale_id] = sale_id
+      pos_sales.shopify_pos_sales_receipt_sales << ShopifyPosSalesReceiptSale.create!(receipt)
+    end
+
+    shopify_pos_sales_tax = pos_sales.create_shopify_pos_sales_tax
+    shopify_pos_sales_tax.create_location_taxes
+
+    pos_costs = DailyShopifyPostCost.create!(date: min_date)
+
+    pos_sales_costs.each do |location, cost|
+      cost[:location] = location
+      pos_costs.shopify_pos_sales_costs << ShopifyPosSalesCost.create!(cost)
+    end
+
+    pos_sales_costs_by_sale.each do |sale_id, cost|
+      cost[:sale_id] = sale_id
+      pos_costs.shopify_pos_sales_cost_sales << ShopifyPosSalesCostSale.create!(cost)
     end
 
     #######################
