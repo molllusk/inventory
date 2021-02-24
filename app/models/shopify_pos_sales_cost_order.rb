@@ -1,4 +1,9 @@
 class ShopifyPosSalesCostOrder < ApplicationRecord
+  belongs_to :daily_shoipify_pos_cost, optional: true
+
+  def outlet_name
+    # VendClient::OUTLET_NAMES_BY_ID[outlet_id]
+  end
 end
 
 # == Schema Information

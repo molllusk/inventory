@@ -1,4 +1,21 @@
 class ShopifyPosSalesReceiptSale < ApplicationRecord
+  belongs_to :daily_shopify_pos_sale, optional: true
+
+  def outlet_name
+    # VendClient::OUTLET_NAMES_BY_ID[outlet_id]
+  end
+
+  def credits
+    discount.round(2) + credit_payments.round(2) + cash_or_check_payments.round(2) + gift_card_payments.round(2)
+  end
+
+  def debits
+    product_sales.round(2) + gift_card_sales.round(2) + sales_tax.round(2) + shipping.round(2) + discount_sales.round(2)
+  end
+
+  def sum_check
+    credits - debits
+  end
 end
 
 # == Schema Information
