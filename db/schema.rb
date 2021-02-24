@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_02_024855) do
+ActiveRecord::Schema.define(version: 2021_02_23_043141) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -40,6 +40,19 @@ ActiveRecord::Schema.define(version: 2021_02_02_024855) do
     t.boolean "cancelled", default: false
     t.bigint "shopify_order_id"
     t.string "inventory_planner_id"
+  end
+
+  create_table "daily_shopify_pos_costs", force: :cascade do |t|
+    t.datetime "date"
+    t.bigint "qbo_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "daily_shopify_pos_sales", force: :cascade do |t|
+    t.datetime "date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "daily_vend_consignments", force: :cascade do |t|
@@ -157,6 +170,62 @@ ActiveRecord::Schema.define(version: 2021_02_02_024855) do
     t.bigint "location"
     t.integer "inventory"
     t.integer "shopify_datum_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "shopify_pos_sales_cost_orders", force: :cascade do |t|
+    t.datetime "sale_at"
+    t.float "cost", default: 0.0
+    t.bigint "location"
+    t.string "name"
+    t.integer "order_id"
+    t.integer "daily_shopify_pos_costs_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "shopify_pos_sales_costs", force: :cascade do |t|
+    t.float "cost", default: 0.0
+    t.bigint "location"
+    t.integer "daily_shopify_pos_costs_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "shopify_pos_sales_receipt_sales", force: :cascade do |t|
+    t.float "gift_card_sales", default: 0.0
+    t.float "gift_card_payments", default: 0.0
+    t.float "credit_payments", default: 0.0
+    t.float "cash_payments", default: 0.0
+    t.float "product_sales", default: 0.0
+    t.float "discount", default: 0.0
+    t.float "discount_sales", default: 0.0
+    t.float "sales_tax", default: 0.0
+    t.float "shipping", default: 0.0
+    t.bigint "location"
+    t.integer "daily_shopify_pos_sale_id"
+    t.string "name"
+    t.datetime "sale_at"
+    t.bigint "order_id"
+    t.float "rentals", default: 0.0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "shopify_pos_sales_receipts", force: :cascade do |t|
+    t.float "gift_card_sales", default: 0.0
+    t.float "gift_card_payments", default: 0.0
+    t.float "credit_payments", default: 0.0
+    t.float "cash_payments", default: 0.0
+    t.float "product_sales", default: 0.0
+    t.float "discount", default: 0.0
+    t.float "discount_sales", default: 0.0
+    t.float "sales_tax", default: 0.0
+    t.float "shipping", default: 0.0
+    t.bigint "location"
+    t.integer "daily_shopify_pos_sale_id"
+    t.bigint "qbo_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
