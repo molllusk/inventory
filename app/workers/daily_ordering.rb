@@ -45,7 +45,7 @@ class DailyOrdering
     if daily_orders_ip.present?
       daily_orders_ip.each do |daily_order|
         ip_shop = daily_order['warehouse']
-        next unless InventoryPlannerClient::IP_SHOPS.includes?(ip_shop)
+        next unless InventoryPlannerClient::IP_SHOPS.include?(ip_shop)
 
         daily_order['items'].each do |item|
           ##### need to eliminate all this vend stuff
