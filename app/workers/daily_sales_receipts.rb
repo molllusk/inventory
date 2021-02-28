@@ -395,7 +395,7 @@ class DailySalesReceipts
     pos_sales_costs = Hash.new { |hash, key| hash[key] = Hash.new(0) }
     pos_sales_costs_by_sale = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
-    pos_sales.each do |sale|
+    pos_sales.each do |order|
       order_names_by_id[order['id']] = order['name']
       costs_by_location = Hash.new(0)
 
@@ -412,19 +412,128 @@ class DailySalesReceipts
       order_name = order['name']
       order_tax = order['tax_lines'].reduce(0) { |sum, tax_line| sum + tax_line['price'].to_f }
 
+      sale_id = order['id'] # needs to be order ID or order name
+
+      # outlet = sale['outlet_id'] # needs to be shopify location
+
+      # pos_sales_receipt_by_sale[sale_id][:location] = outlet
+      # pos_sales_cost_by_sale[sale_id][:location] = outlet
+
+      pos_sales_receipt_by_sale[sale_id][:sale_at] = order['closed_at']
+      pos_sales_cost_by_sale[sale_id][:sale_at] = order['closed_at']
+
+      pos_sales_receipt_by_sale[sale_id][:receipt_number] = order['name']
+      pos_sales_cost_by_sale[sale_id][:receipt_number] = order['name']
+
+      order['line_items'].each do |line_item|
+        next unless line_item['fulfillment_status'].present?
+
+        discount = item['discount_total'].negative? ? 0 : item['discount_total']
+
+        case item['product_id']
+        when '801eea1d-3e65-11e2-b1f5-4040782fde00' # Gift Cards
+          pos_sales_receipt[outlet][:gift_card_sales] += item['price_total'] + discount
+          pos_sales_receipt_by_sale[sale_id][:gift_card_sales] += item['price_total'] + discount
+        when '0adfd74a-153e-11e6-f182-ae0e9b7d09f8' # Shipping
+          pos_sales_receipt[outlet][:shipping] += item['price_total'] + discount
+          pos_sales_receipt_by_sale[sale_id][:shipping] += item['price_total'] + discount
+        when '5ddba61e-3598-11e2-b1f5-4040782fde00' # discount
+          pos_sales_receipt[outlet][:discount_sales] += item['price_total'] + discount
+          pos_sales_receipt_by_sale[sale_id][:discount_sales] += item['price_total'] + discount
+        else
+          pos_sales_receipt[outlet][:product_sales] += item['price_total'] + discount
+          pos_sales_receipt_by_sale[sale_id][:product_sales] += item['price_total'] + discount
+
+          pos_sales_receipt_by_sale[sale_id][:rentals] += item['price_total'] + discount if ShopifyPosSalesTax::RENTAL_TYPES.include?(item['product_id']) ### NEED TO DO PRODUCT TYPE HERE
+        end
+
+        pos_sales_receipt[outlet][:discount] += discount
+        pos_sales_receipt_by_sale[sale_id][:discount] += discount
+
+        pos_sales_receipt[outlet][:sales_tax] += item['tax_total']
+        pos_sales_receipt_by_sale[sale_id][:sales_tax] += item['tax_total']
+
+        pos_sales_receipt[outlet][:cost] += item['cost_total']
+        pos_sales_cost_by_sale[sale_id][:cost] += item['cost_total']
+      end
+
       ###########
 
-      outlet = sale['outlet_id'] # needs to be shopify location
-      sale_id = sale['id'] # needs to be order ID or order name
+      sales_totals_by_order[order_name][:sales_tax] = order_tax
+      sales_totals_by_order[order_name][:discount] = order['total_discounts'].to_f
 
-      pos_sales_receipt_by_sale[sale_id][:location] = outlet
-      pos_sales_cost_by_sale[sale_id][:location] = outlet
+      shopify_sales_receipt[:discount] += order['total_discounts'].to_f
+      shopify_sales_receipt[:sales_tax] += order_tax
 
-      pos_sales_receipt_by_sale[sale_id][:sale_at] = sale['sale_date']
-      pos_sales_cost_by_sale[sale_id][:sale_at] = sale['sale_date']
+      fulfillments = ShopifyClient.fulfillments(order['id'])
 
-      pos_sales_receipt_by_sale[sale_id][:receipt_number] = sale['receipt_number']
-      pos_sales_cost_by_sale[sale_id][:receipt_number] = sale['receipt_number']
+      order['line_items'].each do |line_item|
+        next unless line_item['fulfillment_status'].present?
+
+        variant_id = line_item['variant_id']
+        fulfillment = fulfillments.find { |fulfillment_candidate| fulfillment_candidate['line_items'].find { |fulfillment_line_item| fulfillment_line_item['variant_id'] == variant_id } }
+        location_id = fulfillment.present? && fulfillment['location_id'].present? ? fulfillment['location_id'] : 'no_location'
+
+        cost = 0.0
+        shopify_product = ShopifyDatum.find_by(variant_id: variant_id)
+        raw_cost = shopify_product.present? ? shopify_product.get_cost : ShopifyClient.get_cost(variant_id)
+
+        if raw_cost.present?
+          cost = raw_cost * line_item['quantity'].to_f
+        else
+          Airbrake.notify("RETAIL Item sold is missing COST in both systems { order_name: #{order_name}, variant_id: #{variant_id}, product_id: #{line_item['product_id']} }")
+        end
+
+        costs_by_order[order_name][:cost] += cost
+        costs_report[:cost] += cost
+        costs_by_location[location_id] += cost
+        location_sales_costs[location_id] += cost
+
+        if line_item['gift_card'] || line_item['product_id'] == 1045344714837 # mollusk money
+          shopify_sales_receipt[:gift_card_sales] += line_item['price'].to_f * line_item['quantity'].to_f
+          sales_totals_by_order[order_name][:gift_card_sales] += line_item['price'].to_f * line_item['quantity'].to_f
+        else
+          shopify_sales_receipt[:product_sales] += line_item['price'].to_f * line_item['quantity'].to_f
+          sales_totals_by_order[order_name][:product_sales] += line_item['price'].to_f * line_item['quantity'].to_f
+        end
+      end
+
+      costs_by_order[order_name][:order_id] = order['id']
+      costs_by_order[order_name][:closed_at] = order['closed_at']
+      costs_by_order[order_name][:location_costs] = costs_by_location
+
+      order_shipping = order['shipping_lines'].reduce(0) { |sum, shipping_line| sum + shipping_line['price'].to_f }
+
+      sales_totals_by_order[order_name][:shipping] = order_shipping
+      shopify_sales_receipt[:shipping] += order_shipping
+
+      transactions = ShopifyClient.transactions(order['id'])
+
+      transactions.each do |transaction|
+        next unless %w[capture sale refund].include?(transaction['kind']) && transaction['status'] == 'success'
+
+        if %w[capture sale].include?(transaction['kind'])
+          case transaction['gateway']
+          when 'gift_card'
+            sales_totals_by_order[order_name][:gift_card_payments] += transaction['amount'].to_f
+            shopify_sales_receipt[:gift_card_payments] += transaction['amount'].to_f
+          when 'paypal'
+            sales_totals_by_order[order_name][:paypal_payments] += transaction['amount'].to_f
+            shopify_sales_receipt[:paypal_payments] += transaction['amount'].to_f
+          when 'shopify_payments'
+            sales_totals_by_order[order_name][:shopify_payments] += transaction['amount'].to_f
+            shopify_sales_receipt[:shopify_payments] += transaction['amount'].to_f
+          end
+        elsif transaction['kind'] == 'refund' && transaction['gateway'] == 'gift_card'
+          if transaction['message'] == 'Another transaction failed so the gift card was rolled back'
+            sales_totals_by_order[order_name][:gift_card_payments] -= transaction['amount'].to_f
+            shopify_sales_receipt[:gift_card_payments] -= transaction['amount'].to_f
+          end
+        end
+      end
+    end
+
+      ###########
 
       sale['line_items'].each do |item|
         discount = item['discount_total'].negative? ? 0 : item['discount_total']

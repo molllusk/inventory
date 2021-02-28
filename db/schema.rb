@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_23_043141) do
+ActiveRecord::Schema.define(version: 2021_02_25_031413) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -174,6 +174,16 @@ ActiveRecord::Schema.define(version: 2021_02_23_043141) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "shopify_pos_location_sales_taxes", force: :cascade do |t|
+    t.float "amount", default: 0.0
+    t.float "sales_tax", default: 0.0
+    t.float "shipping", default: 0.0
+    t.bigint "location"
+    t.integer "shopify_pos_sales_tax_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "shopify_pos_sales_cost_orders", force: :cascade do |t|
     t.datetime "sale_at"
     t.float "cost", default: 0.0
@@ -226,6 +236,12 @@ ActiveRecord::Schema.define(version: 2021_02_23_043141) do
     t.bigint "location"
     t.integer "daily_shopify_pos_sale_id"
     t.bigint "qbo_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "shopify_pos_sales_taxes", force: :cascade do |t|
+    t.integer "daily_shopify_pos_sale_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

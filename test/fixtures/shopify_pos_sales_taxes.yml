@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  daily_shopify_pos_sale_id: 1
+
+two:
+  daily_shopify_pos_sale_id: 1
+
+# == Schema Information
+#
+# Table name: shopify_pos_sales_taxes
+#
+#  id                        :bigint(8)        not null, primary key
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  daily_shopify_pos_sale_id :integer
+#
