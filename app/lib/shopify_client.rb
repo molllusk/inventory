@@ -323,7 +323,7 @@ module ShopifyClient
   end
 
   def self.all_draft_orders(status = nil)
-    if (status)
+    if status
       params = { limit: 250, status: status }
       cursor_paginate('draft_orders', params)
     else
@@ -355,6 +355,6 @@ module ShopifyClient
   end
 
   def self.next_page_url(next_link)
-    next_link.split(';').first.gsub(/\<|\>/, '')
+    next_link.split(';').first.gsub(/<|>/, '')
   end
 end

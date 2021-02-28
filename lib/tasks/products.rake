@@ -66,7 +66,7 @@ namespace :products do
           end
         else # duplicate
           existing_shopify_duplicate = product.shopify_duplicates.find_by(original_variant_id: existing_shopify_variant_id, duplicate_variant_id: shopify_attrs[:variant_id])
-          
+
           if existing_shopify_duplicate.present?
             existing_shopify_duplicate.touch
           else

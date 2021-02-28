@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ShopifyPosSalesReceipt < ApplicationRecord
   belongs_to :daily_shopify_pos_sale, optional: true
 

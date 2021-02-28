@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ShopifyPosLocationSalesTax < ApplicationRecord
   belongs_to :shopify_pos_sales_tax
 
@@ -29,7 +31,7 @@ class ShopifyPosLocationSalesTax < ApplicationRecord
   end
 
   def provider
-    outlet_name.split(/\s+/).join('-') + '-Store'
+    "#{outlet_name.split(/\s+/).join('-')}-Store"
   end
 
   def to_zip

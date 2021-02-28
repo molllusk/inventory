@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ShopifyDeletion < ApplicationRecord
   belongs_to :product, optional: true
 

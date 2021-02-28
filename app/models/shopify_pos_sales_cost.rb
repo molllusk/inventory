@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ShopifyPosSalesCost < ApplicationRecord
   belongs_to :daily_shopify_pos_cost, optional: true
 

@@ -94,9 +94,8 @@ class DailyInventoryTransfer < ApplicationRecord
 
   def cancel
     return if cancelled?
-    daily_orders.not_cancelled.each do |daily_order|
-      daily_order.cancel
-    end
+
+    daily_orders.not_cancelled.each(&:cancel)
 
     if daily_orders.not_cancelled.count.zero?
       delete_qbo_journal_entry
@@ -110,7 +109,7 @@ class DailyInventoryTransfer < ApplicationRecord
   end
 
   def post_to_shopify
-    daily_orders.each { |order| order.post_to_shopify }
+    daily_orders.each(&:post_to_shopify)
   end
 end
 

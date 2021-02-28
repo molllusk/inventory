@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateShopifyDuplicates < ActiveRecord::Migration[5.2]
   def change
     create_table :shopify_duplicates do |t|

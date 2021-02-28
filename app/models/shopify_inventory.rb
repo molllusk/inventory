@@ -17,7 +17,7 @@ class ShopifyInventory < ApplicationRecord
     'Shopify Fulfillment Network' => 36225056853
   }
 
-  DEAD_LOCATIONS = ['Jam Warehouse Retail', 'Postworks']
+  DEAD_LOCATIONS = ['Jam Warehouse Retail', 'Postworks'].freeze
 
   def self.active_locations
     locations.keys - DEAD_LOCATIONS

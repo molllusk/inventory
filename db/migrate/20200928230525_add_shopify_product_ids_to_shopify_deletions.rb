@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddShopifyProductIdsToShopifyDeletions < ActiveRecord::Migration[5.2]
   def change
     add_column :shopify_deletions, :deleted_shopify_product_id, :bigint

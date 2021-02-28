@@ -15,7 +15,7 @@ class Product < ApplicationRecord
     vb: 'Venice Beach'
   }.freeze
 
-  CLOSED_LOCATIONS = ['Silver Lake']
+  CLOSED_LOCATIONS = ['Silver Lake'].freeze
 
   ORDER_LOCATIONS = LOCATION_NAMES_BY_CODE.values - CLOSED_LOCATIONS
 
@@ -56,7 +56,7 @@ class Product < ApplicationRecord
     terms = query.to_s.downcase.split(/\s+/)
 
     terms = terms.map do |e|
-      ('%' + e + '%').gsub(/%+/, '%')
+      "%#{e}%".gsub(/%+/, '%')
     end
 
     # configure number of OR conditions for provision
@@ -144,6 +144,7 @@ class Product < ApplicationRecord
     inventory_items.each do |inventory_item|
       shopify_variant = ShopifyDatum.find_by(inventory_item_id: inventory_item['id'])
       next if shopify_variant.cost.to_f == inventory_item['cost'].to_f
+
       shopify_variant.update_attribute(:cost, inventory_item['cost'])
     end
   end
@@ -163,9 +164,7 @@ class Product < ApplicationRecord
 
   def update_inventory(orders, outlet)
     connect_inventory_location(outlet) if missing_inventory_location?(outlet)
-    if update_shopify_inventory?(outlet)
-      adjust_inventory(outlet) unless orders_present?(orders)
-    end
+    adjust_inventory(outlet) if update_shopify_inventory?(outlet) && !orders_present?(orders)
   end
 
   def orders_present?(orders)

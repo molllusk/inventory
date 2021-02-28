@@ -41,13 +41,13 @@ class DailyOrder < ApplicationRecord
     'San Francisco' => 3265917026389,
     'Santa Barbara' => 3265930625109,
     'Venice Beach' => 3265924825173
-  }
+  }.freeze
 
   PHONE_NUMBERS = {
     'San Francisco' => '415-564-6300',
     'Santa Barbara' => '805-568-0908',
     'Venice Beach' => '310-396-1969'
-  }
+  }.freeze
 
   def to_pdf
     # create an instance of ActionView, so we can use the render method outside of a controller
@@ -164,11 +164,11 @@ class DailyOrder < ApplicationRecord
   end
 
   def total_price(items)
-    items.inject(0.0) { |sum, item| sum + (item[:price] * item[:quantity]) }
+    items.reduce(0.0) { |sum, item| sum + (item[:price] * item[:quantity]) }
   end
 
   def total_line_item_quantities(items)
-    items.inject(0.0) { |sum, item| sum + item[:quantity] }
+    items.reduce(0.0) { |sum, item| sum + item[:quantity] }
   end
 
   def shopify_order_params
@@ -199,9 +199,7 @@ class DailyOrder < ApplicationRecord
       }
     }
 
-    if total_line_item_quantities(line_items) > 20
-      params[:order][:tags] = 'Wholesale'
-    end
+    params[:order][:tags] = 'Wholesale' if total_line_item_quantities(line_items) > 20
 
     params
   end
@@ -231,7 +229,7 @@ class DailyOrder < ApplicationRecord
         warehouse: InventoryPlannerClient::SF_WAREHOUSE,
         currency: 'USD',
         status: 'sent',
-        expected_date: 3.days.from_now.strftime("%Y-%m-%d"),
+        expected_date: 3.days.from_now.strftime('%Y-%m-%d'),
         items: orders.map(&:ip_line_item)
       }
     }
@@ -280,7 +278,7 @@ class DailyOrder < ApplicationRecord
         line_item_id: item['id'],
         quantity: item['quantity'],
         restock_type: 'cancel',
-        location_id: 36225056853 #SFN
+        location_id: 36225056853 # SFN
       }
     end
   end
@@ -306,19 +304,15 @@ class DailyOrder < ApplicationRecord
   end
 
   def cancel_shopify_order
-    begin
-      ShopifyClient.cancel_order(shopify_order_id)
-    rescue StandardError
-      Airbrake.notify("ERROR CANCELLING Shopify Order (#{shopify_order_id}) for Daily Order: #{id} for #{outlet_name}")
-    end
+    ShopifyClient.cancel_order(shopify_order_id)
+  rescue StandardError
+    Airbrake.notify("ERROR CANCELLING Shopify Order (#{shopify_order_id}) for Daily Order: #{id} for #{outlet_name}")
   end
 
   def cancel_inventory_planner_po
-    begin
-      InventoryPlannerClient.cancel_purchase_order(inventory_planner_id)
-    rescue StandardError
-      Airbrake.notify("ERROR CANCELLING Inventory Planner PO (#{inventory_planner_id}) for Daily Order: #{id} for #{outlet_name}")
-    end
+    InventoryPlannerClient.cancel_purchase_order(inventory_planner_id)
+  rescue StandardError
+    Airbrake.notify("ERROR CANCELLING Inventory Planner PO (#{inventory_planner_id}) for Daily Order: #{id} for #{outlet_name}")
   end
 
   def ship_to_address
@@ -355,9 +349,8 @@ class DailyOrder < ApplicationRecord
 
   def cancel
     return if cancelled?
-    orders.not_cancelled.each do |order|
-      order.cancel
-    end
+
+    orders.not_cancelled.each(&:cancel)
 
     if orders.not_cancelled.count.zero?
       cancel_consignment unless vend_consignment_id.blank?

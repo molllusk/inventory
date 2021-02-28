@@ -31,7 +31,7 @@ class VendLocationSalesTax < ApplicationRecord
   end
 
   def provider
-    outlet_name.split(/\s+/).join('-') + '-Store'
+    "#{outlet_name.split(/\s+/).join('-')}-Store"
   end
 
   def to_zip

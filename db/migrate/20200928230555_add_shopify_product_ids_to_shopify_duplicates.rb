@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddShopifyProductIdsToShopifyDuplicates < ActiveRecord::Migration[5.2]
   def change
     add_column :shopify_duplicates, :original_shopify_product_id, :bigint

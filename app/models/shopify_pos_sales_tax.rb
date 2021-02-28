@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ShopifyPosSalesTax < ApplicationRecord
   belongs_to :daily_shopify_pos_sale
   has_many :shopify_pos_location_sales_taxes, dependent: :destroy

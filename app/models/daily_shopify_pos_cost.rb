@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DailyShopifyPosCost < ApplicationRecord
   has_many :shopify_pos_sales_costs, dependent: :destroy
   has_many :shopify_pos_sales_cost_sales, dependent: :destroy

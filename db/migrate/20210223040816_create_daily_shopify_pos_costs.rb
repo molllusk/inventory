@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateDailyShopifyPosCosts < ActiveRecord::Migration[5.2]
   def change
     create_table :daily_shopify_pos_costs do |t|

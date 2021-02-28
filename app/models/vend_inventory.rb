@@ -3,7 +3,7 @@
 class VendInventory < ApplicationRecord
   belongs_to :vend_datum
 
-  DEAD_LOCATIONS = ['5e234f4e-8eed-11e0-8e09-4040f540b50a'] # San Francisco
+  DEAD_LOCATIONS = ['5e234f4e-8eed-11e0-8e09-4040f540b50a'].freeze # San Francisco
 
   scope :exclude_dead_locations, -> { where.not(outlet_id: DEAD_LOCATIONS) }
 
