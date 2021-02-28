@@ -12,15 +12,15 @@ class InventoryPlannerClient
   IP_SHOPS = [SF_WAREHOUSE, SB_WAREHOUSE, VB_WAREHOUSE].freeze
 
   VEND_OUTLET_ID_BY_IP_SHOP = {
-    'c18098_49481991' => '5e234f4e-8eed-11e0-8e09-4040f540b50a',
-    'c18098_7702609973' => '8d27bed3-060b-11e4-a0f5-b8ca3a64f8f4',
-    'c18098_7702577205' => '0adfd74a-153e-11e9-fa42-67b5781ba1fb'
+    SF_WAREHOUSE => '5e234f4e-8eed-11e0-8e09-4040f540b50a',
+    SB_WAREHOUSE => '8d27bed3-060b-11e4-a0f5-b8ca3a64f8f4',
+    VB_WAREHOUSE => '0adfd74a-153e-11e9-fa42-67b5781ba1fb'
   }.freeze
 
   SHOPIFY_LOCATION_BY_IP_SHOP = {
-    'c18098_49481991' => 'Mollusk SF',
-    'c18098_7702609973' => 'Mollusk SB',
-    'c18098_7702577205' => 'Mollusk VB'
+    SF_WAREHOUSE => 'Mollusk SF',
+    SB_WAREHOUSE => 'Mollusk SB',
+    VB_WAREHOUSE => 'Mollusk VB'
   }.freeze
 
   def self.vend_outlet_id(ip_shop)
