@@ -25,7 +25,7 @@ class ShopifyPosLocationSalesTax < ApplicationRecord
   end
 
   def transaction_date
-    vend_sales_tax.date
+    shopify_pos_sales_tax.date
   end
 
   def provider
