@@ -14,7 +14,7 @@ class ShopifySalesCost < ApplicationRecord
   end
 
   def retail_base_url?
-    retail? || (wholesale? && date > Date.parse("2020-07-15 00:00:00 UTC"))
+    retail? || (wholesale? && date > Date.parse('2020-07-15 00:00:00 UTC'))
   end
 
   def journal_entry_params

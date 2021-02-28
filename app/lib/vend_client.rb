@@ -75,7 +75,7 @@ class VendClient
       end
     end
 
-    if response && response.body
+    if response&.body
       response.body['data'] || {}
     else
       {}

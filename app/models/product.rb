@@ -15,7 +15,7 @@ class Product < ApplicationRecord
     vb: 'Venice Beach'
   }.freeze
 
-  CLOSED_LOCATIONS = ['Silver Lake']
+  CLOSED_LOCATIONS = ['Silver Lake'].freeze
 
   ORDER_LOCATIONS = LOCATION_NAMES_BY_CODE.values - CLOSED_LOCATIONS
 
@@ -144,6 +144,7 @@ class Product < ApplicationRecord
     inventory_items.each do |inventory_item|
       shopify_variant = ShopifyDatum.find_by(inventory_item_id: inventory_item['id'])
       next if shopify_variant.cost.to_f == inventory_item['cost'].to_f
+
       shopify_variant.update_attribute(:cost, inventory_item['cost'])
     end
   end
