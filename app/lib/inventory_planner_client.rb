@@ -9,6 +9,28 @@ class InventoryPlannerClient
   SB_WAREHOUSE = 'c18098_7702609973'
   VB_WAREHOUSE = 'c18098_7702577205'
 
+  IP_SHOPS = [SF_WAREHOUSE, SB_WAREHOUSE, VB_WAREHOUSE].freeze
+
+  VEND_OUTLET_ID_BY_IP_SHOP = {
+    'c18098_49481991' => '5e234f4e-8eed-11e0-8e09-4040f540b50a',
+    'c18098_7702609973' => '8d27bed3-060b-11e4-a0f5-b8ca3a64f8f4',
+    'c18098_7702577205' => '0adfd74a-153e-11e9-fa42-67b5781ba1fb'
+  }.freeze
+
+  SHOPIFY_LOCATION_BY_IP_SHOP = {
+    'c18098_49481991' => 'Mollusk SF',
+    'c18098_7702609973' => 'Mollusk SB',
+    'c18098_7702577205' => 'Mollusk VB'
+  }.freeze
+
+  def self.vend_outlet_id(ip_shop)
+    VEND_OUTLET_ID_BY_IP_SHOP[ip_shop]
+  end
+
+  def self.shopify_location(ip_shop)
+    SHOPIFY_LOCATION_BY_IP_SHOP[ip_shop]
+  end
+
   def self.connection
     sleep(0.5)
     Faraday.new(url: BASE_URL) do |faraday|
@@ -50,7 +72,7 @@ class InventoryPlannerClient
     response = connection.patch do |req|
       req.url "api/v1/purchase-orders/#{inventory_planner_id}"
       req.headers['Content-Type'] = 'application/json'
-      req.body = { 'purchase-order': {  status: 'CANCELLED' }}.to_json
+      req.body = { 'purchase-order': { status: 'CANCELLED' } }.to_json
     end
     response.body
   end

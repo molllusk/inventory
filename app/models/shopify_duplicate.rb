@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ShopifyDuplicate < ApplicationRecord
   belongs_to :product, optional: true
 

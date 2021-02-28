@@ -21,7 +21,7 @@ class ShopifySalesReceipt < ApplicationRecord
   end
 
   def retail_base_url?
-    retail? || (wholesale? && date > Date.parse("2020-07-15 00:00:00 UTC"))
+    retail? || (wholesale? && date > Date.parse('2020-07-15 00:00:00 UTC'))
   end
 
   def sales_receipt_params
@@ -81,33 +81,33 @@ class ShopifySalesReceipt < ApplicationRecord
       }
     ]
 
-    if retail?
-      default_items += [
-        {
-          item_id: '172114', # Taxable Retail Sales
-          amount: product_sales,
-          description: 'Taxable Retail Sales'
-        },
-        {
-          item_id: '181577', # Discount
-          amount: -discount,
-          description: 'Discount'
-        }
-      ]
-    else
-      default_items += [
-        {
-          item_id: '175030', # Wholesale Sales
-          amount: product_sales,
-          description: 'Wholesale Sales'
-        },
-        {
-          item_id: '175030', # Wholesale Sales (Discount)
-          amount: -discount,
-          description: 'Wholesale Sales'
-        }
-      ]
-    end
+    default_items += if retail?
+                       [
+                         {
+                           item_id: '172114', # Taxable Retail Sales
+                           amount: product_sales,
+                           description: 'Taxable Retail Sales'
+                         },
+                         {
+                           item_id: '181577', # Discount
+                           amount: -discount,
+                           description: 'Discount'
+                         }
+                       ]
+                     else
+                       [
+                         {
+                           item_id: '175030', # Wholesale Sales
+                           amount: product_sales,
+                           description: 'Wholesale Sales'
+                         },
+                         {
+                           item_id: '175030', # Wholesale Sales (Discount)
+                           amount: -discount,
+                           description: 'Wholesale Sales'
+                         }
+                       ]
+                     end
   end
 
   def post_to_qbo

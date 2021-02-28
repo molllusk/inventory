@@ -4,8 +4,7 @@ class DailyOrdersController < ApplicationController
   before_action :logged_in_user
   before_action :load_daily_order
 
-  def show
-  end
+  def show; end
 
   def po
     respond_to do |format|

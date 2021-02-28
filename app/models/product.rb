@@ -15,9 +15,9 @@ class Product < ApplicationRecord
     vb: 'Venice Beach'
   }.freeze
 
-  CLOSED_LOCATIONS = ['Silver Lake']
+  CLOSED_LOCATIONS = ['Silver Lake'].freeze
 
-  ORDER_LOCATIONS = LOCATION_NAMES_BY_CODE.values - CLOSED_LOCATIONS
+  ORDER_LOCATIONS = LOCATION_NAMES_BY_CODE.values - CLOSED_LOCATIONS + ['Fill']
 
   filterrific(
     default_filter_params: { sorted_by: 'created_at_desc' },
@@ -91,7 +91,8 @@ class Product < ApplicationRecord
 
   def self.update_inventories(orders)
     # We'll make this store.where(sync_inventory: true) make it a scope then
-    %i[vb sb].each do |outlet|
+    # %i[sf vb sb]
+    %i[].each do |outlet|
       # do not update inventory if any order exists for that variant in any location
       update_entire_store_inventory(orders, outlet)
     end
@@ -144,6 +145,7 @@ class Product < ApplicationRecord
     inventory_items.each do |inventory_item|
       shopify_variant = ShopifyDatum.find_by(inventory_item_id: inventory_item['id'])
       next if shopify_variant.cost.to_f == inventory_item['cost'].to_f
+
       shopify_variant.update_attribute(:cost, inventory_item['cost'])
     end
   end

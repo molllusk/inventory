@@ -17,10 +17,22 @@ class ShopifyInventory < ApplicationRecord
     'Shopify Fulfillment Network' => 36225056853
   }
 
-  DEAD_LOCATIONS = ['Jam Warehouse Retail', 'Postworks']
+  DEAD_LOCATIONS = ['Jam Warehouse Retail', 'Postworks'].freeze
+
+  # This is transitional and won't be needed once vend is fully deprecated
+  VEND_OUTLET_NAMES_BY_LOCATION = {
+    'Mollusk SF' => '5e234f4e-8eed-11e0-8e09-4040f540b50a',
+    'Mollusk SB' => '8d27bed3-060b-11e4-a0f5-b8ca3a64f8f4',
+    'Mollusk VB' => '0adfd74a-153e-11e9-fa42-67b5781ba1fb'
+  }.freeze
 
   def self.active_locations
     locations.keys - DEAD_LOCATIONS
+  end
+
+  # This is transitional and won't be needed once vend is fully deprecated
+  def outlet_id
+    VEND_OUTLET_NAMES_BY_LOCATION[location]
   end
 end
 

@@ -12,6 +12,7 @@ class DailyOrdering
 
     daily_inventory_transfer = DailyInventoryTransfer.create(date: date)
 
+    ##### Need to eliminate the use of Vend Ids etc. once the last vend order has been received we will switch to shopify location for this.
     sf = DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('San Francisco'))
     vb = DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Venice Beach'))
     sb = DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Santa Barbara'))
@@ -26,23 +27,10 @@ class DailyOrdering
       'Mollusk SB' => sb
     }
 
-    location_names = ['San Francisco', 'Venice Beach', 'Santa Barbara']
+    ##### !!!!!
+    # Need to eliminate the use of Vend Ids etc. once the last vend order has been received switch to shopify variant in daily orders IP part below.
 
     outstanding_orders_by_product = Hash.new { |hash, key| hash[key] = Hash.new(0) }
-
-    release_schedule = Product.get_release_schedule
-
-    release_date_by_handle = Hash.new { |hash, key| hash[key] = {} }
-
-    release_schedule.each do |product|
-      clean_product_handle = product['Handle'].to_s.strip.downcase
-      next if clean_product_handle.blank?
-      release_date_by_handle[clean_product_handle][:date] = Date.strptime(product['Release Date'], '%m/%d/%Y')
-
-      location_names.each do |location|
-        release_date_by_handle[clean_product_handle][location] = product[location] == 'TRUE'
-      end
-    end
 
     daily_orders = VendClient.daily_orders
 
@@ -56,11 +44,15 @@ class DailyOrdering
 
     if daily_orders_ip.present?
       daily_orders_ip.each do |daily_order|
-        if daily_order['warehouse'] == InventoryPlannerClient::SF_WAREHOUSE
-          daily_order['items'].each do |item|
-            product_id = VendDatum.find_by(sku: item['barcode'])&.vend_id
-            outstanding_orders_by_product[product_id][VendClient::OUTLET_NAMES_BY_ID.key('San Francisco')] += item['replenishment'].to_f if product_id.present?
-          end
+        ip_shop = daily_order['warehouse']
+        next unless InventoryPlannerClient::IP_SHOPS.includes?(ip_shop)
+
+        daily_order['items'].each do |item|
+          ##### need to eliminate all this vend stuff
+          product_id = VendDatum.find_by(sku: item['barcode'])&.vend_id
+          outstanding_orders_by_product[product_id][InventoryPlannerClient.vend_outlet_id(ip_shop)] += item['replenishment'].to_f if product_id.present?
+          # product_id = ShopifyDatum.find_by(barcode: item['barcode'])&.variant_id
+          # outstanding_orders_by_product[product_id][InventoryPlannerClient.shopify_location_id(ip_shop)] += item['replenishment'].to_f if product_id.present?
         end
       end
     end
@@ -72,6 +64,7 @@ class DailyOrdering
     draft_orders.each do |order|
       order['line_items'].each do |line_item|
         next unless line_item['variant_id'].present? # some line items are empty?
+
         draft_orders_by_variant[line_item['variant_id']] += line_item['quantity']
       end
     end
@@ -82,48 +75,29 @@ class DailyOrdering
     ShopifyDatum.with_warehouse.find_each do |shopify_product|
       next if shopify_product.sale?
 
+      ##### This will be removed once vend orders are all received
       vend_product = shopify_product.product.vend_datum
       next unless vend_product.present?
 
       clean_handle = shopify_product.handle.to_s.strip.downcase
-      product_release_date = release_date_by_handle[clean_handle][:date]
-      next if product_release_date.present? && product_release_date > pacific_time
 
       inventories = {}
       fill_levels = shopify_product.product.daily_order_inventory_thresholds
-
-      # Previously new releases shipped at a different rate in the first 30 days of their release and fill levels weren't store based.
-
-      # days_since_release = product_release_date.present? ? (pacific_time.to_date - product_release_date).to_i : 420
-      # new_release = days_since_release < 30 && fill_levels['new_release_fill'].present?
-
-      # fill_level = (new_release ? fill_levels['new_release_fill'] : fill_levels['fill']).to_i
+      fill_level = fill_levels['Fill'].to_i
 
       outstanding_orders_by_outlet_id = outstanding_orders_by_product[vend_product.vend_id]
       outstanding_draft_orders = draft_orders_by_variant[shopify_product.variant_id]
 
       cost = shopify_product.get_cost
 
-      vend_product.vend_inventories.where(outlet_id: location_names.map { |location_name| VendClient::OUTLET_NAMES_BY_ID.key(location_name) }).each do |inventory|
-
-        # CONFUSING: if a product is not on the release schedule then skip for Santa Barbara and continue for other locations (unless it is false in the schedule)
-        missing_local_flag = release_date_by_handle[clean_handle][inventory.location].nil?
-        next if missing_local_flag && inventory.location == 'Santa Barbara'
-        next if !missing_local_flag && !release_date_by_handle[clean_handle][inventory.location]
-
-        fill_level = fill_levels[inventory.location].to_i
+      shopify_product.shopify_inventories.where(location: todays_orders.keys).each do |inventory|
+        ##### need to transition this to Shopify Location when Vend is fully deprecated
         outstanding_orders = outstanding_orders_by_outlet_id[inventory.outlet_id]
-
-        if inventory.location == 'San Francisco'
-          inventory = shopify_product.shopify_inventories.find_by(location: 'Mollusk SF')
-          next unless inventory.present?
-        end
 
         store_inventory = inventory.inventory.negative? ? 0 : inventory.inventory
 
         complete_inventory = store_inventory + outstanding_orders
 
-        # fill_level = fill_levels['fill'].to_i if new_release && inventory.location == 'Santa Barbara'
         adjustment = complete_inventory < fill_level ? fill_level - complete_inventory : 0
 
         next unless adjustment.positive?
@@ -131,15 +105,15 @@ class DailyOrdering
         case inventory.location
         when 'San Francisco', 'Mollusk SF'
           inventories[:sf_outstanding] = outstanding_orders
-          inventories[:sf_vend] = inventory.inventory
+          inventories[:sf_shopify] = inventory.inventory
           inventories[:sf_adjustment] = adjustment
         when 'Santa Barbara', 'Mollusk SB'
           inventories[:sb_outstanding] = outstanding_orders
-          inventories[:sb_vend] = inventory.inventory
+          inventories[:sb_shopify] = inventory.inventory
           inventories[:sb_adjustment] = adjustment
         when 'Venice Beach', 'Mollusk VB'
           inventories[:vb_outstanding] = outstanding_orders
-          inventories[:vb_vend] = inventory.inventory
+          inventories[:vb_shopify] = inventory.inventory
           inventories[:vb_adjustment] = adjustment
         end
       end
@@ -169,8 +143,8 @@ class DailyOrdering
               location_order.orders.create(
                 quantity: inventories[:sf_adjustment],
                 product_id: shopify_product.product_id,
-                threshold: fill_levels['San Francisco'].to_i,
-                vend_qty: inventories[:sf_vend],
+                threshold: fill_level,
+                vend_qty: inventories[:sf_shopify],
                 cost: cost,
                 sent_orders: inventories[:sf_outstanding]
               )
@@ -180,8 +154,8 @@ class DailyOrdering
               location_order.orders.create(
                 quantity: inventories[:vb_adjustment],
                 product_id: shopify_product.product_id,
-                threshold: fill_levels['Venice Beach'].to_i,
-                vend_qty: inventories[:vb_vend],
+                threshold: fill_level,
+                vend_qty: inventories[:vb_shopify],
                 cost: cost,
                 sent_orders: inventories[:vb_outstanding]
               )
@@ -189,13 +163,13 @@ class DailyOrdering
             when 'Mollusk SB'
               inventories[:sb_adjustment] = warehouse_inventory if inventories[:sb_adjustment] > warehouse_inventory
               location_order.orders.create(
-                  quantity: inventories[:sb_adjustment],
-                  product_id: shopify_product.product_id,
-                  threshold: fill_levels['Santa Barbara'].to_i,
-                  vend_qty: inventories[:sb_vend],
-                  cost: cost,
-                  sent_orders: inventories[:sb_outstanding]
-                )
+                quantity: inventories[:sb_adjustment],
+                product_id: shopify_product.product_id,
+                threshold: fill_level,
+                vend_qty: inventories[:sb_shopify],
+                cost: cost,
+                sent_orders: inventories[:sb_outstanding]
+              )
               warehouse_inventory -= inventories[:sb_adjustment]
             end
           end
@@ -207,11 +181,7 @@ class DailyOrdering
     todays_orders.each do |_location, daily_order|
       if daily_order.orders.count.positive?
         daily_inventory_transfer.update_attributes(po_id: next_po_number) unless daily_order.po?
-        if daily_order.outlet_name == 'San Francisco'
-          daily_order.create_ip_purchase_order
-        else
-          daily_order.create_consignment
-        end
+        daily_order.create_ip_purchase_order
       end
     end
 

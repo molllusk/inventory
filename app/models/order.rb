@@ -14,6 +14,7 @@ class Order < ApplicationRecord
 
   def cancel
     return if cancelled?
+
     update_attribute(:cancelled, true)
   end
 
