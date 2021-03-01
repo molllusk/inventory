@@ -37,7 +37,7 @@ class DailyShopifyPosSale < ApplicationRecord
       },
       {
         item_id: '181577', # Discount
-        amount: receipt.discount_sales - receipt.discount,
+        amount: -receipt.discount,
         description: 'Discount'
       },
       {
@@ -46,7 +46,7 @@ class DailyShopifyPosSale < ApplicationRecord
         description: 'Cash or Check Payments'
       },
       {
-        item_id: Qbo::CREDIT_CARD_PAYMENT_ID_BY_OUTLET[receipt.outlet_name], # Paypal Payment
+        item_id: Qbo::CREDIT_CARD_PAYMENT_ID_BY_OUTLET[receipt.outlet_name],
         amount: -receipt.credit_payments,
         description: "Credit Card Payment - #{receipt.outlet_name}"
       },

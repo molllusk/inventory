@@ -37,7 +37,7 @@ class ShopifyPosSalesTax < ApplicationRecord
     taxes = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
     sales.each do |sale|
-      taxes[sale.location][:amount] += sale.product_sales + sale.shipping + sale.discount_sales - sale.discount - sale.rentals
+      taxes[sale.location][:amount] += sale.product_sales + sale.shipping - sale.discount - sale.rentals
       taxes[sale.location][:shipping] += sale.shipping
       taxes[sale.location][:sales_tax] += sale.sales_tax
     end

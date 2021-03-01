@@ -435,7 +435,14 @@ class DailySalesReceipts
 
         cost = 0.0
         shopify_product = ShopifyDatum.find_by(variant_id: variant_id)
-        raw_cost = shopify_product.get_cost # : ShopifyClient.get_cost(variant_id)
+        if shopify_product.blank?
+          shopify_product = ShopifyClient.get_product(line_item['product_id'])
+          product_type = shopify_product['product_type']
+          raw_cost = ShopifyClient.get_cost(variant_id)
+        else
+          product_type = shopify_product.product_type
+          raw_cost = shopify_product.get_cost
+        end
 
         if raw_cost.present?
           cost = raw_cost * line_item['quantity'].to_f
@@ -448,7 +455,7 @@ class DailySalesReceipts
 
         item_total = line_item['price'].to_f * line_item['quantity'].to_f
 
-        case shopify_product.product_type
+        case product_type
         when 'Gift Card' # Gift Cards
           shopify_pos_sales_receipt[location][:gift_card_sales] += item_total
           shopify_pos_sales_receipt_by_sale[order_name][:gift_card_sales] += item_total
@@ -459,7 +466,7 @@ class DailySalesReceipts
           shopify_pos_sales_receipt[location][:product_sales] += item_total
           shopify_pos_sales_receipt_by_sale[order_name][:product_sales] += item_total
 
-          shopify_pos_sales_receipt_by_sale[order_name][:rentals] += item_total if shopify_product.product_type == 'Rental'
+          shopify_pos_sales_receipt_by_sale[order_name][:rentals] += item_total if product_type == 'Rental'
         end
       end
 

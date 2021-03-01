@@ -12,7 +12,7 @@ class ShopifyPosSalesReceiptSale < ApplicationRecord
   end
 
   def debits
-    product_sales.round(2) + gift_card_sales.round(2) + sales_tax.round(2) + shipping.round(2) + discount_sales.round(2)
+    product_sales.round(2) + gift_card_sales.round(2) + sales_tax.round(2) + shipping.round(2)
   end
 
   def sum_check

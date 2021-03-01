@@ -132,6 +132,11 @@ module ShopifyClient
     response.body['variant'] || {}
   end
 
+  def ShopifyClient.get_product(product_id)
+    response = connection.get "#{API_VERSION}/products/#{product_id}.json"
+    response.body['product'] || {}
+  end
+
   def self.get_cost(variant_id)
     variant = get_variant(variant_id)
     return unless variant.present?
