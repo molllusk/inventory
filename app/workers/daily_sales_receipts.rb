@@ -505,7 +505,7 @@ class DailySalesReceipts
 
     shopify_pos_sales_receipt_by_sale.each do |order_name, receipt|
       receipt[:name] = order_name
-      shopify_pos_sales.shopify_pos_sales_cost_sales << ShopifyPosSalesReceiptSale.create!(receipt)
+      shopify_pos_sales.shopify_pos_sales_receipt_sales << ShopifyPosSalesReceiptSale.create!(receipt)
     end
 
     shopify_pos_sales_tax = shopify_pos_sales.create_shopify_pos_sales_tax
