@@ -81,32 +81,32 @@ class ShopifySalesReceipt < ApplicationRecord
       }
     ]
 
-    default_items += if retail?
-                       [
-                         {
-                           item_id: '172114', # Taxable Retail Sales
-                           amount: product_sales,
-                           description: 'Taxable Retail Sales'
-                         },
-                         {
-                           item_id: '181577', # Discount
-                           amount: -discount,
-                           description: 'Discount'
-                         }
-                       ]
-                     else
-                       [
-                         {
-                           item_id: '175030', # Wholesale Sales
-                           amount: product_sales,
-                           description: 'Wholesale Sales'
-                         },
-                         {
-                           item_id: '175030', # Wholesale Sales (Discount)
-                           amount: -discount,
-                           description: 'Wholesale Sales'
-                         }
-                       ]
+    default_items + if retail?
+                      [
+                        {
+                          item_id: '172114', # Taxable Retail Sales
+                          amount: product_sales,
+                          description: 'Taxable Retail Sales'
+                        },
+                        {
+                          item_id: '181577', # Discount
+                          amount: -discount,
+                          description: 'Discount'
+                        }
+                      ]
+                    else
+                      [
+                        {
+                          item_id: '175030', # Wholesale Sales
+                          amount: product_sales,
+                          description: 'Wholesale Sales'
+                        },
+                        {
+                          item_id: '175030', # Wholesale Sales (Discount)
+                          amount: -discount,
+                          description: 'Wholesale Sales'
+                        }
+                      ]
                      end
   end
 

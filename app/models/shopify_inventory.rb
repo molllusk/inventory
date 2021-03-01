@@ -9,12 +9,12 @@ class ShopifyInventory < ApplicationRecord
 
   enum location: {
     # retail site
-    'Jam Warehouse Retail' => 7700054069,
+    'Jam Warehouse Retail' => 7_700_054_069,
     'Mollusk SF' => 49481991,
-    'Mollusk SB' => 7702609973,
-    'Mollusk VB' => 7702577205,
-    'Postworks' => 18186895445,
-    'Shopify Fulfillment Network' => 36225056853
+    'Mollusk SB' => 7_702_609_973,
+    'Mollusk VB' => 7_702_577_205,
+    'Postworks' => 18_186_895_445,
+    'Shopify Fulfillment Network' => 36_225_056_853
   }
 
   DEAD_LOCATIONS = ['Jam Warehouse Retail', 'Postworks'].freeze

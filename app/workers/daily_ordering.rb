@@ -70,7 +70,6 @@ class DailyOrdering
     end
 
     #  Redis.current.set('min_daily_order_version', daily_order.last['version']) if daily_orders.present?
-    pacific_time = Time.now.in_time_zone('Pacific Time (US & Canada)').end_of_day
 
     ShopifyDatum.with_warehouse.find_each do |shopify_product|
       next if shopify_product.sale?
@@ -78,8 +77,6 @@ class DailyOrdering
       ##### This will be removed once vend orders are all received
       vend_product = shopify_product.product.vend_datum
       next unless vend_product.present?
-
-      clean_handle = shopify_product.handle.to_s.strip.downcase
 
       inventories = {}
       fill_levels = shopify_product.product.daily_order_inventory_thresholds

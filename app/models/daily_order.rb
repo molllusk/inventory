@@ -38,9 +38,9 @@ class DailyOrder < ApplicationRecord
   }.freeze
 
   LOCATION_ID_BY_VEND_OUTLET_NAME = {
-    'San Francisco' => 3265917026389,
-    'Santa Barbara' => 3265930625109,
-    'Venice Beach' => 3265924825173
+    'San Francisco' => 3_265_917_026_389,
+    'Santa Barbara' => 3_265_930_625_109,
+    'Venice Beach' => 3_265_924_825_173
   }.freeze
 
   PHONE_NUMBERS = {
@@ -122,6 +122,7 @@ class DailyOrder < ApplicationRecord
     "mollusk_#{po_stem}_order_#{po_id}.csv"
   end
 
+  ###### need to switch to shopify location
   def outlet_name
     VendClient::OUTLET_NAMES_BY_ID[outlet_id]
   end
@@ -159,6 +160,10 @@ class DailyOrder < ApplicationRecord
     LOCATION_ID_BY_VEND_OUTLET_NAME[outlet_name].to_s
   end
 
+  def inventory_planner_warehouse_id
+    InventoryPlannerClient::VEND_OUTLET_ID_BY_IP_SHOP.key(outlet_id)
+  end
+
   def shopify_order_line_items
     orders.map(&:shopify_line_item)
   end
@@ -176,7 +181,7 @@ class DailyOrder < ApplicationRecord
 
     params = {
       order: {
-        location_id: 36225056853,
+        location_id: 36_225_056_853,
         financial_status: 'paid',
         fulfillment_status: nil,
         taxable: false,
@@ -226,7 +231,7 @@ class DailyOrder < ApplicationRecord
       'purchase-order': {
         reference: display_po,
         vendor: 'mollusk',
-        warehouse: InventoryPlannerClient::SF_WAREHOUSE,
+        warehouse: inventory_planner_warehouse_id,
         currency: 'USD',
         status: 'sent',
         expected_date: 3.days.from_now.strftime('%Y-%m-%d'),
@@ -278,7 +283,7 @@ class DailyOrder < ApplicationRecord
         line_item_id: item['id'],
         quantity: item['quantity'],
         restock_type: 'cancel',
-        location_id: 36225056853 # SFN
+        location_id: 36_225_056_853 # SFN
       }
     end
   end
