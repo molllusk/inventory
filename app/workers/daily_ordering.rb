@@ -151,52 +151,54 @@ class DailyOrdering
       warehouse_inventory = shopify_product.shopify_inventories.find_by(location: 'Shopify Fulfillment Network')&.inventory.to_i - outstanding_draft_orders - minimum_reserve
       has_adjustment = total_adjustments.positive? && warehouse_inventory.positive?
 
-      if has_adjustment && warehouse_inventory.positive?
-        # order is important here: SF -> VB -> SB
-        adjusted_locations = []
-        adjusted_locations << 'Mollusk SF' if inventories[:sf_adjustment].to_i.positive?
-        adjusted_locations << 'Mollusk VB' if inventories[:vb_adjustment].to_i.positive?
-        adjusted_locations << 'Mollusk SB' if inventories[:sb_adjustment].to_i.positive?
+      if has_adjustment
+        if warehouse_inventory.positive?
+          # order is important here: SF -> VB -> SB
+          adjusted_locations = []
+          adjusted_locations << 'Mollusk SF' if inventories[:sf_adjustment].to_i.positive?
+          adjusted_locations << 'Mollusk VB' if inventories[:vb_adjustment].to_i.positive?
+          adjusted_locations << 'Mollusk SB' if inventories[:sb_adjustment].to_i.positive?
 
-        adjusted_locations.each do |location|
-          break if warehouse_inventory < 1
+          adjusted_locations.each do |location|
+            break if warehouse_inventory < 1
 
-          location_order = todays_orders[location]
+            location_order = todays_orders[location]
 
-          case location
-          when 'Mollusk SF'
-            inventories[:sf_adjustment] = warehouse_inventory if inventories[:sf_adjustment] > warehouse_inventory
-            location_order.orders.create(
-              quantity: inventories[:sf_adjustment],
-              product_id: shopify_product.product_id,
-              threshold: fill_levels['San Francisco'].to_i,
-              vend_qty: inventories[:sf_vend],
-              cost: cost,
-              sent_orders: inventories[:sf_outstanding]
-            )
-            warehouse_inventory -= inventories[:sf_adjustment]
-          when 'Mollusk VB'
-            inventories[:vb_adjustment] = warehouse_inventory if inventories[:vb_adjustment] > warehouse_inventory
-            location_order.orders.create(
-              quantity: inventories[:vb_adjustment],
-              product_id: shopify_product.product_id,
-              threshold: fill_levels['Venice Beach'].to_i,
-              vend_qty: inventories[:vb_vend],
-              cost: cost,
-              sent_orders: inventories[:vb_outstanding]
-            )
-            warehouse_inventory -= inventories[:vb_adjustment]
-          when 'Mollusk SB'
-            inventories[:sb_adjustment] = warehouse_inventory if inventories[:sb_adjustment] > warehouse_inventory
-            location_order.orders.create(
-              quantity: inventories[:sb_adjustment],
-              product_id: shopify_product.product_id,
-              threshold: fill_levels['Santa Barbara'].to_i,
-              vend_qty: inventories[:sb_vend],
-              cost: cost,
-              sent_orders: inventories[:sb_outstanding]
-            )
-            warehouse_inventory -= inventories[:sb_adjustment]
+            case location
+            when 'Mollusk SF'
+              inventories[:sf_adjustment] = warehouse_inventory if inventories[:sf_adjustment] > warehouse_inventory
+              location_order.orders.create(
+                quantity: inventories[:sf_adjustment],
+                product_id: shopify_product.product_id,
+                threshold: fill_levels['San Francisco'].to_i,
+                vend_qty: inventories[:sf_vend],
+                cost: cost,
+                sent_orders: inventories[:sf_outstanding]
+              )
+              warehouse_inventory -= inventories[:sf_adjustment]
+            when 'Mollusk VB'
+              inventories[:vb_adjustment] = warehouse_inventory if inventories[:vb_adjustment] > warehouse_inventory
+              location_order.orders.create(
+                quantity: inventories[:vb_adjustment],
+                product_id: shopify_product.product_id,
+                threshold: fill_levels['Venice Beach'].to_i,
+                vend_qty: inventories[:vb_vend],
+                cost: cost,
+                sent_orders: inventories[:vb_outstanding]
+              )
+              warehouse_inventory -= inventories[:vb_adjustment]
+            when 'Mollusk SB'
+              inventories[:sb_adjustment] = warehouse_inventory if inventories[:sb_adjustment] > warehouse_inventory
+              location_order.orders.create(
+                quantity: inventories[:sb_adjustment],
+                product_id: shopify_product.product_id,
+                threshold: fill_levels['Santa Barbara'].to_i,
+                vend_qty: inventories[:sb_vend],
+                cost: cost,
+                sent_orders: inventories[:sb_outstanding]
+              )
+              warehouse_inventory -= inventories[:sb_adjustment]
+            end
           end
         end
       end
