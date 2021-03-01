@@ -21,7 +21,7 @@ class InventoryUpdate < ApplicationRecord
     terms = query.to_s.downcase.split(/\s+/)
 
     terms = terms.map do |e|
-      ('%' + e + '%').gsub(/%+/, '%')
+      "%#{e}%".gsub(/%+/, '%')
     end
 
     # configure number of OR conditions for provision
