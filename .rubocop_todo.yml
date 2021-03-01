@@ -6,29 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: AllowAliasSyntax, AllowedMethods.
-# AllowedMethods: alias_method, public, protected, private
-Layout/EmptyLinesAroundAttributeAccessor:
-  Exclude:
-    - 'app/models/user.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: empty_lines, no_empty_lines
-Layout/EmptyLinesAroundBlockBody:
-  Exclude:
-    - 'db/schema.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyleAlignWith, Severity.
-# SupportedStylesAlignWith: keyword, variable, start_of_line
-Layout/EndAlignment:
-  Exclude:
-    - 'app/models/shopify_sales_receipt.rb'
 
 # Offense count: 1
 Lint/FloatComparison:
@@ -101,23 +78,6 @@ Style/AsciiComments:
 Style/Documentation:
   Enabled: false
 
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: always, always_true, never
-Style/FrozenStringLiteralComment:
-  Exclude:
-    - 'app/views/users/_user.json.jbuilder'
-    - 'app/views/users/index.json.jbuilder'
-    - 'app/views/users/show.json.jbuilder'
-    - 'db/schema.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/GlobalStdStream:
-  Exclude:
-    - 'config/environments/production.rb'
-
 # Offense count: 8
 # Configuration parameters: MinBodyLength.
 Style/GuardClause:
@@ -131,69 +91,22 @@ Style/GuardClause:
     - 'app/models/product.rb'
     - 'app/models/shopify_sales_receipt.rb'
 
-# Offense count: 2
 Style/MixinUsage:
   Exclude:
     - 'bin/setup'
     - 'bin/update'
 
-# Offense count: 28
 # Cop supports --auto-correct.
 # Configuration parameters: Strict.
 Style/NumericLiterals:
   MinDigits: 9
 
-# Offense count: 3
-# Cop supports --auto-correct.
-# Configuration parameters: SafeForConstants.
-Style/RedundantFetchBlock:
-  Exclude:
-    - 'config/puma.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-Style/RedundantRegexpEscape:
-  Exclude:
-    - 'app/lib/shopify_client.rb'
-
-# Offense count: 3
-# Cop supports --auto-correct.
-# Configuration parameters: AllowModifier.
-Style/SoleNestedConditional:
-  Exclude:
-    - 'app/models/product.rb'
-    - 'app/workers/daily_ordering.rb'
-    - 'app/workers/sku_check.rb'
-
-# Offense count: 6
-# Cop supports --auto-correct.
-Style/StringConcatenation:
-  Exclude:
-    - 'app/helpers/application_helper.rb'
-    - 'app/lib/vend_client.rb'
-    - 'app/mailers/application_mailer.rb'
-    - 'app/models/inventory_update.rb'
-    - 'app/models/product.rb'
-    - 'app/models/vend_location_sales_tax.rb'
-
-# Offense count: 346
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, ConsistentQuotesInMultiline.
-# SupportedStyles: single_quotes, double_quotes
-Style/StringLiterals:
-  Exclude:
-    - 'app/views/users/show.json.jbuilder'
-    - 'db/schema.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
 # Configuration parameters: WordRegex.
 # SupportedStyles: percent, brackets
 Style/WordArray:
   EnforcedStyle: percent
   MinSize: 4
 
-# Offense count: 114
 # Cop supports --auto-correct.
 # Configuration parameters: AutoCorrect, AllowHeredoc, AllowURI, URISchemes, IgnoreCopDirectives, IgnoredPatterns.
 # URISchemes: http, https

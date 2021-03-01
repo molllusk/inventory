@@ -165,9 +165,7 @@ class Product < ApplicationRecord
 
   def update_inventory(orders, outlet)
     connect_inventory_location(outlet) if missing_inventory_location?(outlet)
-    if update_shopify_inventory?(outlet)
-      adjust_inventory(outlet) unless orders_present?(orders)
-    end
+    adjust_inventory(outlet) if update_shopify_inventory?(outlet) && !orders_present?(orders)
   end
 
   def orders_present?(orders)

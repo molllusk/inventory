@@ -16,10 +16,7 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :products do
-        collection do
-        end
-      end
+      resources :products
     end
   end
 

@@ -185,7 +185,7 @@ class WholesaleOrder < ApplicationRecord
     defaults[:billing][:address] = billing_address
     defaults[:billing][:email] = customer_data_row['BillingEmail']
     defaults[:customerMessage] = customer_data_row['Shipping Method']
-    defaults[:priority] = { id: customer_data_row['Priority for AOP OCs'].split(' ').first.to_i } if customer_data_row['Priority for AOP OCs'].present?
+    defaults[:priority] = { id: customer_data_row['Priority for AOP OCs'].split.first.to_i } if customer_data_row['Priority for AOP OCs'].present?
 
     defaults[:terms] = { id: sos_terms['id'] }
     defaults[:channel] = { id: sos_channel['id'] }

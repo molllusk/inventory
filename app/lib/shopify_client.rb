@@ -86,8 +86,8 @@ module ShopifyClient
 
   def self.connect_inventory_location(inventory_item_id, location_id)
     body = {
-      'location_id': location_id,
-      'inventory_item_id': inventory_item_id
+      location_id: location_id,
+      inventory_item_id: inventory_item_id
     }
 
     response = connection.post do |req|
@@ -160,9 +160,9 @@ module ShopifyClient
 
   def self.adjust_inventory(inventory_item_id, location_id, adjustment)
     body = {
-      'location_id': location_id,
-      'inventory_item_id': inventory_item_id,
-      'available_adjustment': adjustment
+      location_id: location_id,
+      inventory_item_id: inventory_item_id,
+      available_adjustment: adjustment
     }
 
     response = connection.post do |req|
@@ -349,6 +349,6 @@ module ShopifyClient
   end
 
   def self.next_page_url(next_link)
-    next_link.split(';').first.gsub(/\<|\>/, '')
+    next_link.split(';').first.gsub(/<|>/, '')
   end
 end

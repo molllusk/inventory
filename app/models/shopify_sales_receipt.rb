@@ -107,7 +107,7 @@ class ShopifySalesReceipt < ApplicationRecord
                           description: 'Wholesale Sales'
                         }
                       ]
-                     end
+                    end
   end
 
   def post_to_qbo
