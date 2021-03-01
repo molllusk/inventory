@@ -1,0 +1,20 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  date: 2021-02-22 20:08:16
+  qbo_id: 
+
+two:
+  date: 2021-02-22 20:08:16
+  qbo_id:
+
+# == Schema Information
+#
+# Table name: daily_shopify_pos_costs
+#
+#  id         :bigint(8)        not null, primary key
+#  date       :datetime
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  qbo_id     :bigint(8)
+#

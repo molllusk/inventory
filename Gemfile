@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-ruby '2.6.6'
+ruby '2.7.2'
 source 'https://rubygems.org'
 
 git_source(:github) do |repo_name|
@@ -42,9 +42,6 @@ gem 'uglifier', '>= 1.3.0'
 
 # See https://github.com/rails/execjs#readme for more supported runtimes
 # gem 'therubyracer', platforms: :ruby
-
-# Use Redis adapter to run Action Cable in production
-# gem 'redis', '~> 4.0'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development

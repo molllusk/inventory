@@ -201,8 +201,8 @@ class DailyOrdering
             end
           end
         end
-        # daily_order_data << inventories
       end
+      # daily_order_data << inventories
     end
 
     todays_orders.each do |_location, daily_order|
