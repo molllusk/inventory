@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_25_031413) do
+ActiveRecord::Schema.define(version: 2021_03_01_232317) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -190,7 +190,7 @@ ActiveRecord::Schema.define(version: 2021_02_25_031413) do
     t.bigint "location"
     t.string "name"
     t.integer "order_id"
-    t.integer "daily_shopify_pos_costs_id"
+    t.integer "daily_shopify_pos_cost_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -198,7 +198,7 @@ ActiveRecord::Schema.define(version: 2021_02_25_031413) do
   create_table "shopify_pos_sales_costs", force: :cascade do |t|
     t.float "cost", default: 0.0
     t.bigint "location"
-    t.integer "daily_shopify_pos_costs_id"
+    t.integer "daily_shopify_pos_cost_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
