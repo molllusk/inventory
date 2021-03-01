@@ -388,22 +388,17 @@ class DailySalesReceipts
       wholesale_shopify_sales_cost.shopify_sales_cost_orders << ShopifySalesCostOrder.create!(values)
     end
 
-    ####### POS SHOPIFY #######
+    #######################
+    ##### POS SHOPIFY #####
+    #######################
 
-    pos_sales_receipt = Hash.new(0)
-    pos_costs_report = Hash.new(0)
+    shopify_pos_sales_receipt = Hash.new { |hash, key| hash[key] = Hash.new(0) }
+    shopify_pos_sales_receipt_by_sale = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
-    pos_sales_receipt[:date] = min_date
-    pos_costs_report[:date] = min_date
-
-    pos_location_sales_costs = Hash.new(0)
-    pos_sales_totals_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
-    pos_costs_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
+    shopify_pos_sales_costs = Hash.new { |hash, key| hash[key] = Hash.new(0) }
+    shopify_pos_sales_costs_by_sale = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
     pos_sales.each do |order|
-      order_names_by_id[order['id']] = order['name']
-      costs_by_location = Hash.new(0)
-
       if %w[refunded partially_refunded].include?(order['financial_status'])
         ShopifyClient.refunds(order['id']).each do |refund|
           next if Time.parse(refund['created_at']) < min_date || Time.parse(refund['created_at']) > max_date
@@ -414,58 +409,59 @@ class DailySalesReceipts
 
       next if Time.parse(order['closed_at']) < min_date || Time.parse(order['closed_at']) > max_date
 
+      location = order['location_id']
+      order_id = order['id']
       order_name = order['name']
       order_tax = order['tax_lines'].reduce(0) { |sum, tax_line| sum + tax_line['price'].to_f }
 
-      pos_sales_totals_by_order[order_name][:order_id] = order['id']
-      pos_sales_totals_by_order[order_name][:closed_at] = order['closed_at']
-      pos_sales_totals_by_order[order_name][:sales_tax] = order_tax
-      pos_sales_totals_by_order[order_name][:discount] = order['total_discounts'].to_f
+      shopify_pos_sales_receipt_by_sale[order_name][:order_id] = order['id']
+      shopify_pos_sales_costs_by_sale[order_name][:order_id] = order['id']
 
-      pos_sales_receipt[:discount] += order['total_discounts'].to_f
-      pos_sales_receipt[:sales_tax] += order_tax
+      shopify_pos_sales_receipt_by_sale[order_name][:name] = order_name
+      shopify_pos_sales_costs_by_sale[order_name][:name] = order_name
 
-      fulfillments = ShopifyClient.fulfillments(order['id'])
+      shopify_pos_sales_receipt_by_sale[order_name][:sale_at] = order['closed_at']
+      shopify_pos_sales_costs_by_sale[order_name][:sale_at] = order['closed_at']
+
+      shopify_pos_sales_receipt_by_sale[order_name][:location] = location
+      shopify_pos_sales_costs_by_sale[order_name][:location] = location
+
+      shopify_pos_sales_receipt_by_sale[order_name][:sales_tax] = order_tax
+      shopify_pos_sales_receipt_by_sale[order_name][:discount] = order['total_discounts'].to_f
 
       order['line_items'].each do |line_item|
         next unless line_item['fulfillment_status'].present?
-
         variant_id = line_item['variant_id']
-        fulfillment = fulfillments.find { |fulfillment_candidate| fulfillment_candidate['line_items'].find { |fulfillment_line_item| fulfillment_line_item['variant_id'] == variant_id } }
-        location_id = fulfillment.present? && fulfillment['location_id'].present? ? fulfillment['location_id'] : 'no_location'
 
         cost = 0.0
         shopify_product = ShopifyDatum.find_by(variant_id: variant_id)
-        raw_cost = shopify_product.present? ? shopify_product.get_cost : ShopifyClient.get_cost(variant_id)
+        raw_cost = shopify_product.get_cost # : ShopifyClient.get_cost(variant_id)
 
         if raw_cost.present?
           cost = raw_cost * line_item['quantity'].to_f
         else
-          Airbrake.notify("RETAIL Item sold is missing COST in both systems { order_name: #{order_name}, variant_id: #{variant_id}, product_id: #{line_item['product_id']} }")
+          Airbrake.notify("Product sold is missing COST { order_name: #{order_name}, variant_id: #{variant_id}, product_id: #{line_item['product_id']} }")
         end
 
-        pos_costs_by_order[order_name][:cost] += cost
-        pos_costs_report[:cost] += cost
-        costs_by_location[location_id] += cost
-        pos_location_sales_costs[location_id] += cost
+        shopify_pos_sales_costs[location][:cost] += cost
+        shopify_pos_sales_costs_by_sale[order_name][:cost] += cost
 
-        if line_item['gift_card'] || line_item['product_id'] == 1045344714837 # mollusk money
-          pos_sales_receipt[:gift_card_sales] += line_item['price'].to_f * line_item['quantity'].to_f
-          pos_sales_totals_by_order[order_name][:gift_card_sales] += line_item['price'].to_f * line_item['quantity'].to_f
+        item_total = line_item['price'].to_f * line_item['quantity'].to_f
+
+        case shopify_product.product_type
+        when 'Gift Card' # Gift Cards
+          shopify_pos_sales_receipt[location][:gift_card_sales] += item_total
+          shopify_pos_sales_receipt_by_sale[order_name][:gift_card_sales] += item_total
+        when 'Shipping' # Shipping
+          shopify_pos_sales_receipt[location][:shipping] += item_total
+          shopify_pos_sales_receipt_by_sale[order_name][:shipping] += item_total
         else
-          pos_sales_receipt[:product_sales] += line_item['price'].to_f * line_item['quantity'].to_f
-          pos_sales_totals_by_order[order_name][:product_sales] += line_item['price'].to_f * line_item['quantity'].to_f
+          shopify_pos_sales_receipt[location][:product_sales] += item_total
+          shopify_pos_sales_receipt_by_sale[order_name][:product_sales] += item_total
+
+          shopify_pos_sales_receipt_by_sale[order_name][:rentals] += item_total if shopify_product.product_type == 'Rental'
         end
       end
-
-      pos_costs_by_order[order_name][:order_id] = order['id']
-      pos_costs_by_order[order_name][:closed_at] = order['closed_at']
-      pos_costs_by_order[order_name][:location_costs] = costs_by_location
-
-      order_shipping = order['shipping_lines'].reduce(0) { |sum, shipping_line| sum + shipping_line['price'].to_f }
-
-      pos_sales_totals_by_order[order_name][:shipping] = order_shipping
-      pos_sales_receipt[:shipping] += order_shipping
 
       transactions = ShopifyClient.transactions(order['id'])
 
@@ -474,65 +470,50 @@ class DailySalesReceipts
 
         if %w[capture sale].include?(transaction['kind'])
           case transaction['gateway']
+          when 'cash'
+            shopify_pos_sales_receipt[location][:cash_payments] += transaction['amount'].to_f
+            shopify_pos_sales_receipt_by_sale[order_name][:cash_payments] += transaction['amount'].to_f
           when 'gift_card'
-            pos_sales_totals_by_order[order_name][:gift_card_payments] += transaction['amount'].to_f
-            pos_sales_receipt[:gift_card_payments] += transaction['amount'].to_f
-          when 'paypal'
-            pos_sales_totals_by_order[order_name][:paypal_payments] += transaction['amount'].to_f
-            pos_sales_receipt[:paypal_payments] += transaction['amount'].to_f
+            shopify_pos_sales_receipt[location][:gift_card_payments] += transaction['amount'].to_f
+            shopify_pos_sales_receipt_by_sale[order_name][:gift_card_payments] += transaction['amount'].to_f
           when 'shopify_payments'
-            pos_sales_totals_by_order[order_name][:shopify_payments] += transaction['amount'].to_f
-            pos_sales_receipt[:shopify_payments] += transaction['amount'].to_f
+            shopify_pos_sales_receipt[location][:credit_payments] += transaction['amount'].to_f
+            shopify_pos_sales_receipt_by_sale[order_name][:credit_payments] += transaction['amount'].to_f
           end
         elsif transaction['kind'] == 'refund' && transaction['gateway'] == 'gift_card'
           if transaction['message'] == 'Another transaction failed so the gift card was rolled back'
-            pos_sales_totals_by_order[order_name][:gift_card_payments] -= transaction['amount'].to_f
-            pos_sales_receipt[:gift_card_payments] -= transaction['amount'].to_f
+            shopify_pos_sales_receipt[location][:gift_card_payments] -= transaction['amount'].to_f
+            shopify_pos_sales_receipt_by_sale[order_name][:gift_card_payments] -= transaction['amount'].to_f
           end
         end
       end
     end
 
-    pos_costs_report[:location_costs] = pos_location_sales_costs
+    shopify_pos_sales = DailyShopifyPosSale.create!(date: min_date)
 
-    pos_shopify_sales_cost = # ShopifySalesCost.create!(pos_costs_report)
-    pos_shopify_sales_receipt = # ShopifySalesReceipt.create!(pos_sales_receipt)
-
-    pos_sales_totals_by_order.each do |order_name, values|
-      values[:name] = order_name
-      # wholesale_shopify_sales_receipt.shopify_sales_receipt_orders << ShopifySalesReceiptOrder.create!(values)
-    end
-
-    pos_costs_by_order.each do |order_name, values|
-      values[:name] = order_name
-      # wholesale_shopify_sales_cost.shopify_sales_cost_orders << ShopifySalesCostOrder.create!(values)
-    end
-
-    pos_sales = DailyShopifyPosSale.create!(date: min_date)
-
-    pos_sales_receipt.each do |location, receipt|
+    shopify_pos_sales_receipt.each do |location, receipt|
       receipt[:location] = location
-      pos_sales.shopify_pos_sales_receipts << ShopifyPosSalesReceipt.create!(receipt)
+      shopify_pos_sales.shopify_pos_sales_receipts << ShopifyPosSalesReceipt.create!(receipt)
     end
 
-    pos_sales_receipt_by_sale.each do |sale_id, receipt|
-      receipt[:sale_id] = sale_id
-      pos_sales.shopify_pos_sales_receipt_sales << ShopifyPosSalesReceiptSale.create!(receipt)
+    shopify_pos_sales_receipt_by_sale.each do |order_name, receipt|
+      receipt[:name] = order_name
+      shopify_pos_sales.shopify_pos_sales_cost_sales << ShopifyPosSalesReceiptSale.create!(receipt)
     end
 
-    shopify_pos_sales_tax = pos_sales.create_shopify_pos_sales_tax
+    shopify_pos_sales_tax = shopify_pos_sales.create_shopify_pos_sales_tax
     shopify_pos_sales_tax.create_location_taxes
 
-    pos_costs = DailyShopifyPostCost.create!(date: min_date)
+    shopify_pos_costs = DailyShopifyPosCost.create!(date: min_date)
 
-    pos_sales_costs.each do |location, cost|
+    shopify_pos_sales_costs.each do |location, cost|
       cost[:location] = location
-      pos_costs.shopify_pos_sales_costs << ShopifyPosSalesCost.create!(cost)
+      shopify_pos_costs.shopify_pos_sales_costs << ShopifyPosSalesCost.create!(cost)
     end
 
-    pos_sales_costs_by_sale.each do |sale_id, cost|
-      cost[:sale_id] = sale_id
-      pos_costs.shopify_pos_sales_cost_sales << ShopifyPosSalesCostSale.create!(cost)
+    shopify_pos_sales_costs_by_sale.each do |order_name, cost|
+      cost[:order_name] = order_name
+      shopify_pos_costs.shopify_pos_sales_cost_sales << ShopifyPosSalesCostSale.create!(cost)
     end
 
     #######################
@@ -709,6 +690,18 @@ class DailySalesReceipts
 
     begin
       wholesale_shopify_sales_receipt.post_to_qbo
+    rescue StandardError
+      Airbrake.notify($ERROR_INFO)
+    end
+
+    begin
+      shopify_pos_costs.post_to_qbo
+    rescue StandardError
+      Airbrake.notify($ERROR_INFO)
+    end
+
+    begin
+      shopify_pos_sales.post_to_qbo
     rescue StandardError
       Airbrake.notify($ERROR_INFO)
     end

@@ -37,17 +37,17 @@ class ShopifyPosSalesTax < ApplicationRecord
     taxes = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
     sales.each do |sale|
-      taxes[sale.outlet_id][:amount] += sale.product_sales + sale.shipping + sale.discount_sales - sale.discount - sale.rentals
-      taxes[sale.outlet_id][:shipping] += sale.shipping
-      taxes[sale.outlet_id][:sales_tax] += sale.sales_tax
+      taxes[sale.location][:amount] += sale.product_sales + sale.shipping + sale.discount_sales - sale.discount - sale.rentals
+      taxes[sale.location][:shipping] += sale.shipping
+      taxes[sale.location][:sales_tax] += sale.sales_tax
     end
 
     taxes
   end
 
   def create_location_taxes
-    taxes_by_location.each do |outlet_id, location_tax|
-      location_tax[:outlet_id] = outlet_id
+    taxes_by_location.each do |location, location_tax|
+      location_tax[:location] = location
       shopify_pos_location_sales_taxes.create(location_tax)
     end
   end

@@ -17,7 +17,7 @@ class DailyShopifyPosCost < ApplicationRecord
       details << {
         account_id: '3476', # cost of goods sold
         amount: sales_cost.cost,
-        description: 'Total Cost of Sales Vend',
+        description: 'Total Cost of Sales Shopify POS',
         posting_type: 'Debit',
         class_id: Qbo::CLASS_ID_BY_OUTLET[sales_cost.outlet_name]
       }
@@ -25,7 +25,7 @@ class DailyShopifyPosCost < ApplicationRecord
       details << {
         account_id: Qbo::ACCOUNT_ID_BY_OUTLET[sales_cost.outlet_name], # Location specific Inventory Asset
         amount: sales_cost.cost,
-        description: 'Total Cost of Sales Vend',
+        description: 'Total Cost of Sales Shopify POS',
         posting_type: 'Credit',
         class_id: Qbo::CLASS_ID_BY_OUTLET[sales_cost.outlet_name]
       }

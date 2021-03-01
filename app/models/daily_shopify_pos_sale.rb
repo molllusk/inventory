@@ -3,7 +3,7 @@
 class DailyShopifyPosSale < ApplicationRecord
   has_many :shopify_pos_sales_receipts, dependent: :destroy
   has_many :shopify_pos_sales_receipt_sales, dependent: :destroy
-  # has_one :shopify_pos_sales_tax, dependent: :destroy
+  has_one :shopify_pos_sales_tax, dependent: :destroy
 
   def sales_receipt_params(receipt)
     {
