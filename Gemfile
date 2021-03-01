@@ -37,6 +37,7 @@ gem 'sidekiq', '~> 5.1.3'
 gem 'sidekiq-failures'
 gem 'sidekiq-scheduler', '~> 2.2.2'
 gem 'spreadsheet'
+gem 'thwait'
 gem 'turbolinks', '~> 5'
 gem 'uglifier', '>= 1.3.0'
 
