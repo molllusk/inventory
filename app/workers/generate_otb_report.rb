@@ -15,7 +15,7 @@ class GenerateOtbReport
     today = Date.today.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
     ninety_days = 90.days.ago.to_time.in_time_zone('Pacific Time (US & Canada)').beginning_of_day
 
-    date_ranges_headers = ['Range', 'Start', 'End']
+    date_ranges_headers = %w[Range Start End]
     date_ranges = []
 
     raw_data_by_sku = {}

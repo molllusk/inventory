@@ -41,7 +41,7 @@ class WholesaleOrder < ApplicationRecord
   def self.order_attributes(order)
     order_attrs = {}
     order.except('Sales Analysis Name', 'Department', 'ItemName', 'QuantityOrdered', 'TxnDate').each do |header, value|
-      order_attrs[SAVED_HEADERS[header]] = if ['StartShip', 'CancelDate'].include?(header)
+      order_attrs[SAVED_HEADERS[header]] = if %w[StartShip CancelDate].include?(header)
                                              Date.strptime(value, '%m/%d/%Y')
                                            else
                                              value
