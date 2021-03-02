@@ -10,10 +10,10 @@ module Qbo
   }.freeze
 
   CLASS_ID_BY_OUTLET = {
-    'San Francisco' => 300000000000824364,
-    'Santa Barbara' => 300000000000880547,
-    'Silver Lake' => 300000000000824366,
-    'Venice Beach' => 300000000000824365
+    'San Francisco' => 300_000_000_000_824_364,
+    'Santa Barbara' => 300_000_000_000_880_547,
+    'Silver Lake' => 300_000_000_000_824_366,
+    'Venice Beach' => 300_000_000_000_824_365
   }.freeze
 
   CUSTOMER_ID_BY_OUTLET = {
@@ -41,7 +41,7 @@ module Qbo
   SHOPIFY_CUSTOMER_ID = 24694
   WHOLESALE_SHOPIFY_CUSTOMER_ID = 26037
 
-  MOLLUSK_WEST_CLASS = 300000000000824363
+  MOLLUSK_WEST_CLASS = 300_000_000_000_824_363
 
   def self.token
     QboToken.last.refresh_if_necessary

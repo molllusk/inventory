@@ -9,18 +9,40 @@ class ShopifyInventory < ApplicationRecord
 
   enum location: {
     # retail site
-    'Jam Warehouse Retail' => 7700054069,
+    'Jam Warehouse Retail' => 7_700_054_069,
     'Mollusk SF' => 49481991,
-    'Mollusk SB' => 7702609973,
-    'Mollusk VB' => 7702577205,
-    'Postworks' => 18186895445,
-    'Shopify Fulfillment Network' => 36225056853
+    'Mollusk SB' => 7_702_609_973,
+    'Mollusk VB' => 7_702_577_205,
+    'Postworks' => 18_186_895_445,
+    'Shopify Fulfillment Network' => 36_225_056_853
   }
 
   DEAD_LOCATIONS = ['Jam Warehouse Retail', 'Postworks'].freeze
 
+  # This is transitional and won't be needed once vend is fully deprecated
+  VEND_OUTLET_NAMES_BY_LOCATION = {
+    'Mollusk SF' => '5e234f4e-8eed-11e0-8e09-4040f540b50a',
+    'Mollusk SB' => '8d27bed3-060b-11e4-a0f5-b8ca3a64f8f4',
+    'Mollusk VB' => '0adfd74a-153e-11e9-fa42-67b5781ba1fb'
+  }.freeze
+
+  STORE_CITIES = {
+    'Mollusk SF' => 'San Francisco',
+    'Mollusk VB' => 'Venice Beach',
+    'Mollusk SB' => 'Santa Barbara'
+  }
+
   def self.active_locations
     locations.keys - DEAD_LOCATIONS
+  end
+
+  def city
+    STORE_CITIES[location]
+  end
+
+  # This is transitional and won't be needed once vend is fully deprecated
+  def outlet_id
+    VEND_OUTLET_NAMES_BY_LOCATION[location]
   end
 end
 

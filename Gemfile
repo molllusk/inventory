@@ -53,7 +53,7 @@ group :development, :test do
   # Adds support for Capybara system testing and selenium driver
   gem 'capybara', '~> 2.13'
   gem 'dotenv-rails'
-  gem 'rubocop', '~> 0.84.0', require: false
+  gem 'rubocop-rails', require: false
   gem 'selenium-webdriver'
 end
 

@@ -110,7 +110,7 @@ class DailySalesReceipts
         costs_by_location[location_id] += cost
         location_sales_costs[location_id] += cost
 
-        if line_item['gift_card'] || line_item['product_id'] == 1045344714837 # mollusk money
+        if line_item['gift_card'] || line_item['product_id'] == 1_045_344_714_837 # mollusk money
           shopify_sales_receipt[:gift_card_sales] += line_item['price'].to_f * line_item['quantity'].to_f
           sales_totals_by_order[order_name][:gift_card_sales] += line_item['price'].to_f * line_item['quantity'].to_f
         else
@@ -324,7 +324,7 @@ class DailySalesReceipts
         costs_by_location[location_id] += cost
         wholesale_location_sales_costs[location_id] += cost
 
-        if line_item['gift_card'] || line_item['product_id'] == 1045344714837 # mollusk money
+        if line_item['gift_card'] || line_item['product_id'] == 1_045_344_714_837 # mollusk money
           wholesale_shopify_sales_receipt[:gift_card_sales] += line_item['price'].to_f * line_item['quantity'].to_f
           wholesale_sales_totals_by_order[order_name][:gift_card_sales] += line_item['price'].to_f * line_item['quantity'].to_f
         else
