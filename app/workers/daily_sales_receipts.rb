@@ -33,7 +33,6 @@ class DailySalesReceipts
     wholesale_orders = []
     refunds = []
     pos_sales = []
-    pos_returns = []
 
     location_sales_costs = Hash.new(0)
     refund_costs_by_location = Hash.new(0)
@@ -410,7 +409,6 @@ class DailySalesReceipts
       next if Time.parse(order['closed_at']) < min_date || Time.parse(order['closed_at']) > max_date
 
       location = order['location_id']
-      order_id = order['id']
       order_name = order['name']
       order_tax = order['tax_lines'].reduce(0) { |sum, tax_line| sum + tax_line['price'].to_f }
 

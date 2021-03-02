@@ -30,7 +30,7 @@ class ShopifyInventory < ApplicationRecord
     'Mollusk SF' => 'San Francisco',
     'Mollusk VB' => 'Venice Beach',
     'Mollusk SB' => 'Santa Barbara'
-  }
+  }.freeze
 
   def self.active_locations
     locations.keys - DEAD_LOCATIONS

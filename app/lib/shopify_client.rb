@@ -6,8 +6,8 @@ module ShopifyClient
 
   OUTLET_NAMES_BY_ID = {
     49481991 => 'San Francisco',
-    7702609973 => 'Santa Barbara',
-    7702577205 => 'Venice Beach'
+    7_702_609_973 => 'Santa Barbara',
+    7_702_577_205 => 'Venice Beach'
   }.freeze
 
   SAVED_PRODUCT_ATTRIBUTES = %i[
