@@ -18,7 +18,7 @@
     <% products.each do |product| %>
       <% vend = product.vend_datum %>
       <% shopify = product.shopify_datum %>
-      <tr>full_title
+      <tr>
         <td><%= link_to product do %><%= product.title %> <i class='fa fa-external-link-alt'></i><% end %></td>
         <td><%= product.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
         <td><%= shopify.present? ? shopify.barcode : vend&.sku %></td>
