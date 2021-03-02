@@ -80,7 +80,6 @@ class DailyOrdering
 
       inventories = {}
       fill_levels = shopify_product.product.daily_order_inventory_thresholds
-      fill_level = fill_levels['Fill'].to_i
 
       outstanding_orders_by_outlet_id = outstanding_orders_by_product[vend_product.vend_id]
       outstanding_draft_orders = draft_orders_by_variant[shopify_product.variant_id]
@@ -90,6 +89,8 @@ class DailyOrdering
       shopify_product.shopify_inventories.where(location: todays_orders.keys).each do |inventory|
         ##### need to transition this to Shopify Location when Vend is fully deprecated
         outstanding_orders = outstanding_orders_by_outlet_id[inventory.outlet_id]
+
+        fill_level = fill_levels[inventory.city].to_i
 
         store_inventory = inventory.inventory.negative? ? 0 : inventory.inventory
 
@@ -140,7 +141,7 @@ class DailyOrdering
               location_order.orders.create(
                 quantity: inventories[:sf_adjustment],
                 product_id: shopify_product.product_id,
-                threshold: fill_level,
+                threshold: fill_levels['San Francisco'].to_i,
                 vend_qty: inventories[:sf_shopify],
                 cost: cost,
                 sent_orders: inventories[:sf_outstanding]
@@ -151,7 +152,7 @@ class DailyOrdering
               location_order.orders.create(
                 quantity: inventories[:vb_adjustment],
                 product_id: shopify_product.product_id,
-                threshold: fill_level,
+                threshold: fill_levels['Venice Beach'].to_i,
                 vend_qty: inventories[:vb_shopify],
                 cost: cost,
                 sent_orders: inventories[:vb_outstanding]
@@ -162,7 +163,7 @@ class DailyOrdering
               location_order.orders.create(
                 quantity: inventories[:sb_adjustment],
                 product_id: shopify_product.product_id,
-                threshold: fill_level,
+                threshold: fill_levels['Santa Barbara'].to_i,
                 vend_qty: inventories[:sb_shopify],
                 cost: cost,
                 sent_orders: inventories[:sb_outstanding]
