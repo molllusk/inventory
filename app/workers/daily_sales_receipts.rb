@@ -428,6 +428,8 @@ class DailySalesReceipts
 
       shopify_pos_sales_receipt[location][:sales_tax] += order_tax
       shopify_pos_sales_receipt_by_sale[order_name][:sales_tax] = order_tax
+
+      shopify_pos_sales_receipt[location][:discount] += order['total_discounts'].to_f
       shopify_pos_sales_receipt_by_sale[order_name][:discount] = order['total_discounts'].to_f
 
       order['line_items'].each do |line_item|
