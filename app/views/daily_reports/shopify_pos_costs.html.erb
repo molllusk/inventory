@@ -1,0 +1,43 @@
+<h2 class='center'>Vend Cost of Goods</h2>
+
+<table class="products full_width">
+  <tr>
+    <th>Date</th>
+    <th>QBO</th>
+    <th>Outlet</th>
+    <th>Cost</th>
+  </tr>
+  <% @shopify_pos_costs.each do |costs| %>
+    <tr>
+      <% row_span = costs.shopify_pos_sales_costs.count.zero? ? 1 : costs.shopify_pos_sales_costs.count %>
+      <td class='border-bottom' rowspan='<%= row_span %>' style='background-color: #FFFFFF'>
+        <a href='<%= daily_shopify_pos_cost_path(costs) %>' target='_blank'><%= costs.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y") %> <i class='fa fa-external-link-alt'></i></a>
+      </td>
+      <td class='border-bottom' rowspan='<%= row_span %>' style='background-color: #FFFFFF'>
+        <% if costs.qbo_id.present? %><a href='https://c3.qbo.intuit.com/app/journal?txnId=<%= costs.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a><% end %>
+      </td>
+      <% if costs.shopify_pos_sales_costs.present? %>
+        <% costs.shopify_pos_sales_costs.sort_by(&:location).each_with_index do |sales_cost, index| %>
+          <% last_row = (index == (costs.shopify_pos_sales_costs.count - 1)) %>
+          <% if index.positive? %>
+            <tr>
+          <% end %>
+            <td class='<%= 'border-bottom' if last_row %>'>
+              <%= sales_cost.outlet_name %>
+            </td>
+            <td class='<%= 'border-bottom' if last_row %>'>
+              <%= number_to_currency(sales_cost.cost, unit: '$', separator: '.', delimiter: ',') %>
+            </td>
+          </tr>
+        <% end %>
+      <% else %>
+          <td class='border-bottom'> - </td>
+          <td class='border-bottom'> - </td>
+        </tr>
+      <% end %>
+  <% end %>
+</table>
+
+<div class='center'>
+<%= will_paginate @shopify_pos_costs %>
+</div>

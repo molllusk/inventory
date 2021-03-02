@@ -26,8 +26,18 @@ class ShopifyInventory < ApplicationRecord
     'Mollusk VB' => '0adfd74a-153e-11e9-fa42-67b5781ba1fb'
   }.freeze
 
+  STORE_CITIES = {
+    'Mollusk SF' => 'San Francisco',
+    'Mollusk VB' => 'Venice Beach',
+    'Mollusk SB' => 'Santa Barbara'
+  }
+
   def self.active_locations
     locations.keys - DEAD_LOCATIONS
+  end
+
+  def city
+    STORE_CITIES[location]
   end
 
   # This is transitional and won't be needed once vend is fully deprecated
