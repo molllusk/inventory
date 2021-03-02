@@ -20,5 +20,5 @@ end
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
 #  daily_shopify_pos_cost_id :integer
-#  order_id                  :integer
+#  order_id                  :bigint(8)
 #
