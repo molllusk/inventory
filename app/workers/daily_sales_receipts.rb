@@ -18,27 +18,12 @@ class DailySalesReceipts
 
     Airbrake.notify("Expected #{expected_order_count} orders, but got #{orders.count} while running daily reports") unless orders.count == expected_order_count
 
-    shopify_sales_receipt = Hash.new(0)
-    costs_report = Hash.new(0)
-    refunded_amounts = Hash.new(0)
-
-    shopify_sales_receipt[:date] = min_date
-    costs_report[:date] = min_date
-    refunded_amounts[:date] = min_date
-
     web_sales = []
     pos_sales = []
     wholesale_orders = []
     refunds = []
 
-    location_sales_costs = Hash.new(0)
-    refund_costs_by_location = Hash.new(0)
-
     order_names_by_id = {}
-
-    sales_totals_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
-    refund_totals_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
-    costs_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
     # Filter and sort orders into buckets: web, pos, wholesale, refund
     orders.each do |order|
@@ -76,6 +61,16 @@ class DailySalesReceipts
     ###########################
     ##### SHOPIFY Website #####
     ###########################
+
+    shopify_sales_receipt = Hash.new(0)
+    shopify_sales_receipt[:date] = min_date
+
+    costs_report = Hash.new(0)
+    costs_report[:date] = min_date
+
+    sales_totals_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
+    costs_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
+    location_sales_costs = Hash.new(0)
 
     web_sales.each do |order|
       costs_by_location = Hash.new(0)
@@ -161,6 +156,12 @@ class DailySalesReceipts
     ###########################
     ##### SHOPIFY Refunds #####
     ###########################
+
+    refund_costs_by_location = Hash.new(0)
+    refund_totals_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
+
+    refunded_amounts = Hash.new(0)
+    refunded_amounts[:date] = min_date
 
     refunds.each do |refund|
       order_name = order_names_by_id[refund['order_id']]
