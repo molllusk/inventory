@@ -17,7 +17,11 @@ class ShopifyDatum < ApplicationRecord
   end
 
   def full_title
-    "#{title} - #{variant_title}"
+    if variant_title.present? && variant_title != "Default Title"
+      "#{title} - #{variant_title}"
+    else
+      title
+    end
   end
 
   def third_party?

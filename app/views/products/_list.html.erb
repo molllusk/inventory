@@ -18,12 +18,12 @@
     <% products.each do |product| %>
       <% vend = product.vend_datum %>
       <% shopify = product.shopify_datum %>
-      <tr>
-        <td><%= link_to product do %><%= vend.variant_name %> <i class='fa fa-external-link-alt'></i><% end %></td>
+      <tr>full_title
+        <td><%= link_to product do %><%= shopify.present? ? shopify.full_title : vend&.variant_name %> <i class='fa fa-external-link-alt'></i><% end %></td>
         <td><%= product.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
-        <td><%= vend.sku %></td>
+        <td><%= shopify.present? ? shopify.barcode : vend&.sku %></td>
         <td>
-          <% if vend.vend_inventories.present? %>
+          <% if vend.present? && vend.vend_inventories.present? %>
             <% vend.vend_inventories.exclude_dead_locations.each do |inventory| %>
               <strong><%= inventory.location %></strong>: <%= inventory.inventory %><br />
             <% end %>
@@ -59,7 +59,9 @@
           <% end %>
         </td>
         <td>
-          <p class='mb-0'><a href='<%= vend.link %>' target='_blank'>Vend <i class='fa fa-external-link-alt'></i></a></p>
+          <% if vend.present? %>
+            <p class='mb-0'><a href='<%= vend.link %>' target='_blank'>Vend <i class='fa fa-external-link-alt'></i></a></p>
+          <% end %>
           <% if shopify.present? %>
             <p class='mt-2 mb-0'><a href='<%= shopify.link %>' target='_blank'>Shopify <i class='fa fa-external-link-alt'></i></a></p>
           <% end %>
