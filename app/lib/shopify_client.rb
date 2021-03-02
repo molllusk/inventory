@@ -132,7 +132,7 @@ module ShopifyClient
     response.body['variant'] || {}
   end
 
-  def ShopifyClient.get_product(product_id)
+  def self.get_product(product_id)
     response = connection.get "#{API_VERSION}/products/#{product_id}.json"
     response.body['product'] || {}
   end

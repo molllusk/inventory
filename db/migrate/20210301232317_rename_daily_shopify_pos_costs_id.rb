@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RenameDailyShopifyPosCostsId < ActiveRecord::Migration[5.2]
   def change
     change_table :shopify_pos_sales_costs do |t|

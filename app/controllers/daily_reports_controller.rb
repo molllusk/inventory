@@ -15,6 +15,14 @@ class DailyReportsController < ApplicationController
     @shopify_costs = ShopifySalesCost.retail.order('date DESC').paginate(page: params[:page], per_page: 20)
   end
 
+  def shopify_pos_sales_receipts
+    @shopify_pos_sales = DailyShopifyPosSale.order('date DESC').paginate(page: params[:page], per_page: 20)
+  end
+
+  def shopify_pos_costs
+    @shopify_pos_costs = DailyShopifyPosCost.order('date DESC').paginate(page: params[:page], per_page: 20)
+  end
+
   def wholesale_shopify_sales_receipts
     @wholesale_shopify_sales_receipts = ShopifySalesReceipt.wholesale.order('date DESC').paginate(page: params[:page], per_page: 20)
   end

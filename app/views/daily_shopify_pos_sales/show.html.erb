@@ -1,0 +1,116 @@
+<div class='center'>
+  <h2>Shopify POS Sales Receipts for <%= @daily_shopify_pos_sale.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%Y") %></h2>
+</div>
+
+<table class="products full_width">
+  <tr>
+    <th>Outlet</th>
+    <th>Product Sales</th>
+    <th>Gift Card Sales</th>
+    <th>Discounts</th>
+    <th>Sales Tax</th>
+    <th>Shipping</th>
+    <th>Credit Payments</th>
+    <th>Cash Payments</th>
+    <th>Gift Card Payments</th>
+    <th><span style='color: red'>Over</span> / <span style='color: blue'>Short</span></th>
+    <th>QBO</th>
+  </tr>
+  <% @daily_shopify_pos_sale.shopify_pos_sales_receipts.sort_by(&:outlet_id).each do |receipt| %>
+    <tr>
+      <td><%= receipt.outlet_name %></td>
+      <td><%= number_to_currency(receipt.product_sales, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(receipt.gift_card_sales, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(receipt.discount, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(receipt.sales_tax, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(receipt.shipping, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(receipt.credit_payments, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(receipt.cash_payments, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(receipt.gift_card_payments, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td>
+        <% if receipt.sum_check.to_d.truncate(2).to_f == 0.0 %>
+          <p style='color: green'><i class="fa fa-check"></i></p>
+        <% elsif receipt.sum_check.positive? %>
+          <p style='color: red'><%= number_to_currency(receipt.sum_check, unit: '$', separator: '.', delimiter: ',') %></p>
+        <% else %>
+          <p style='color: blue'><%= number_to_currency(receipt.sum_check, unit: '$', separator: '.', delimiter: ',') %></p>
+        <% end %>
+      </td>
+      <td>
+        <% if receipt.qbo_id.present? %><a href='https://c3.qbo.intuit.com/app/salesreceipt?txnId=<%= receipt.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a><% end %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<% if @daily_shopify_pos_sale.shopify_pos_sales_tax.present? %>
+  <div class='center mt-3'>
+    <h2>Taxes</h2>
+  </div>
+
+  <table class="products full_width">
+    <tr>
+      <th>Outlet</th>
+      <th>Amount</th>
+      <th>Sales Tax</th>
+      <th>Shipping</th>
+      <th>id</th>
+    </tr>
+    <% @daily_shopify_pos_sale.shopify_pos_sales_tax.shopify_pos_location_sales_taxes.sort_by(&:outlet_id).each do |tax| %>
+      <tr>
+        <td><%= tax.outlet_name %></td>
+        <td><%= number_to_currency(tax.amount, unit: '$', separator: '.', delimiter: ',') %></td>
+        <td><%= number_to_currency(tax.sales_tax, unit: '$', separator: '.', delimiter: ',') %></td>
+        <td><%= number_to_currency(tax.shipping, unit: '$', separator: '.', delimiter: ',') %></td>
+        <td><%= tax.id %></td>
+      </tr>
+    <% end %>
+  </table>
+<% end %>
+
+<div class='center mt-3'>
+  <h2>Sales</h2>
+</div>
+
+<table class="products full_width">
+  <tr>
+    <th>Sale at</th>
+    <th>Receipt Number</th>
+    <th>Outlet</th>
+    <th>Product Sales</th>
+    <th>Gift Card Sales</th>
+    <th>Rentals</th>
+    <th>Discounts</th>
+    <th>Sales Tax</th>
+    <th>Shipping</th>
+    <th>Shopify Payments</th>
+    <th>Cash of Check Payments</th>
+    <th>Gift Card Payments</th>
+    <th><span style='color: red'>Over</span> / <span style='color: blue'>Short</span></th>
+  </tr>
+  <% @daily_shopify_pos_sale.shopify_pos_sales_receipt_sales.sort_by { |sale| [ sale.outlet_id, sale.sale_at ] }.each do |sale| %>
+    <tr>
+      <td><%= sale.sale_at.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %></td>
+      <td><a href='' target='_blank'><%= sale.receipt_number %> <i class='fa fa-external-link-alt'></i></a></td>
+      <td><%= sale.outlet_name %></td>
+      <td><%= number_to_currency(sale.product_sales, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(sale.gift_card_sales, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(sale.rentals, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(sale.discount, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(sale.sales_tax, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(sale.shipping, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(sale.credit_payments, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(sale.cash_or_check_payments, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(sale.gift_card_payments, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td>
+        <% if sale.sum_check.to_d.truncate(2).to_f == 0.0 %>
+          <p style='color: green'><i class="fa fa-check"></i></p>
+        <% elsif sale.sum_check.positive? %>
+          <p style='color: red'><%= number_to_currency(sale.sum_check, unit: '$', separator: '.', delimiter: ',') %></p>
+        <% else %>
+          <p style='color: blue'><%= number_to_currency(sale.sum_check, unit: '$', separator: '.', delimiter: ',') %></p>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+</table>

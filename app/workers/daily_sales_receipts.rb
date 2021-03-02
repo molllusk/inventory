@@ -431,6 +431,7 @@ class DailySalesReceipts
 
       order['line_items'].each do |line_item|
         next unless line_item['fulfillment_status'].present?
+
         variant_id = line_item['variant_id']
 
         cost = 0.0

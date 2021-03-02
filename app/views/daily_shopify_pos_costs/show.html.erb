@@ -1,0 +1,45 @@
+<div class='center'>
+  <h2>Shopify POS Sales Costs for <%= @daily_shopify_pos_costs.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%Y") %> <% if @daily_shopify_pos_costs.qbo_id.present? %>(<a href='https://c3.qbo.intuit.com/app/journal?txnId=<%= @daily_shopify_pos_costs.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a>)<% end %></h2>
+</div>
+
+<table class="products full_width">
+  <tr>
+    <th>Outlet</th>
+    <th>Cost</th>
+  </tr>
+  <% @daily_shopify_pos_costs.shopify_pos_sales_costs.sort_by(&:outlet_id).each do |cost| %>
+    <tr>
+      <td>
+        <%= cost.outlet_name %>
+      </td>
+      <td>
+        <%= number_to_currency(cost.cost, unit: '$', separator: '.', delimiter: ',') %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<div class='center'>
+  <h2>Orders</h2>
+</div>
+
+<table class="products full_width">
+  <tr>
+    <th>Sale at</th>
+    <th>Receipt Number</th>
+    <th>Outlet</th>
+    <th>Cost</th>
+  </tr>
+  <% @daily_shopify_pos_costs.shopify_pos_sales_cost_sales.sort_by { |sale| [ sale.outlet_id, sale.sale_at ] }.each do |sale| %>
+    <tr>
+      <td><%= sale.sale_at.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %></td>
+      <td><a href='' target='_blank'><%= sale.receipt_number %> <i class='fa fa-external-link-alt'></i></a></td>
+      <td>
+        <%= sale.outlet_name %>
+      </td>
+      <td>
+        <%= number_to_currency(sale.cost, unit: '$', separator: '.', delimiter: ',') %>
+      </td>
+    </tr>
+  <% end %>
+</table>
