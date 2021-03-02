@@ -13,10 +13,6 @@ class DailySalesReceipts
 
     puts "Getting orders from #{days_ago} day(s) ago #{min_date.strftime('%m/%d/%Y')}..."
 
-    ##########################
-    ##### SHOPIFY RETAIL #####
-    ##########################
-
     orders = ShopifyClient.closed_orders_since(day)
     expected_order_count = ShopifyClient.closed_orders_since_count(day)
 
@@ -26,13 +22,14 @@ class DailySalesReceipts
     costs_report = Hash.new(0)
     refunded_amounts = Hash.new(0)
 
-    refunded_amounts[:date] = min_date
     shopify_sales_receipt[:date] = min_date
     costs_report[:date] = min_date
+    refunded_amounts[:date] = min_date
 
+    web_sales = []
+    pos_sales = []
     wholesale_orders = []
     refunds = []
-    pos_sales = []
 
     location_sales_costs = Hash.new(0)
     refund_costs_by_location = Hash.new(0)
@@ -43,6 +40,7 @@ class DailySalesReceipts
     refund_totals_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
     costs_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
+    # Filter and sort orders into buckets: web, pos, wholesale, refund
     orders.each do |order|
       # skip internal orders to the shops
       next if order['source_name'] == 'mollusk_app'
@@ -50,21 +48,11 @@ class DailySalesReceipts
 
       order_names_by_id[order['id']] = order['name']
 
-      # tease out in-store Point of Sale orders for separate accounting
-      if order['source_name'] == 'pos'
-        pos_sales << order
-        next
-      end
+      pos = order['source_name'] == 'pos'
+      wholesale = order['customer']&.[]('tags')&.include?('wholesale')
+      refund = %w[refunded partially_refunded].include?(order['financial_status'])
 
-      # tease out wholesale orders for separate wholesale accounting
-      if order['customer']&.[]('tags')&.include?('wholesale')
-        wholesale_orders << order
-        next
-      end
-
-      costs_by_location = Hash.new(0)
-
-      if %w[refunded partially_refunded].include?(order['financial_status'])
+      if refund && !wholesale
         ShopifyClient.refunds(order['id']).each do |refund|
           next if Time.parse(refund['created_at']) < min_date || Time.parse(refund['created_at']) > max_date
 
@@ -72,8 +60,25 @@ class DailySalesReceipts
         end
       end
 
+      # out of bounds for sales/cost accounting
       next if Time.parse(order['closed_at']) < min_date || Time.parse(order['closed_at']) > max_date
 
+      # put the order in the right bucket
+      if wholesale
+        wholesale_orders << order
+      elsif pos
+        pos_sales << order
+      else
+        web_sales << order
+      end
+    end
+
+    ###########################
+    ##### SHOPIFY Website #####
+    ###########################
+
+    web_sales.each do |order|
+      costs_by_location = Hash.new(0)
       order_name = order['name']
       order_tax = order['tax_lines'].reduce(0) { |sum, tax_line| sum + tax_line['price'].to_f }
 
@@ -152,6 +157,10 @@ class DailySalesReceipts
         end
       end
     end
+
+    ###########################
+    ##### SHOPIFY Refunds #####
+    ###########################
 
     refunds.each do |refund|
       order_name = order_names_by_id[refund['order_id']]
@@ -286,8 +295,6 @@ class DailySalesReceipts
     wholesale_orders.each do |order|
       costs_by_location = Hash.new(0)
 
-      next if Time.parse(order['closed_at']) < min_date || Time.parse(order['closed_at']) > max_date
-
       order_name = order['name']
       order_tax = order['tax_lines'].reduce(0) { |sum, tax_line| sum + tax_line['price'].to_f }
 
@@ -388,7 +395,7 @@ class DailySalesReceipts
     end
 
     #######################
-    ##### POS SHOPIFY #####
+    #### SHOPIFY Store ####
     #######################
 
     shopify_pos_sales_receipt = Hash.new { |hash, key| hash[key] = Hash.new(0) }
@@ -398,16 +405,6 @@ class DailySalesReceipts
     shopify_pos_sales_costs_by_sale = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
     pos_sales.each do |order|
-      if %w[refunded partially_refunded].include?(order['financial_status'])
-        ShopifyClient.refunds(order['id']).each do |refund|
-          next if Time.parse(refund['created_at']) < min_date || Time.parse(refund['created_at']) > max_date
-
-          refunds << refund
-        end
-      end
-
-      next if Time.parse(order['closed_at']) < min_date || Time.parse(order['closed_at']) > max_date
-
       location = order['location_id']
       order_name = order['name']
       order_tax = order['tax_lines'].reduce(0) { |sum, tax_line| sum + tax_line['price'].to_f }
