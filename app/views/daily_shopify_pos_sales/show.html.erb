@@ -16,7 +16,7 @@
     <th><span style='color: red'>Over</span> / <span style='color: blue'>Short</span></th>
     <th>QBO</th>
   </tr>
-  <% @daily_shopify_pos_sale.shopify_pos_sales_receipts.sort_by(&:outlet_id).each do |receipt| %>
+  <% @daily_shopify_pos_sale.shopify_pos_sales_receipts.sort_by(&:location).each do |receipt| %>
     <tr>
       <td><%= receipt.outlet_name %></td>
       <td><%= number_to_currency(receipt.product_sales, unit: '$', separator: '.', delimiter: ',') %></td>
@@ -56,7 +56,7 @@
       <th>Shipping</th>
       <th>id</th>
     </tr>
-    <% @daily_shopify_pos_sale.shopify_pos_sales_tax.shopify_pos_location_sales_taxes.sort_by(&:outlet_id).each do |tax| %>
+    <% @daily_shopify_pos_sale.shopify_pos_sales_tax.shopify_pos_location_sales_taxes.sort_by(&:location).each do |tax| %>
       <tr>
         <td><%= tax.outlet_name %></td>
         <td><%= number_to_currency(tax.amount, unit: '$', separator: '.', delimiter: ',') %></td>
@@ -88,7 +88,7 @@
     <th>Gift Card Payments</th>
     <th><span style='color: red'>Over</span> / <span style='color: blue'>Short</span></th>
   </tr>
-  <% @daily_shopify_pos_sale.shopify_pos_sales_receipt_sales.sort_by { |sale| [ sale.outlet_id, sale.sale_at ] }.each do |sale| %>
+  <% @daily_shopify_pos_sale.shopify_pos_sales_receipt_sales.sort_by { |sale| [ sale.location, sale.sale_at ] }.each do |sale| %>
     <tr>
       <td><%= sale.sale_at.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %></td>
       <td><a href='' target='_blank'><%= sale.receipt_number %> <i class='fa fa-external-link-alt'></i></a></td>

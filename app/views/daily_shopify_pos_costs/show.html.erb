@@ -7,7 +7,7 @@
     <th>Outlet</th>
     <th>Cost</th>
   </tr>
-  <% @daily_shopify_pos_costs.shopify_pos_sales_costs.sort_by(&:outlet_id).each do |cost| %>
+  <% @daily_shopify_pos_costs.shopify_pos_sales_costs.sort_by(&:location).each do |cost| %>
     <tr>
       <td>
         <%= cost.outlet_name %>
@@ -30,7 +30,7 @@
     <th>Outlet</th>
     <th>Cost</th>
   </tr>
-  <% @daily_shopify_pos_costs.shopify_pos_sales_cost_sales.sort_by { |sale| [ sale.outlet_id, sale.sale_at ] }.each do |sale| %>
+  <% @daily_shopify_pos_costs.shopify_pos_sales_cost_sales.sort_by { |sale| [ sale.location, sale.sale_at ] }.each do |sale| %>
     <tr>
       <td><%= sale.sale_at.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %></td>
       <td><a href='' target='_blank'><%= sale.receipt_number %> <i class='fa fa-external-link-alt'></i></a></td>
