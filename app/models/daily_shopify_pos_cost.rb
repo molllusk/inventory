@@ -2,7 +2,7 @@
 
 class DailyShopifyPosCost < ApplicationRecord
   has_many :shopify_pos_sales_costs, dependent: :destroy
-  has_many :shopify_pos_sales_cost_sales, dependent: :destroy
+  has_many :shopify_pos_sales_cost_orders, dependent: :destroy
 
   def journal_entry_params
     {
@@ -34,7 +34,7 @@ class DailyShopifyPosCost < ApplicationRecord
   end
 
   def post_to_qbo
-    if shopify_pos_sales_cost_sales.present?
+    if shopify_pos_sales_cost_orders.present?
       qbo = Qbo.create_journal_entry(journal_entry)
       update_attribute(:qbo_id, qbo.id) unless qbo.blank?
     end

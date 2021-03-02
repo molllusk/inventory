@@ -520,7 +520,7 @@ class DailySalesReceipts
 
     shopify_pos_sales_costs_by_sale.each do |order_name, cost|
       cost[:order_name] = order_name
-      shopify_pos_costs.shopify_pos_sales_cost_sales << ShopifyPosSalesCostSale.create!(cost)
+      shopify_pos_costs.shopify_pos_sales_cost_orders << ShopifyPosSalesCostSale.create!(cost)
     end
 
     #######################
