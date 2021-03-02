@@ -519,7 +519,7 @@ class DailySalesReceipts
     end
 
     shopify_pos_sales_costs_by_sale.each do |order_name, cost|
-      cost[:order_name] = order_name
+      cost[:name] = order_name
       shopify_pos_costs.shopify_pos_sales_cost_orders << ShopifyPosSalesCostOrder.create!(cost)
     end
 
