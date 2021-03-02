@@ -100,7 +100,7 @@
       <td><%= number_to_currency(sale.sales_tax, unit: '$', separator: '.', delimiter: ',') %></td>
       <td><%= number_to_currency(sale.shipping, unit: '$', separator: '.', delimiter: ',') %></td>
       <td><%= number_to_currency(sale.credit_payments, unit: '$', separator: '.', delimiter: ',') %></td>
-      <td><%= number_to_currency(sale.cash_or_check_payments, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(sale.cash_payments, unit: '$', separator: '.', delimiter: ',') %></td>
       <td><%= number_to_currency(sale.gift_card_payments, unit: '$', separator: '.', delimiter: ',') %></td>
       <td>
         <% if sale.sum_check.to_d.truncate(2).to_f == 0.0 %>
