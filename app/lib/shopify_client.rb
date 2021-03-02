@@ -5,9 +5,9 @@ module ShopifyClient
   API_VERSION = '/admin/api/2021-01'
 
   OUTLET_NAMES_BY_ID = {
-    '49481991' => 'San Francisco',
-    '7702609973' => 'Santa Barbara',
-    '7702577205' => 'Venice Beach'
+    49481991 => 'San Francisco',
+    7702609973 => 'Santa Barbara',
+    7702577205 => 'Venice Beach'
   }.freeze
 
   SAVED_PRODUCT_ATTRIBUTES = %i[
