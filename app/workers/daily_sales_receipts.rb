@@ -426,6 +426,7 @@ class DailySalesReceipts
       shopify_pos_sales_receipt_by_sale[order_name][:location] = location
       shopify_pos_sales_costs_by_sale[order_name][:location] = location
 
+      shopify_pos_sales_receipt[location][:sales_tax] += order_tax
       shopify_pos_sales_receipt_by_sale[order_name][:sales_tax] = order_tax
       shopify_pos_sales_receipt_by_sale[order_name][:discount] = order['total_discounts'].to_f
 

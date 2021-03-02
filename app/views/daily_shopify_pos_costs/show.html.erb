@@ -33,7 +33,7 @@
   <% @daily_shopify_pos_costs.shopify_pos_sales_cost_orders.sort_by { |sale| [ sale.location, sale.sale_at ] }.each do |sale| %>
     <tr>
       <td><%= sale.sale_at.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %></td>
-      <td><a href='https://mollusksurf.myshopify.com/admin/orders/<%= sale.order_id %>' target='_blank'>#<%= sale.name %> <i class='fa fa-external-link-alt'></i></a></td>
+      <td><a href='https://mollusksurf.myshopify.com/admin/orders/<%= sale.order_id %>' target='_blank'><%= sale.name %> <i class='fa fa-external-link-alt'></i></a></td>
       <td>
         <%= sale.outlet_name %>
       </td>
