@@ -1,4 +1,4 @@
-<h2 class='center'>Vend Daily Sales Receipts</h2>
+<h2 class='center'>Shoopify POS Daily Sales Receipts</h2>
 
 <table class="products full_width">
   <tr>
@@ -20,7 +20,7 @@
       <td class='border-bottom' rowspan='<%= day.shopify_pos_sales_receipts.count.zero? ? 1 : day.shopify_pos_sales_receipts.count %>' style='background-color: #FFFFFF'><a href='<%= daily_shopify_pos_sale_path(day) %>' target='_blank'><%= day.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %> <i class='fa fa-external-link-alt'></i></a></td>
       <% if day.shopify_pos_sales_receipts.present? %>
         <% day.shopify_pos_sales_receipts.sort_by(&:location).each_with_index do |receipt, index| %>
-          <% last_row = (index == (day.vend_sales_receipts.count - 1)) %>
+          <% last_row = (index == (day.shopify_pos_sales_receipts.count - 1)) %>
           <% if index.positive? %>
             <tr>
           <% end %>

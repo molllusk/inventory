@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class DailyVendCostsController < ApplicationController
+class DailyShopifyPosCostsController < ApplicationController
   before_action :logged_in_user
 
   def show
