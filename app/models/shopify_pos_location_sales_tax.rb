@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-class VendLocationSalesTax < ApplicationRecord
-  belongs_to :vend_sales_tax
+class ShopifyPosLocationSalesTax < ApplicationRecord
+  belongs_to :shopify_pos_sales_tax
 
   CSV_HEADERS = %i[
     amount
@@ -23,11 +23,11 @@ class VendLocationSalesTax < ApplicationRecord
   }.freeze
 
   def outlet_name
-    VendClient::OUTLET_NAMES_BY_ID[outlet_id]
+    ShopifyClient::OUTLET_NAMES_BY_ID[location]
   end
 
   def transaction_date
-    vend_sales_tax.date
+    shopify_pos_sales_tax.date
   end
 
   def provider
@@ -65,14 +65,14 @@ end
 
 # == Schema Information
 #
-# Table name: vend_location_sales_taxes
+# Table name: shopify_pos_location_sales_taxes
 #
-#  id                :bigint(8)        not null, primary key
-#  amount            :float            default(0.0)
-#  sales_tax         :float            default(0.0)
-#  shipping          :float            default(0.0)
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  outlet_id         :string
-#  vend_sales_tax_id :integer
+#  id                       :bigint(8)        not null, primary key
+#  amount                   :float            default(0.0)
+#  location                 :bigint(8)
+#  sales_tax                :float            default(0.0)
+#  shipping                 :float            default(0.0)
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
+#  shopify_pos_sales_tax_id :integer
 #

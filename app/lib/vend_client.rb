@@ -67,7 +67,7 @@ class VendClient
     response = nil
 
     begin
-      response = connection.get resource + '/' + id
+      response = connection.get "#{resource}/#{id}"
     rescue StandardError
       if (retries += 1) < 5
         sleep(retries)

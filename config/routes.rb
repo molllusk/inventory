@@ -42,6 +42,8 @@ Rails.application.routes.draw do
     collection do
       get :shopify_sales_receipts
       get :shopify_costs
+      get :shopify_pos_sales_receipts
+      get :shopify_pos_costs
       get :shopify_refunds
       get :wholesale_shopify_sales_receipts
       get :wholesale_shopify_costs
@@ -51,6 +53,9 @@ Rails.application.routes.draw do
       get :vend_sales_taxes
     end
   end
+
+  resources :daily_shopify_pos_costs
+  resources :daily_shopify_pos_sales
 
   resources :daily_vend_consignments
   resources :daily_vend_costs

@@ -4,6 +4,12 @@ module ShopifyClient
   BASE_URL = "https://#{ENV['SHOPIFY_USER']}:#{ENV['SHOPIFY_PASSWORD']}@mollusksurf.myshopify.com"
   API_VERSION = '/admin/api/2021-01'
 
+  OUTLET_NAMES_BY_ID = {
+    49481991 => 'San Francisco',
+    7702609973 => 'Santa Barbara',
+    7702577205 => 'Venice Beach'
+  }.freeze
+
   SAVED_PRODUCT_ATTRIBUTES = %i[
     handle
     product_type
@@ -124,6 +130,11 @@ module ShopifyClient
   def self.get_variant(variant_id)
     response = connection.get "#{API_VERSION}/variants/#{variant_id}.json"
     response.body['variant'] || {}
+  end
+
+  def self.get_product(product_id)
+    response = connection.get "#{API_VERSION}/products/#{product_id}.json"
+    response.body['product'] || {}
   end
 
   def self.get_cost(variant_id)
@@ -349,6 +360,6 @@ module ShopifyClient
   end
 
   def self.next_page_url(next_link)
-    next_link.split(';').first.gsub(/\<|\>/, '')
+    next_link.split(';').first.gsub(/<|>/, '')
   end
 end

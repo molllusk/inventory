@@ -98,7 +98,7 @@ class DailyInventoryTransfer < ApplicationRecord
     daily_orders.not_cancelled.each(&:cancel)
 
     if daily_orders.not_cancelled.count.zero?
-      delete_qbo_journal_entry
+      delete_qbo_journal_entry if qbo_id.present?
       update_attribute(:cancelled, true)
     end
   end
