@@ -176,6 +176,10 @@ class Product < ApplicationRecord
     adjust_inventory_vend(outlet, inventory_adjustment(outlet))
   end
 
+  def title
+    shopify_datum&.full_title || vend_datum&.variant_name
+  end
+
   def inventory_csv_row_data
     data = {
       id: id,
