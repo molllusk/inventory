@@ -37,6 +37,7 @@ class DailyOrder < ApplicationRecord
     'Santa Barbara' => '93101'
   }.freeze
 
+  ######### VEND
   LOCATION_ID_BY_VEND_OUTLET_NAME = {
     'San Francisco' => 3_265_917_026_389,
     'Santa Barbara' => 3_265_930_625_109,
@@ -122,7 +123,7 @@ class DailyOrder < ApplicationRecord
     "mollusk_#{po_stem}_order_#{po_id}.csv"
   end
 
-  ###### need to switch to shopify location
+  ######### VEND
   def outlet_name
     VendClient::OUTLET_NAMES_BY_ID[outlet_id]
   end
@@ -156,10 +157,12 @@ class DailyOrder < ApplicationRecord
     }
   end
 
+  ######### VEND
   def shopify_customer_id
     LOCATION_ID_BY_VEND_OUTLET_NAME[outlet_name].to_s
   end
 
+  ######### VEND
   def inventory_planner_warehouse_id
     InventoryPlannerClient::VEND_OUTLET_ID_BY_IP_SHOP.key(outlet_id)
   end
