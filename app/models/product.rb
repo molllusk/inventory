@@ -180,6 +180,14 @@ class Product < ApplicationRecord
     shopify_datum&.full_title || vend_datum&.variant_name
   end
 
+  def barcode
+    shopify_datum&.barcode || vend_datum&.sku
+  end
+
+  def sort_key
+    shopify_datum&.sort_key || vend_datum&.sort_key
+  end
+
   def inventory_csv_row_data
     data = {
       id: id,

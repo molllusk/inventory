@@ -122,14 +122,14 @@
           <th>Size</th>
           <th>Quantity</th>
         </tr>
-        <% @daily_order.orders.sort_by { |order| order.product.vend_datum.sort_key }.each do |order| %>
+        <% @daily_order.orders.sort_by { |order| order.product.sort_key }.each do |order| %>
           <tr>
-            <% vend_product = order.product.vend_datum %>
-            <td><%= order.product.shopify_datum&.sku %></td>
-            <td><%= vend_product.name %></td>
-            <td><%= vend_product.vend_type&.[]('name') %></td>
-            <td><%= vend_product.variant_options.find { |vo| vo['name'] == 'Color' }&.[]('value') %></td>
-            <td><%= vend_product.variant_options.find { |vo| vo['name'] == 'Size' }&.[]('value') %></td>
+            <% product = order.product %>
+            <td><%= product.shopify_datum&.sku %></td>
+            <td><%= product.shopify_datum.title %></td>
+            <td><%= product.shopify_datum.product_type %></td>
+            <td><%= product.shopify_datum.option2 %></td>
+            <td><%= product.shopify_datum.option1.to_s.gsub('Default Title') %></td>
             <td class='align-right'><%= order.quantity %></td>
           </tr>
         <% end %>

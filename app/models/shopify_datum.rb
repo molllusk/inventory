@@ -36,6 +36,10 @@ class ShopifyDatum < ApplicationRecord
     tags.find { |tag| %w[3rdparty sale].include?(tag.strip.downcase) }.present?
   end
 
+  def sort_key
+    "#{product_type}#{full_title}"
+  end
+
   def get_cost
     return cost if cost.present?
 

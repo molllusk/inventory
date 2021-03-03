@@ -18,8 +18,8 @@
     <% inventory_updates.each do |update| %>
       <tr>
         <td><%= update.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
-        <td><%= link_to update.product do %><%= update.product.vend_datum.variant_name %> <i class='fa fa-external-link-alt'></i><% end %></td>
-        <td><%= update.product.vend_datum.sku %></td>
+        <td><%= link_to update.product do %><%= update.product.title %> <i class='fa fa-external-link-alt'></i><% end %></td>
+        <td><%= update.product.barcode %></td>
         <td><%= ShopifyInventory::locations.key(update.location) %></td>
         <td><%= ShopifyInventory::locations.key(update.location).include?('Jam ') || ShopifyInventory::locations.key(update.location).include?('Postworks') || ShopifyInventory::locations.key(update.location).include?('Shopify Fulfillment Network') ? ' - ' : update.vend_qty %></td>
         <td><%= update.prior_qty %></td>

@@ -29,7 +29,7 @@ class DailySalesReceipts
     orders.each do |order|
       # skip internal orders to the shops
       next if order['source_name'] == 'mollusk_app'
-      next if order['payment_gateway_names'] == 'exchange-credit'
+      next if order['gateway'] == 'exchange-credit'
 
       order_names_by_id[order['id']] = order['name']
 

@@ -90,7 +90,7 @@ class DailyOrder < ApplicationRecord
     ]
 
     CSV.generate(headers: headers, write_headers: true) do |new_csv|
-      orders.sort_by { |order| order.product.vend_datum.sort_key }.each do |order|
+      orders.sort_by { |order| order.product.sort_key }.each do |order|
         new_csv << [
           display_po,
           'Mollusk',

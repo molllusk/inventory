@@ -21,7 +21,7 @@
       <tr>
         <td><%= link_to product do %><%= product.title %> <i class='fa fa-external-link-alt'></i><% end %></td>
         <td><%= product.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
-        <td><%= shopify.present? ? shopify.barcode : vend&.sku %></td>
+        <td><%= product.barcode %></td>
         <td>
           <% if vend.present? && vend.vend_inventories.present? %>
             <% vend.vend_inventories.exclude_dead_locations.each do |inventory| %>
