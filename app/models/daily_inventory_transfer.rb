@@ -59,7 +59,7 @@ class DailyInventoryTransfer < ApplicationRecord
   end
 
   def orders?
-    daily_orders.find { |daily_order| daily_order.orders.present? }
+    daily_orders.find { |daily_order| daily_order.orders.exists? }
   end
 
   def post_to_qbo
@@ -110,6 +110,10 @@ class DailyInventoryTransfer < ApplicationRecord
 
   def post_to_shopify
     daily_orders.each(&:post_to_shopify)
+  end
+
+  def post_to_inventory_planner
+    daily_orders.each(&:create_ip_purchase_order)
   end
 end
 

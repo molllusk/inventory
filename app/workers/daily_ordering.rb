@@ -150,20 +150,14 @@ class DailyOrdering
           end
         end
       end
-      # daily_order_data << inventories
-    end
-
-    todays_orders.each do |_location, daily_order|
-      if daily_order.orders.count.positive?
-        daily_inventory_transfer.update_attributes(po_id: next_po_number) unless daily_order.po?
-        daily_order.create_ip_purchase_order
-      end
     end
 
     return unless daily_inventory_transfer.orders?
 
-    daily_inventory_transfer.post_to_qbo
-    daily_inventory_transfer.post_to_shopify
-    daily_inventory_transfer.send_po
+    daily_inventory_transfer.update_attributes(po_id: next_po_number)
+    # daily_inventory_transfer.post_to_inventory_planner
+    # daily_inventory_transfer.post_to_qbo
+    # daily_inventory_transfer.post_to_shopify
+    # daily_inventory_transfer.send_po
   end
 end
