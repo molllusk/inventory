@@ -157,6 +157,8 @@ class DailySalesReceipts
     ##### SHOPIFY Refunds #####
     ###########################
 
+    # we need to track refund data fields by web, or post location
+
     refund_costs_by_location = Hash.new(0)
     refund_totals_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
@@ -166,6 +168,8 @@ class DailySalesReceipts
     refunds.each do |refund|
       order_name = order_names_by_id[refund['order_id']]
       fulfillments = ShopifyClient.fulfillments(refund['order_id'])
+      pos = order['source_name'] == 'pos'
+
       costs_by_location = Hash.new(0)
 
       refund_line_items = refund['refund_line_items']
