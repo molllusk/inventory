@@ -56,9 +56,9 @@ class ShopifyDatum < ApplicationRecord
   def order_locations(all_locations = ShopifyInventory::STORE_CITIES.keys)
     return [] if tags.find { |tag| tag.strip.downcase == 'hold-all-stores' }.present?
 
-    all_locations -= ['Mollusk_SF'] if tags.find { |tag| tag.strip.downcase == 'hold-sf' }.present?
-    all_locations -= ['Mollusk_SB'] if tags.find { |tag| tag.strip.downcase == 'hold-sb' }.present?
-    all_locations -= ['Mollusk_VB'] if tags.find { |tag| tag.strip.downcase == 'hold-vb' }.present?
+    all_locations -= ['Mollusk SF'] if tags.find { |tag| tag.strip.downcase == 'hold-sf' }.present?
+    all_locations -= ['Mollusk SB'] if tags.find { |tag| tag.strip.downcase == 'hold-sb' }.present?
+    all_locations -= ['Mollusk VB'] if tags.find { |tag| tag.strip.downcase == 'hold-vb' }.present?
 
     all_locations
   end
