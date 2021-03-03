@@ -168,7 +168,7 @@ class DailySalesReceipts
     refunds.each do |refund|
       order_name = order_names_by_id[refund['order_id']]
       fulfillments = ShopifyClient.fulfillments(refund['order_id'])
-      pos = order['source_name'] == 'pos'
+      pos = refund['source_name'] == 'pos'
 
       costs_by_location = Hash.new(0)
 
