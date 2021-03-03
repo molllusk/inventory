@@ -42,15 +42,25 @@ class ShopifyDatum < ApplicationRecord
 
   def get_cost
     return cost if cost.present?
+    new_cost = ShopifyClient.get_cost(variant_id)
 
-    vend_product = product.vend_datum
-
-    if vend_product.present?
-      vend_product.supply_price.to_f
+    if new_cost.present?
+      update(cost: new_cost)
+      new_cost
     else
-      Airbrake.notify("COST MISSING: Item in shopify order, shopify product exists without Vend Product and Cost is missing in Shopify: { barcode: #{barcode}, product_id: #{shopify_product_id}, variant_id: #{variant_id} }")
+      Airbrake.notify("COST MISSING: Item in shopify order { barcode: #{barcode}, product_id: #{shopify_product_id}, variant_id: #{variant_id} }")
       0.0
     end
+  end
+
+  def order_locations(all_locations = ShopifyInventory::STORE_CITIES.keys)
+    return [] if tags.find { |tag| tag.strip.downcase == 'hold-all-stores' }.present?
+
+    all_locations -= ['Mollusk_SF'] if tags.find { |tag| tag.strip.downcase == 'hold-sf' }.present?
+    all_locations -= ['Mollusk_SB'] if tags.find { |tag| tag.strip.downcase == 'hold-sb' }.present?
+    all_locations -= ['Mollusk_VB'] if tags.find { |tag| tag.strip.downcase == 'hold-vb' }.present?
+
+    all_locations
   end
 
   def link
