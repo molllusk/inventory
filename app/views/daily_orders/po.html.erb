@@ -129,7 +129,7 @@
             <td><%= product.shopify_datum.title %></td>
             <td><%= product.shopify_datum.product_type %></td>
             <td><%= product.shopify_datum.option2 %></td>
-            <td><%= product.shopify_datum.option1.to_s.gsub('Default Title') %></td>
+            <td><%= product.shopify_datum.option1.to_s.gsub('Default Title','') %></td>
             <td class='align-right'><%= order.quantity %></td>
           </tr>
         <% end %>
