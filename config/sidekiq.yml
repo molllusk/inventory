@@ -17,10 +17,6 @@
     cron: '* * 1 * *'
     class: 'RenewSosToken'
     description: 'Refresh SOS access token once a month'
-  daily_ordering:
-    cron: '0 10 * * 1-5'
-    class: 'DailyOrdering'
-    description: 'Daily Orders for shops (restocks from warehouse)'
   update_product_costs:
     cron: '0 8 * * *'
     class: 'UpdateProductCosts'

@@ -37,8 +37,8 @@ class DailyOrder < ApplicationRecord
     'Santa Barbara' => '93101'
   }.freeze
 
-  ######### VEND - Getting shopify location id from vend outlet city
-  LOCATION_ID_BY_VEND_OUTLET_NAME = {
+  ######### VEND
+  CUSTOMER_ID_BY_VEND_OUTLET_NAME = {
     'San Francisco' => 3_265_917_026_389,
     'Santa Barbara' => 3_265_930_625_109,
     'Venice Beach' => 3_265_924_825_173
@@ -158,7 +158,7 @@ class DailyOrder < ApplicationRecord
   end
 
   def shopify_customer_id
-    LOCATION_ID_BY_VEND_OUTLET_NAME[outlet_name].to_s
+    CUSTOMER_ID_BY_VEND_OUTLET_NAME[outlet_name].to_s
   end
 
   ######### VEND
