@@ -37,7 +37,7 @@ class DailyOrder < ApplicationRecord
     'Santa Barbara' => '93101'
   }.freeze
 
-  ######### VEND
+  ######### VEND - Getting shopify location id from vend outlet city
   LOCATION_ID_BY_VEND_OUTLET_NAME = {
     'San Francisco' => 3_265_917_026_389,
     'Santa Barbara' => 3_265_930_625_109,
@@ -125,7 +125,7 @@ class DailyOrder < ApplicationRecord
 
   ######### VEND
   def outlet_name
-    VendClient::OUTLET_NAMES_BY_ID[outlet_id]
+    VendClient::OUTLET_NAMES_BY_ID[outlet_id] || ShopifyClient::OUTLET_NAMES_BY_ID[outlet_id.to_i]
   end
 
   def po?
@@ -157,14 +157,13 @@ class DailyOrder < ApplicationRecord
     }
   end
 
-  ######### VEND
   def shopify_customer_id
     LOCATION_ID_BY_VEND_OUTLET_NAME[outlet_name].to_s
   end
 
   ######### VEND
   def inventory_planner_warehouse_id
-    InventoryPlannerClient::VEND_OUTLET_ID_BY_IP_SHOP.key(outlet_id)
+    InventoryPlannerClient::VEND_OUTLET_ID_BY_IP_SHOP.key(outlet_id) || InventoryPlannerClient::SHOPIFY_OUTLET_ID_BY_IP_SHOP.key(outlet_id.to_i)
   end
 
   def shopify_order_line_items
