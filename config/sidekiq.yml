@@ -5,10 +5,6 @@
   - orders
   - reporting
 :schedule:
-  sku_check:
-    cron: '0 21 * * *'
-    class: 'SkuCheck'
-    description: 'Check for mismatched SKUs'
   daily_sales_receipts:
     cron: '0 9 * * *'
     class: 'DailySalesReceipts'
