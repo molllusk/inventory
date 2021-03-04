@@ -21,3 +21,7 @@
     cron: '0 8 * * *'
     class: 'UpdateProductCosts'
     description: 'Update product costs from shopify before sales receipts'
+  daily_ordering:
+    cron: '0 10 * * 1-5'
+    class: 'DailyOrdering'
+    description: 'Daily Orders for shops (restocks from warehouse)'
