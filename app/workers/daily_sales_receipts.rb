@@ -37,7 +37,7 @@ class DailySalesReceipts
       is_wholesale = order['customer']&.[]('tags')&.include?('wholesale')
       is_refund = %w[refunded partially_refunded].include?(order['financial_status'])
 
-      if is_refund && !is_wholesale
+      if is_refund
         ShopifyClient.refunds(order['id']).each do |refund|
           next if Time.parse(refund['created_at']) < min_date || Time.parse(refund['created_at']) > max_date
 
@@ -258,32 +258,6 @@ class DailySalesReceipts
       end
     end
 
-    refunded_amounts[:shipping] = refunded_amounts[:product_sales] + refunded_amounts[:sales_tax] + refunded_amounts[:refunded_shipping] + refunded_amounts[:arbitrary_discount] - refunded_amounts[:discount] - refunded_amounts[:total_payments]
-    refunded_amounts[:location_costs] = refund_costs_by_location
-    
-    shopify_refund = ShopifyRefund.create!(refunded_amounts)
-
-    refund_totals_by_order.each do |order_name, values|
-      values[:name] = order_name
-      values[:shipping] = values[:product_sales] + values[:sales_tax] + values[:refunded_shipping] + values[:arbitrary_discount] - values[:discount] - values[:total_payments]
-      shopify_refund.shopify_refund_orders << ShopifyRefundOrder.create!(values)
-    end
-
-    shopify_sales_receipt = ShopifySalesReceipt.create!(shopify_sales_receipt)
-
-    sales_totals_by_order.each do |order_name, values|
-      values[:name] = order_name
-      shopify_sales_receipt.shopify_sales_receipt_orders << ShopifySalesReceiptOrder.create!(values)
-    end
-
-    costs_report[:location_costs] = location_sales_costs
-    shopify_sales_cost = ShopifySalesCost.create!(costs_report)
-
-    costs_by_order.each do |order_name, values|
-      values[:name] = order_name
-      shopify_sales_cost.shopify_sales_cost_orders << ShopifySalesCostOrder.create!(values)
-    end
-
     ###########################
     #### SHOPIFY WHOLESALE ####
     ###########################
@@ -378,26 +352,6 @@ class DailySalesReceipts
           end
         end
       end
-    end
-
-    wholesale_costs_report[:location_costs] = wholesale_location_sales_costs
-
-    wholesale_costs_report[:store] = :wholesale
-    wholesale_shopify_sales_receipt[:store] = :wholesale
-
-    wholesale_shopify_sales_cost = ShopifySalesCost.create!(wholesale_costs_report)
-    wholesale_shopify_sales_receipt = ShopifySalesReceipt.create!(wholesale_shopify_sales_receipt)
-
-    wholesale_sales_totals_by_order.each do |order_name, values|
-      values[:name] = order_name
-      values[:store] = :wholesale
-      wholesale_shopify_sales_receipt.shopify_sales_receipt_orders << ShopifySalesReceiptOrder.create!(values)
-    end
-
-    wholesale_costs_by_order.each do |order_name, values|
-      values[:name] = order_name
-      values[:store] = :wholesale
-      wholesale_shopify_sales_cost.shopify_sales_cost_orders << ShopifySalesCostOrder.create!(values)
     end
 
     #######################
@@ -501,6 +455,66 @@ class DailySalesReceipts
       end
     end
 
+    #############################
+    ####### Save Objects ########
+    #############################
+
+    ### Shopify Refunds ###
+
+    refunded_amounts[:shipping] = refunded_amounts[:product_sales] + refunded_amounts[:sales_tax] + refunded_amounts[:refunded_shipping] + refunded_amounts[:arbitrary_discount] - refunded_amounts[:discount] - refunded_amounts[:total_payments]
+    refunded_amounts[:location_costs] = refund_costs_by_location
+    shopify_refund = ShopifyRefund.create!(refunded_amounts)
+
+    refund_totals_by_order.each do |order_name, values|
+      values[:name] = order_name
+      values[:shipping] = values[:product_sales] + values[:sales_tax] + values[:refunded_shipping] + values[:arbitrary_discount] - values[:discount] - values[:total_payments]
+      shopify_refund.shopify_refund_orders << ShopifyRefundOrder.create!(values)
+    end
+
+    ### Shopify Sales Receipt Web ###
+
+    shopify_sales_receipt = ShopifySalesReceipt.create!(shopify_sales_receipt)
+
+    sales_totals_by_order.each do |order_name, values|
+      values[:name] = order_name
+      shopify_sales_receipt.shopify_sales_receipt_orders << ShopifySalesReceiptOrder.create!(values)
+    end
+
+    ### Shopify Sales Cost Web ###
+
+    costs_report[:location_costs] = location_sales_costs
+    shopify_sales_cost = ShopifySalesCost.create!(costs_report)
+
+    costs_by_order.each do |order_name, values|
+      values[:name] = order_name
+      shopify_sales_cost.shopify_sales_cost_orders << ShopifySalesCostOrder.create!(values)
+    end
+
+    ### Shopify Sales Receipt Web (Wholesale) ###
+
+    wholesale_shopify_sales_receipt[:store] = :wholesale
+    wholesale_shopify_sales_receipt = ShopifySalesReceipt.create!(wholesale_shopify_sales_receipt)
+
+    wholesale_sales_totals_by_order.each do |order_name, values|
+      values[:name] = order_name
+      values[:store] = :wholesale
+      wholesale_shopify_sales_receipt.shopify_sales_receipt_orders << ShopifySalesReceiptOrder.create!(values)
+    end
+
+    ### Shopify Sales Costs Web (Wholesale) ###
+
+    wholesale_costs_report[:location_costs] = wholesale_location_sales_costs
+    wholesale_costs_report[:store] = :wholesale
+    wholesale_shopify_sales_cost = ShopifySalesCost.create!(wholesale_costs_report)
+
+    wholesale_costs_by_order.each do |order_name, values|
+      values[:name] = order_name
+      values[:store] = :wholesale
+      wholesale_shopify_sales_cost.shopify_sales_cost_orders << ShopifySalesCostOrder.create!(values)
+    end
+
+    ### Shopify Sales Receipt Store ###
+
     shopify_pos_sales = DailyShopifyPosSale.create!(date: min_date)
 
     shopify_pos_sales_receipt.each do |location, receipt|
@@ -513,8 +527,12 @@ class DailySalesReceipts
       shopify_pos_sales.shopify_pos_sales_receipt_sales << ShopifyPosSalesReceiptSale.create!(receipt)
     end
 
+    ### Shopify Sales Taxes Store (this might be obsolete) ###
+
     shopify_pos_sales_tax = shopify_pos_sales.create_shopify_pos_sales_tax
     shopify_pos_sales_tax.create_location_taxes
+
+    ### Shopify Sales Cost Store ###
 
     shopify_pos_costs = DailyShopifyPosCost.create!(date: min_date)
 
@@ -526,150 +544,6 @@ class DailySalesReceipts
     shopify_pos_sales_costs_by_sale.each do |order_name, cost|
       cost[:name] = order_name
       shopify_pos_costs.shopify_pos_sales_cost_orders << ShopifyPosSalesCostOrder.create!(cost)
-    end
-
-    #######################
-    ########  VEND ########
-    #######################
-
-    vend_sales = VendClient.sales(day)
-
-    vend_sales_receipt = Hash.new { |hash, key| hash[key] = Hash.new(0) }
-    vend_sales_receipt_by_sale = Hash.new { |hash, key| hash[key] = Hash.new(0) }
-
-    vend_sales_costs = Hash.new { |hash, key| hash[key] = Hash.new(0) }
-    vend_sales_costs_by_sale = Hash.new { |hash, key| hash[key] = Hash.new(0) }
-
-    vend_sales.each do |sale|
-      next unless sale['status'] == 'CLOSED'
-
-      outlet = sale['outlet_id']
-      sale_id = sale['id']
-
-      vend_sales_receipt_by_sale[sale_id][:outlet_id] = outlet
-      vend_sales_costs_by_sale[sale_id][:outlet_id] = outlet
-
-      vend_sales_receipt_by_sale[sale_id][:sale_at] = sale['sale_date']
-      vend_sales_costs_by_sale[sale_id][:sale_at] = sale['sale_date']
-
-      vend_sales_receipt_by_sale[sale_id][:receipt_number] = sale['receipt_number']
-      vend_sales_costs_by_sale[sale_id][:receipt_number] = sale['receipt_number']
-
-      sale['line_items'].each do |item|
-        discount = item['discount_total'].negative? ? 0 : item['discount_total']
-
-        case item['product_id']
-        when '801eea1d-3e65-11e2-b1f5-4040782fde00' # Gift Cards
-          vend_sales_receipt[outlet][:gift_card_sales] += item['price_total'] + discount
-          vend_sales_receipt_by_sale[sale_id][:gift_card_sales] += item['price_total'] + discount
-        when '0adfd74a-153e-11e6-f182-ae0e9b7d09f8' # Shipping
-          vend_sales_receipt[outlet][:shipping] += item['price_total'] + discount
-          vend_sales_receipt_by_sale[sale_id][:shipping] += item['price_total'] + discount
-        when '5ddba61e-3598-11e2-b1f5-4040782fde00' # discount
-          vend_sales_receipt[outlet][:discount_sales] += item['price_total'] + discount
-          vend_sales_receipt_by_sale[sale_id][:discount_sales] += item['price_total'] + discount
-        else
-          vend_sales_receipt[outlet][:product_sales] += item['price_total'] + discount
-          vend_sales_receipt_by_sale[sale_id][:product_sales] += item['price_total'] + discount
-
-          vend_sales_receipt_by_sale[sale_id][:rentals] += item['price_total'] + discount if VendSalesTax::RENTAL_IDS.include?(item['product_id'])
-        end
-
-        vend_sales_receipt[outlet][:discount] += discount
-        vend_sales_receipt_by_sale[sale_id][:discount] += discount
-
-        vend_sales_receipt[outlet][:sales_tax] += item['tax_total']
-        vend_sales_receipt_by_sale[sale_id][:sales_tax] += item['tax_total']
-
-        vend_sales_costs[outlet][:cost] += item['cost_total']
-        vend_sales_costs_by_sale[sale_id][:cost] += item['cost_total']
-      end
-
-      sale['payments'].each do |payment|
-        case payment['retailer_payment_type_id']
-        when '0adfd74a-153e-11e9-ef2a-7cd37d28240d', 'eb021256-8eed-11e0-8e09-4040f540b50a' # credit sf, credit other locations
-          vend_sales_receipt[outlet][:credit_payments] += payment['amount']
-          vend_sales_receipt_by_sale[sale_id][:credit_payments] += payment['amount']
-        when '5e4b6218-8eed-11e0-8e09-4040f540b50a' # cash or check
-          vend_sales_receipt[outlet][:cash_or_check_payments] += payment['amount']
-          vend_sales_receipt_by_sale[sale_id][:cash_or_check_payments] += payment['amount']
-        when 'd1477a96-a0f8-11e0-8317-4040f540b50a' # gift card
-          vend_sales_receipt[outlet][:gift_card_payments] += payment['amount']
-          vend_sales_receipt_by_sale[sale_id][:gift_card_payments] += payment['amount']
-        end
-      end
-    end
-
-    vend_sales = DailyVendSale.create!(date: min_date)
-
-    vend_sales_receipt.each do |location, receipt|
-      receipt[:outlet_id] = location
-      vend_sales.vend_sales_receipts << VendSalesReceipt.create!(receipt)
-    end
-
-    vend_sales_receipt_by_sale.each do |sale_id, receipt|
-      receipt[:sale_id] = sale_id
-      vend_sales.vend_sales_receipt_sales << VendSalesReceiptSale.create!(receipt)
-    end
-
-    vend_sales_tax = vend_sales.create_vend_sales_tax
-    vend_sales_tax.create_location_taxes
-
-    vend_costs = DailyVendCost.create!(date: min_date)
-
-    vend_sales_costs.each do |location, cost|
-      cost[:outlet_id] = location
-      vend_costs.vend_sales_costs << VendSalesCost.create!(cost)
-    end
-
-    vend_sales_costs_by_sale.each do |sale_id, cost|
-      cost[:sale_id] = sale_id
-      vend_costs.vend_sales_cost_sales << VendSalesCostSale.create!(cost)
-    end
-
-    ###############################
-    ########  Consignments ########
-    ###############################
-
-    consignments = VendClient.consignments
-    consignments_received_report = Hash.new { |hash, key| hash[key] = Hash.new(0) }
-
-    consignments_received = Hash.new { |hash, key| hash[key] = {} }
-
-    consignments.each do |consignment|
-      next unless consignment['source_outlet_id'].present?
-
-      received_at = Time.parse(consignment['received_at'])
-      next if received_at < min_date || received_at > max_date
-
-      products = VendClient.consignment_products(consignment['id'])
-      cost = products.sum { |product| product['cost'].to_f * product['received'].to_f }
-
-      consignments_received_report[:received][consignment['outlet_id']] += cost
-      consignments_received_report[:supplied][consignment['source_outlet_id']] += cost
-      consignments_received[consignment['id']][:receiving_id] = consignment['outlet_id']
-      consignments_received[consignment['id']][:supplying_id] = consignment['source_outlet_id']
-      consignments_received[consignment['id']][:cost] = cost
-      consignments_received[consignment['id']][:received_at] = consignment['received_at']
-    end
-
-    Redis.current.set('min_consignment_version', consignments.last['version']) if consignments.present?
-
-    daily_vend_consignment = DailyVendConsignment.create!(date: min_date)
-
-    if consignments.present?
-      consignments_received_report[:received].each do |outlet, cost|
-        daily_vend_consignment.vend_consignment_location_costs << VendConsignmentLocationCost.create!(role: :receiver, outlet_id: outlet, cost: cost)
-      end
-
-      consignments_received_report[:supplied].each do |outlet, cost|
-        daily_vend_consignment.vend_consignment_location_costs << VendConsignmentLocationCost.create!(role: :supplier, outlet_id: outlet, cost: cost)
-      end
-
-      consignments_received.each do |id, consignment|
-        consignment['vend_consignment_id'] = id
-        daily_vend_consignment.vend_consignments << VendConsignment.create!(consignment)
-      end
     end
 
     #############################
@@ -714,24 +588,6 @@ class DailySalesReceipts
 
     begin
       shopify_pos_sales.post_to_qbo
-    rescue StandardError
-      Airbrake.notify($ERROR_INFO)
-    end
-
-    begin
-      vend_costs.post_to_qbo
-    rescue StandardError
-      Airbrake.notify($ERROR_INFO)
-    end
-
-    begin
-      vend_sales.post_to_qbo
-    rescue StandardError
-      Airbrake.notify($ERROR_INFO)
-    end
-
-    begin
-      daily_vend_consignment.post_to_qbo
     rescue StandardError
       Airbrake.notify($ERROR_INFO)
     end
