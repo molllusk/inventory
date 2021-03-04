@@ -29,15 +29,15 @@ class DailySalesReceipts
     orders.each do |order|
       # skip internal orders to the shops
       next if order['source_name'] == 'mollusk_app'
-      next if order['payment_gateway_names'] == 'exchange-credit'
+      next if order['gateway'] == 'exchange-credit'
 
       order_names_by_id[order['id']] = order['name']
 
-      pos = order['source_name'] == 'pos'
-      wholesale = order['customer']&.[]('tags')&.include?('wholesale')
-      refund = %w[refunded partially_refunded].include?(order['financial_status'])
+      is_pos = order['source_name'] == 'pos'
+      is_wholesale = order['customer']&.[]('tags')&.include?('wholesale')
+      is_refund = %w[refunded partially_refunded].include?(order['financial_status'])
 
-      if refund && !wholesale
+      if is_refund && !is_wholesale
         ShopifyClient.refunds(order['id']).each do |refund|
           next if Time.parse(refund['created_at']) < min_date || Time.parse(refund['created_at']) > max_date
 
@@ -49,9 +49,9 @@ class DailySalesReceipts
       next if Time.parse(order['closed_at']) < min_date || Time.parse(order['closed_at']) > max_date
 
       # put the order in the right bucket
-      if wholesale
+      if is_wholesale
         wholesale_orders << order
-      elsif pos
+      elsif is_pos
         pos_sales << order
       else
         web_sales << order
@@ -157,6 +157,8 @@ class DailySalesReceipts
     ##### SHOPIFY Refunds #####
     ###########################
 
+    # we need to track refund data fields by web, or post location
+
     refund_costs_by_location = Hash.new(0)
     refund_totals_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
@@ -166,6 +168,8 @@ class DailySalesReceipts
     refunds.each do |refund|
       order_name = order_names_by_id[refund['order_id']]
       fulfillments = ShopifyClient.fulfillments(refund['order_id'])
+      is_pos_refund = refund['source_name'] == 'pos'
+
       costs_by_location = Hash.new(0)
 
       refund_line_items = refund['refund_line_items']
@@ -255,12 +259,16 @@ class DailySalesReceipts
     end
 
     refunded_amounts[:shipping] = refunded_amounts[:product_sales] + refunded_amounts[:sales_tax] + refunded_amounts[:refunded_shipping] + refunded_amounts[:arbitrary_discount] - refunded_amounts[:discount] - refunded_amounts[:total_payments]
-
     refunded_amounts[:location_costs] = refund_costs_by_location
-    costs_report[:location_costs] = location_sales_costs
-
-    shopify_sales_cost = ShopifySalesCost.create!(costs_report)
+    
     shopify_refund = ShopifyRefund.create!(refunded_amounts)
+
+    refund_totals_by_order.each do |order_name, values|
+      values[:name] = order_name
+      values[:shipping] = values[:product_sales] + values[:sales_tax] + values[:refunded_shipping] + values[:arbitrary_discount] - values[:discount] - values[:total_payments]
+      shopify_refund.shopify_refund_orders << ShopifyRefundOrder.create!(values)
+    end
+
     shopify_sales_receipt = ShopifySalesReceipt.create!(shopify_sales_receipt)
 
     sales_totals_by_order.each do |order_name, values|
@@ -268,11 +276,8 @@ class DailySalesReceipts
       shopify_sales_receipt.shopify_sales_receipt_orders << ShopifySalesReceiptOrder.create!(values)
     end
 
-    refund_totals_by_order.each do |order_name, values|
-      values[:name] = order_name
-      values[:shipping] = values[:product_sales] + values[:sales_tax] + values[:refunded_shipping] + values[:arbitrary_discount] - values[:discount] - values[:total_payments]
-      shopify_refund.shopify_refund_orders << ShopifyRefundOrder.create!(values)
-    end
+    costs_report[:location_costs] = location_sales_costs
+    shopify_sales_cost = ShopifySalesCost.create!(costs_report)
 
     costs_by_order.each do |order_name, values|
       values[:name] = order_name
