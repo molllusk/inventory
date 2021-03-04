@@ -1,0 +1,56 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  arbitrary_discount: 1.5
+  cost: 1.5
+  discount: 1.5
+  gift_card_payments: 1.5
+  paypal_payments: 1.5
+  product_sales: 1.5
+  refunded_shipping: 1.5
+  sales_tax: 1.5
+  shipping: 1.5
+  shopify_payments: 1.5
+  total_payments: 1.5
+  cash_payments: 1.5
+  shopify_refund_id: 1
+  location_id: 
+
+two:
+  arbitrary_discount: 1.5
+  cost: 1.5
+  discount: 1.5
+  gift_card_payments: 1.5
+  paypal_payments: 1.5
+  product_sales: 1.5
+  refunded_shipping: 1.5
+  sales_tax: 1.5
+  shipping: 1.5
+  shopify_payments: 1.5
+  total_payments: 1.5
+  cash_payments: 1.5
+  shopify_refund_id: 1
+  location_id:
+
+# == Schema Information
+#
+# Table name: shopify_pos_refunds
+#
+#  id                 :bigint(8)        not null, primary key
+#  arbitrary_discount :float            default(0.0)
+#  cash_payments      :float            default(0.0)
+#  cost               :float            default(0.0)
+#  discount           :float            default(0.0)
+#  gift_card_payments :float            default(0.0)
+#  paypal_payments    :float            default(0.0)
+#  product_sales      :float            default(0.0)
+#  refunded_shipping  :float            default(0.0)
+#  sales_tax          :float            default(0.0)
+#  shipping           :float            default(0.0)
+#  shopify_payments   :float            default(0.0)
+#  total_payments     :float            default(0.0)
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  location_id        :bigint(8)
+#  shopify_refund_id  :integer
+#

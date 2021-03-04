@@ -1,20 +1,5 @@
 # frozen_string_literal: true
 
-class ShopifyRefund < ApplicationRecord
-  has_many :shopify_refund_orders, dependent: :destroy
-
-  def location_cost(location)
-    location_id = ShopifyInventory.locations[location].to_s
-    location_costs.present? ? (location_costs[location_id] || 0) : 0
-  end
-
-  def journal_entry_params
-    {
-      txn_date: date,
-      doc_number: "APP-SR-#{id}"
-    }
-  end
-
   # '3481', # 40003 Sales:Taxable Sales
   # '3549', # 25500 *Sales Tax Payable
   # '3557', # 40100 Freight Income
@@ -69,6 +54,22 @@ class ShopifyRefund < ApplicationRecord
   #   'Silver Lake' => '181528',
   #   'Venice Beach' => '181529'
   # }.freeze
+
+class ShopifyRefund < ApplicationRecord
+  has_many :shopify_refund_orders, dependent: :destroy
+  has_many :shopify_pos_refunds, dependent: :destroy
+
+  def location_cost(location)
+    location_id = ShopifyInventory.locations[location].to_s
+    location_costs.present? ? (location_costs[location_id] || 0) : 0
+  end
+
+  def journal_entry_params
+    {
+      txn_date: date,
+      doc_number: "APP-SR-#{id}"
+    }
+  end
 
   def journal_line_item_details
     [
