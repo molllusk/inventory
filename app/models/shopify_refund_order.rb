@@ -10,6 +10,7 @@ end
 #
 #  id                 :bigint(8)        not null, primary key
 #  arbitrary_discount :float            default(0.0)
+#  cash_payments      :float            default(0.0)
 #  cost               :float            default(0.0)
 #  discount           :float            default(0.0)
 #  gift_card_payments :float            default(0.0)
@@ -25,5 +26,6 @@ end
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  order_id           :bigint(8)
+#  pos_location_id    :bigint(8)
 #  shopify_refund_id  :integer
 #

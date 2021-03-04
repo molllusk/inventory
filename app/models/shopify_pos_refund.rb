@@ -1,4 +1,5 @@
 class ShopifyPosRefund < ApplicationRecord
+  belongs_to :shopify_refund, optional: true
 end
 
 # == Schema Information
