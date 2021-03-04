@@ -1,5 +1,5 @@
 <div class='center'>
-  <h2>Daily Order for <%= VendClient::OUTLET_NAMES_BY_ID[@daily_order.outlet_id] %> on <%= @daily_order.daily_inventory_transfer.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%Y") %> <% if @daily_order.daily_inventory_transfer.qbo_id.present? %>(<a href='https://c3.qbo.intuit.com/app/journal?txnId=<%= @daily_order.daily_inventory_transfer.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a>)<% end %> <%= link_to(raw('<i class="fa fa-ban"></i> Cancel Order'), daily_order_cancel_path(@daily_order), method: :put, data: { confirm: "Are you sure you want to CANCEL order #{@daily_order.display_po}? This cannot be undone!" }, class: 'btn btn-sm btn-danger') %></h2>
+  <h2>Daily Order for <%= VendClient::OUTLET_NAMES_BY_ID[@daily_order.outlet_id] || ShopifyClient::OUTLET_NAMES_BY_ID[@daily_order.outlet_id.to_i] %> on <%= @daily_order.daily_inventory_transfer.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%Y") %> <% if @daily_order.daily_inventory_transfer.qbo_id.present? %>(<a href='https://c3.qbo.intuit.com/app/journal?txnId=<%= @daily_order.daily_inventory_transfer.qbo_id %>' target='_blank'>QBO <i class='fa fa-external-link-alt'></i></a>)<% end %> <%= link_to(raw('<i class="fa fa-ban"></i> Cancel Order'), daily_order_cancel_path(@daily_order), method: :put, data: { confirm: "Are you sure you want to CANCEL order #{@daily_order.display_po}? This cannot be undone!" }, class: 'btn btn-sm btn-danger') %></h2>
 </div>
 
 <table class="products full_width">
@@ -98,9 +98,9 @@
     <th>Store Inventory</th>
     <th>Threshold</th>
   </tr>
-  <% @daily_order.orders.sort_by { |order| order.product.vend_datum.sort_key }.each do |order| %>
+  <% @daily_order.orders.sort_by { |order| order.product.sort_key }.each do |order| %>
     <tr class='<%= 'cancelled' if order.cancelled? %>'>
-      <td><a href='<%= product_path(order.product) %>' target='_blank'><%= order.product.vend_datum.variant_name %> <i class='fa fa-external-link-alt'></i></a></td>
+      <td><a href='<%= product_path(order.product) %>' target='_blank'><%= order.product.title %> <i class='fa fa-external-link-alt'></i></a></td>
       <td><%= number_to_currency(order.cost, unit: '$', separator: '.', delimiter: ',') %></td>
       <td><%= order.quantity %></td>
       <td><%= order.sent_orders %></td>

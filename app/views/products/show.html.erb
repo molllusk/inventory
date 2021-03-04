@@ -1,8 +1,6 @@
 <% provide(:title, 'Product') %>
-<h3 class='center'><%= @product.vend_datum.variant_name %></h3>
+<h3 class='center'><%= @product.title %></h3>
 <p class='center'>Added <%= @product.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></p>
-
-<hr/>
 
 <%= render partial: 'vend_data' %>
 <%= render partial: 'shopify_data', locals: { shopify: @product.shopify_datum } %>

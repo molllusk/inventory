@@ -6,16 +6,14 @@ class DailyOrdering
 
   def perform
     date = Time.now
-    # daily_order_data = []
 
     next_po_number = DailyInventoryTransfer.last_po + 1
 
     daily_inventory_transfer = DailyInventoryTransfer.create(date: date)
 
-    ##### Need to eliminate the use of Vend Ids etc. once the last vend order has been received we will switch to shopify location for this.
-    sf = DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('San Francisco'))
-    vb = DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Venice Beach'))
-    sb = DailyOrder.create(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key('Santa Barbara'))
+    sf = DailyOrder.create(outlet_id: ShopifyClient::OUTLET_NAMES_BY_ID.key('San Francisco'))
+    vb = DailyOrder.create(outlet_id: ShopifyClient::OUTLET_NAMES_BY_ID.key('Venice Beach'))
+    sb = DailyOrder.create(outlet_id: ShopifyClient::OUTLET_NAMES_BY_ID.key('Santa Barbara'))
 
     daily_inventory_transfer.daily_orders << sf
     daily_inventory_transfer.daily_orders << vb
@@ -27,18 +25,7 @@ class DailyOrdering
       'Mollusk SB' => sb
     }
 
-    ##### !!!!!
-    # Need to eliminate the use of Vend Ids etc. once the last vend order has been received switch to shopify variant in daily orders IP part below.
-
-    outstanding_orders_by_product = Hash.new { |hash, key| hash[key] = Hash.new(0) }
-
-    daily_orders = VendClient.daily_orders
-
-    daily_orders.each do |daily_order|
-      VendClient.consignment_products(daily_order['id']).each do |product|
-        outstanding_orders_by_product[product['product_id']][daily_order['outlet_id']] += product['count'].to_f
-      end
-    end
+    outstanding_orders_by_variant = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
     daily_orders_ip = InventoryPlannerClient.open_store_purchase_orders['purchase-orders']
 
@@ -48,11 +35,8 @@ class DailyOrdering
         next unless InventoryPlannerClient::IP_SHOPS.include?(ip_shop)
 
         daily_order['items'].each do |item|
-          ##### need to eliminate all this vend stuff
-          product_id = VendDatum.find_by(sku: item['barcode'])&.vend_id
-          outstanding_orders_by_product[product_id][InventoryPlannerClient.vend_outlet_id(ip_shop)] += item['replenishment'].to_f if product_id.present?
-          # product_id = ShopifyDatum.find_by(barcode: item['barcode'])&.variant_id
-          # outstanding_orders_by_product[product_id][InventoryPlannerClient.shopify_location_id(ip_shop)] += item['replenishment'].to_f if product_id.present?
+          variant_id = ShopifyDatum.find_by(barcode: item['barcode'])&.variant_id
+          outstanding_orders_by_variant[variant_id][InventoryPlannerClient.shopify_location(ip_shop)] += item['replenishment'].to_f if variant_id.present?
         end
       end
     end
@@ -74,21 +58,16 @@ class DailyOrdering
     ShopifyDatum.with_warehouse.find_each do |shopify_product|
       next if shopify_product.sale?
 
-      ##### This will be removed once vend orders are all received
-      vend_product = shopify_product.product.vend_datum
-      next unless vend_product.present?
-
       inventories = {}
       fill_levels = shopify_product.product.daily_order_inventory_thresholds
 
-      outstanding_orders_by_outlet_id = outstanding_orders_by_product[vend_product.vend_id]
+      outstanding_orders_by_location = outstanding_orders_by_variant[shopify_product.variant_id]
       outstanding_draft_orders = draft_orders_by_variant[shopify_product.variant_id]
 
       cost = shopify_product.get_cost
 
-      shopify_product.shopify_inventories.where(location: todays_orders.keys).each do |inventory|
-        ##### need to transition this to Shopify Location when Vend is fully deprecated
-        outstanding_orders = outstanding_orders_by_outlet_id[inventory.outlet_id]
+      shopify_product.shopify_inventories.where(location: shopify_product.order_locations(todays_orders.keys)).each do |inventory|
+        outstanding_orders = outstanding_orders_by_location[inventory.location]
 
         fill_level = fill_levels[inventory.city].to_i
 
@@ -171,18 +150,12 @@ class DailyOrdering
           end
         end
       end
-      # daily_order_data << inventories
-    end
-
-    todays_orders.each do |_location, daily_order|
-      if daily_order.orders.count.positive?
-        daily_inventory_transfer.update_attributes(po_id: next_po_number) unless daily_order.po?
-        daily_order.create_ip_purchase_order
-      end
     end
 
     return unless daily_inventory_transfer.orders?
 
+    daily_inventory_transfer.update_attributes(po_id: next_po_number)
+    daily_inventory_transfer.post_to_inventory_planner
     daily_inventory_transfer.post_to_qbo
     daily_inventory_transfer.post_to_shopify
     daily_inventory_transfer.send_po

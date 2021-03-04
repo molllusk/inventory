@@ -32,7 +32,7 @@
         <tr class='<%= 'cancelled' if order.cancelled? %>'>
       <% end %>
         <td class='<%= 'border-bottom' if last_row %> <%= 'cancelled' if order.cancelled? %>'>
-          <a href='<%= daily_order_path(order) %>' target='_blank'><%= VendClient::OUTLET_NAMES_BY_ID[order.outlet_id] %> <i class='fa fa-external-link-alt'></i></a>
+          <a href='<%= daily_order_path(order) %>' target='_blank'><%= VendClient::OUTLET_NAMES_BY_ID[order.outlet_id] || ShopifyClient::OUTLET_NAMES_BY_ID[order.outlet_id.to_i] %> <i class='fa fa-external-link-alt'></i></a>
         </td>
         <td class='<%= 'border-bottom' if last_row %> <%= 'cancelled' if order.cancelled? %>'>
           <%= order.orders.count %>

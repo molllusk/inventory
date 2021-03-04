@@ -37,7 +37,8 @@ class DailyOrder < ApplicationRecord
     'Santa Barbara' => '93101'
   }.freeze
 
-  LOCATION_ID_BY_VEND_OUTLET_NAME = {
+  ######### VEND
+  CUSTOMER_ID_BY_VEND_OUTLET_NAME = {
     'San Francisco' => 3_265_917_026_389,
     'Santa Barbara' => 3_265_930_625_109,
     'Venice Beach' => 3_265_924_825_173
@@ -90,7 +91,7 @@ class DailyOrder < ApplicationRecord
     ]
 
     CSV.generate(headers: headers, write_headers: true) do |new_csv|
-      orders.sort_by { |order| order.product.vend_datum.sort_key }.each do |order|
+      orders.sort_by { |order| order.product.sort_key }.each do |order|
         new_csv << [
           display_po,
           'Mollusk',
@@ -122,9 +123,9 @@ class DailyOrder < ApplicationRecord
     "mollusk_#{po_stem}_order_#{po_id}.csv"
   end
 
-  ###### need to switch to shopify location
+  ######### VEND
   def outlet_name
-    VendClient::OUTLET_NAMES_BY_ID[outlet_id]
+    VendClient::OUTLET_NAMES_BY_ID[outlet_id] || ShopifyClient::OUTLET_NAMES_BY_ID[outlet_id.to_i]
   end
 
   def po?
@@ -157,11 +158,12 @@ class DailyOrder < ApplicationRecord
   end
 
   def shopify_customer_id
-    LOCATION_ID_BY_VEND_OUTLET_NAME[outlet_name].to_s
+    CUSTOMER_ID_BY_VEND_OUTLET_NAME[outlet_name].to_s
   end
 
+  ######### VEND
   def inventory_planner_warehouse_id
-    InventoryPlannerClient::VEND_OUTLET_ID_BY_IP_SHOP.key(outlet_id)
+    InventoryPlannerClient::VEND_OUTLET_ID_BY_IP_SHOP.key(outlet_id) || InventoryPlannerClient::SHOPIFY_OUTLET_ID_BY_IP_SHOP.key(outlet_id.to_i)
   end
 
   def shopify_order_line_items

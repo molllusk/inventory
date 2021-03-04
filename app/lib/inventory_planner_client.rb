@@ -17,6 +17,12 @@ class InventoryPlannerClient
     VB_WAREHOUSE => '0adfd74a-153e-11e9-fa42-67b5781ba1fb'
   }.freeze
 
+  SHOPIFY_OUTLET_ID_BY_IP_SHOP = {
+    SF_WAREHOUSE => 49481991,
+    SB_WAREHOUSE => 7_702_609_973,
+    VB_WAREHOUSE => 7_702_577_205
+  }.freeze
+
   SHOPIFY_LOCATION_BY_IP_SHOP = {
     SF_WAREHOUSE => 'Mollusk SF',
     SB_WAREHOUSE => 'Mollusk SB',
