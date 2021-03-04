@@ -17,7 +17,7 @@ class ShopifyDatum < ApplicationRecord
   end
 
   def full_title
-    if variant_title.present? && variant_title != "Default Title"
+    if variant_title.present? && variant_title != 'Default Title'
       "#{title} - #{variant_title}"
     else
       title
@@ -42,6 +42,7 @@ class ShopifyDatum < ApplicationRecord
 
   def get_cost
     return cost if cost.present?
+
     new_cost = ShopifyClient.get_cost(variant_id)
 
     if new_cost.present?

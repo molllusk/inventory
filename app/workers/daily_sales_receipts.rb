@@ -33,11 +33,11 @@ class DailySalesReceipts
 
       order_names_by_id[order['id']] = order['name']
 
-      pos = order['source_name'] == 'pos'
-      wholesale = order['customer']&.[]('tags')&.include?('wholesale')
-      refund = %w[refunded partially_refunded].include?(order['financial_status'])
+      is_pos = order['source_name'] == 'pos'
+      is_wholesale = order['customer']&.[]('tags')&.include?('wholesale')
+      is_refund = %w[refunded partially_refunded].include?(order['financial_status'])
 
-      if refund && !wholesale
+      if is_refund && !is_wholesale
         ShopifyClient.refunds(order['id']).each do |refund|
           next if Time.parse(refund['created_at']) < min_date || Time.parse(refund['created_at']) > max_date
 
@@ -49,9 +49,9 @@ class DailySalesReceipts
       next if Time.parse(order['closed_at']) < min_date || Time.parse(order['closed_at']) > max_date
 
       # put the order in the right bucket
-      if wholesale
+      if is_wholesale
         wholesale_orders << order
-      elsif pos
+      elsif is_pos
         pos_sales << order
       else
         web_sales << order
@@ -168,7 +168,7 @@ class DailySalesReceipts
     refunds.each do |refund|
       order_name = order_names_by_id[refund['order_id']]
       fulfillments = ShopifyClient.fulfillments(refund['order_id'])
-      pos = refund['source_name'] == 'pos'
+      is_pos_refund = refund['source_name'] == 'pos'
 
       costs_by_location = Hash.new(0)
 
