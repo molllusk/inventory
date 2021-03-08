@@ -2,6 +2,13 @@
 
 class ShopifyRefundOrder < ApplicationRecord
   belongs_to :shopify_refund, optional: true
+
+  enum pos_location_id: {
+    # retail site
+    'San Francisco' => 49481991,
+    'Santa Barbara' => 7_702_609_973,
+    'Venice Beach' => 7_702_577_205
+  }
 end
 
 # == Schema Information
