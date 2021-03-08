@@ -134,7 +134,7 @@ class ShopifyRefund < ApplicationRecord
         posting_type: 'Credit'
       },
       {
-        account_id: Qbo::ACCOUNT_ID_BY_OUTLET['San Francisco'],
+        account_id: Qbo::ACCOUNT_ID_BY_OUTLET['Web'],
         amount: location_costs.values.reduce(0) { |cost, sum| cost.to_f + sum.to_f },
         description: 'Costs by SF Location (includes cost of returns from all locations)',
         posting_type: 'Debit'

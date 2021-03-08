@@ -1,5 +1,117 @@
 class ShopifyPosRefund < ApplicationRecord
   belongs_to :shopify_refund, optional: true
+
+  enum location_id: {
+    # retail site
+    'San Francisco' => 49481991,
+    'Santa Barbara' => 7_702_609_973,
+    'Venice Beach' => 7_702_577_205
+  }
+
+  def journal_line_item_details
+    [
+      {
+        account_id: '3481', # 40003 Sales:Taxable Sales
+        amount: product_sales,
+        description: 'Returned Product Sales',
+        posting_type: 'Debit'
+      },
+      {
+        account_id: '3549', # 25500 *Sales Tax Payable
+        amount: sales_tax,
+        description: 'Sales Tax Payable',
+        posting_type: 'Debit'
+      },
+      {
+        account_id: '3557', # 43000 Freight Income
+        amount: refunded_shipping,
+        description: 'Refunded Shipping',
+        posting_type: 'Debit'
+      },
+      {
+        account_id: '3454', # 43000 Sales Discounts
+        amount: discount,
+        description: 'Discounts',
+        posting_type: 'Credit'
+      },
+      {
+        account_id: '3454', # 43000 Sales Discounts
+        amount: arbitrary_discount,
+        description: 'Arbitrary Discounts',
+        posting_type: 'Debit'
+      },
+      {
+        account_id: '3611', # 12010 Credit Card Clearing
+        amount: shopify_payments,
+        description: 'Credit refunds',
+        posting_type: 'Credit'
+      },
+      {
+        account_id: '3487', # 10025 PayPal
+        amount: paypal_payments,
+        description: 'Paypal refunds',
+        posting_type: 'Credit'
+      },
+      {
+        account_id: '3504', # 22050 Gift Certificates Outstanding
+        amount: gift_card_payments,
+        description: 'Gift certificate refunds',
+        posting_type: 'Credit'
+      },
+      {
+        account_id: '3557', # 43000 Freight Income
+        amount: shipping_clean,
+        description: 'Return Shipping Fees',
+        posting_type: 'Credit'
+      },
+      {
+        account_id: '3476', # 50000 Cost of Goods Sold
+        amount: cost,
+        description: 'Returned COGS',
+        posting_type: 'Credit'
+      },
+      {
+        account_id: Qbo::PETTY_CASH_ID_BY_OUTLET[location_id],
+        amount: cash_payments,
+        description: 'Petty Cash by Location',
+        posting_type: 'Credit'
+      },
+      {
+        account_id: Qbo::ACCOUNT_ID_BY_OUTLET[location_id],
+        amount: location_costs.values.reduce(0) { |cost, sum| cost.to_f + sum.to_f },
+        description: 'Costs for Location (POS)',
+        posting_type: 'Debit'
+      }
+    ]
+  end
+
+  # kind of hacky workaround for an edgecase where the shipping calc is just shy of 0 due to some significant digit thing
+  def shipping_clean
+    shipping > -0.01 && shipping.negative? ? 0 : shipping
+  end
+
+  def journal_entry
+    journal_entry = Qbo.journal_entry(journal_entry_params)
+
+    journal_line_item_details.each do |details|
+      line_item_params = {
+        amount: details[:amount],
+        description: details[:description]
+      }
+
+      journal_entry_line_detail = {
+        account_ref: Qbo.base_ref(details[:account_id]),
+        class_ref: Qbo.base_ref(Qbo::MOLLUSK_WEST_CLASS),
+        posting_type: details[:posting_type]
+      }
+
+      line_item = Qbo.journal_entry_line_item(line_item_params, journal_entry_line_detail)
+
+      journal_entry.line_items << line_item
+    end
+
+    journal_entry
+  end
 end
 
 # == Schema Information

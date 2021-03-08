@@ -10,9 +10,6 @@ module Qbo
   # '3487', # 10025 PayPal
   # '3504', # 22050 Gift Certificates Outstanding
   # '3476', # 50000 Cost of Goods Sold
-  # '3558', # 10045 Petty Cash - San Francisco
-  # '3682', # 10048 Petty Cash - Santa Barbara
-  # '3628', # 10047 Petty Cash - Venice Beach
 
   ACCOUNT_ID_BY_OUTLET = {
     'Web' => '3652', # 11137 Finished Goods - Shopify,
@@ -21,6 +18,12 @@ module Qbo
     'Silver Lake' => '3618', # 11002 Inventory Asset - Silver Lake
     'Venice Beach' => '3626' # 11003 Inventory Asset - Venice Beach
   }.freeze
+
+  PETTY_CASH_ID_BY_OUTLET = {
+    'San Francisco' => '3558', # Petty Cash - San Francisco
+    'Santa Barbara' => '3682', # Petty Cash - Santa Barbara
+    'Venice Beach' => '3628' # Petty Cash - Venice Beach
+  }
 
 # San Fran below needs to now be mollusk west, what will this affect beyond refunds
 # "Mollusk West 300000000000824363"

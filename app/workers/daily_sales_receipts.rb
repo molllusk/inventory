@@ -157,10 +157,9 @@ class DailySalesReceipts
     ##### SHOPIFY Refunds #####
     ###########################
 
-    # we need to track refund data fields by web, or post location
-
     refund_costs_by_location = Hash.new(0)
     refund_totals_by_order = Hash.new { |hash, key| hash[key] = Hash.new(0) }
+    refund_totals_by_pos_location = Hash.new { |hash, key| hash[key] = Hash.new(0) }
 
     refunded_amounts = Hash.new(0)
     refunded_amounts[:date] = min_date
@@ -176,8 +175,14 @@ class DailySalesReceipts
 
       refund_line_items.each do |line_item|
         variant_id = line_item['line_item']['variant_id']
-        fulfillment = fulfillments.find { |fulfillment_candidate| fulfillment_candidate['line_items'].find { |fulfillment_line_item| fulfillment_line_item['variant_id'] == variant_id } }
-        location_id = fulfillment.present? && fulfillment['location_id'].present? ? fulfillment['location_id'] : 'no_location'
+
+        if is_pos_refund
+          location_id = line_item['location_id']
+          refund_totals_by_order[order_name][:pos_location_id] += location_id
+        else
+          fulfillment = fulfillments.find { |fulfillment_candidate| fulfillment_candidate['line_items'].find { |fulfillment_line_item| fulfillment_line_item['variant_id'] == variant_id } }
+          location_id = fulfillment.present? && fulfillment['location_id'].present? ? fulfillment['location_id'] : 'no_location'
+        end
 
         refund_cost = 0.0
         shopify_product = ShopifyDatum.find_by(variant_id: variant_id)
@@ -190,7 +195,13 @@ class DailySalesReceipts
         end
 
         refund_totals_by_order[order_name][:cost] += refund_cost
-        refunded_amounts[:cost] += refund_cost
+
+        if is_pos_refund
+          refund_totals_by_pos_location[location_id][:cost] += refunded_cost
+        else
+          refunded_amounts[:cost] += refund_cost
+        end
+
         costs_by_location[location_id] += refund_cost
         refund_costs_by_location[location_id] += refund_cost
 
@@ -203,9 +214,16 @@ class DailySalesReceipts
         refund_totals_by_order[order_name][:product_sales] += sub_total
         refund_totals_by_order[order_name][:sales_tax] += line_item['total_tax'].to_f # or do we want tax lines total
         refund_totals_by_order[order_name][:discount] += refund_discounts
-        refunded_amounts[:product_sales] += sub_total
-        refunded_amounts[:sales_tax] += line_item['total_tax'].to_f # or do we want tax lines total
-        refunded_amounts[:discount] += refund_discounts
+
+        if is_pos_refund
+          refund_totals_by_pos_location[location_id][:product_sales] += sub_total
+          refund_totals_by_pos_location[location_id][:sales_tax] += line_item['total_tax'].to_f # or do we want tax lines total
+          refund_totals_by_pos_location[location_id][:discount] += refund_discounts
+        else
+          refunded_amounts[:product_sales] += sub_total
+          refunded_amounts[:sales_tax] += line_item['total_tax'].to_f # or do we want tax lines total
+          refunded_amounts[:discount] += refund_discounts
+        end
       end
 
       refunded_shipping = 0
@@ -221,11 +239,17 @@ class DailySalesReceipts
         end
       end
 
-      refunded_amounts[:refunded_shipping] += refunded_shipping
-      refunded_amounts[:arbitrary_discount] += arbitrary_discount_from_order_adjustments
-
       refund_totals_by_order[order_name][:refunded_shipping] = refunded_shipping
       refund_totals_by_order[order_name][:arbitrary_discount] = arbitrary_discount_from_order_adjustments
+
+      if is_pos_refund
+        refund_totals_by_pos_location[location_id][:refunded_shipping] = refunded_shipping
+        refund_totals_by_pos_location[location_id][:arbitrary_discount] = arbitrary_discount_from_order_adjustments
+      else
+        refunded_amounts[:refunded_shipping] += refunded_shipping
+        refunded_amounts[:arbitrary_discount] += arbitrary_discount_from_order_adjustments
+      end
+
       refund_totals_by_order[order_name][:created_at] = refund['created_at']
       refund_totals_by_order[order_name][:order_id] = refund['order_id']
       refund_totals_by_order[order_name][:location_costs] = costs_by_location
@@ -236,25 +260,53 @@ class DailySalesReceipts
         case transaction['gateway']
         when 'gift_card'
           refund_totals_by_order[order_name][:gift_card_payments] += transaction['amount'].to_f
-          refunded_amounts[:gift_card_payments] += transaction['amount'].to_f
           refund_totals_by_order[order_name][:total_payments] += transaction['amount'].to_f
-          refunded_amounts[:total_payments] += transaction['amount'].to_f
+          if is_pos_refund
+            refund_totals_by_pos_location[location_id][:gift_card_payments] += transaction['amount'].to_f
+            refund_totals_by_pos_location[location_id][:total_payments] += transaction['amount'].to_f
+          else
+            refunded_amounts[:gift_card_payments] += transaction['amount'].to_f
+            refunded_amounts[:total_payments] += transaction['amount'].to_f
+          end
         when 'paypal'
           refund_totals_by_order[order_name][:paypal_payments] += transaction['amount'].to_f
-          refunded_amounts[:paypal_payments] += transaction['amount'].to_f
           refund_totals_by_order[order_name][:total_payments] += transaction['amount'].to_f
-          refunded_amounts[:total_payments] += transaction['amount'].to_f
+
+          if is_pos_refund
+            refund_totals_by_pos_location[location_id][:paypal_payments] += transaction['amount'].to_f
+            refund_totals_by_pos_location[location_id][:total_payments] += transaction['amount'].to_f
+          else
+            refunded_amounts[:paypal_payments] += transaction['amount'].to_f
+            refunded_amounts[:total_payments] += transaction['amount'].to_f
+          end
         when 'shopify_payments'
           refund_totals_by_order[order_name][:shopify_payments] += transaction['amount'].to_f
-          refunded_amounts[:shopify_payments] += transaction['amount'].to_f
           refund_totals_by_order[order_name][:total_payments] += transaction['amount'].to_f
-          refunded_amounts[:total_payments] += transaction['amount'].to_f
+
+          if is_pos_refund
+            refund_totals_by_pos_location[location_id][:shopify_payments] += transaction['amount'].to_f
+            refund_totals_by_pos_location[location_id][:total_payments] += transaction['amount'].to_f
+          else
+            refunded_amounts[:shopify_payments] += transaction['amount'].to_f
+            refunded_amounts[:total_payments] += transaction['amount'].to_f
+          end
+        when 'cash' # POS only
+          refund_totals_by_order[order_name][:cash_payments] += transaction['amount'].to_f
+          refund_totals_by_order[order_name][:total_payments] += transaction['amount'].to_f
+
+          refund_totals_by_pos_location[location_id][:cash_payments] += transaction['amount'].to_f
+          refund_totals_by_pos_location[location_id][:total_payments] += transaction['amount'].to_f
         end
       end
 
       if refund_line_items.blank?
-        refunded_amounts[:arbitrary_discount] += (refund_totals_by_order[order_name][:total_payments] - refunded_shipping - arbitrary_discount_from_order_adjustments)
         refund_totals_by_order[order_name][:arbitrary_discount] += (refund_totals_by_order[order_name][:total_payments] - refunded_shipping - arbitrary_discount_from_order_adjustments)
+
+        if is_pos_refund
+          refund_totals_by_pos_location[location_id][:arbitrary_discount] += (refund_totals_by_pos_location[order_name][:total_payments] - refunded_shipping - arbitrary_discount_from_order_adjustments)
+        else
+          refunded_amounts[:arbitrary_discount] += (refund_totals_by_order[order_name][:total_payments] - refunded_shipping - arbitrary_discount_from_order_adjustments)
+        end
       end
     end
 
@@ -463,7 +515,14 @@ class DailySalesReceipts
 
     refunded_amounts[:shipping] = refunded_amounts[:product_sales] + refunded_amounts[:sales_tax] + refunded_amounts[:refunded_shipping] + refunded_amounts[:arbitrary_discount] - refunded_amounts[:discount] - refunded_amounts[:total_payments]
     refunded_amounts[:location_costs] = refund_costs_by_location
+
     shopify_refund = ShopifyRefund.create!(refunded_amounts)
+
+    refund_totals_by_pos_location do |location_id, values|
+      values[:location_id] = location_id
+      values[:shipping] = values[:product_sales] + values[:sales_tax] + values[:refunded_shipping] + values[:arbitrary_discount] - values[:discount] - values[:total_payments]
+      shopify_refund.shopify_pos_refunds << ShopifyPosRefund.create!(values)
+    end
 
     refund_totals_by_order.each do |order_name, values|
       values[:name] = order_name
