@@ -1,29 +1,14 @@
 # frozen_string_literal: true
 
-# '3481', # 40003 Sales:Taxable Sales
-# '3549', # 25500 *Sales Tax Payable
-# '3557', # 40100 Freight Income
-# '3454', # 43000 Sales Discounts
-# '3483', # 10010 Mollusk West Checking 5421 (credit cards)
-# '3487', # 10025 PayPal
-# '3504', # 22050 Gift Certificates Outstanding
-# '3476', # 50000 Cost of Goods Sold
+class ShopifyPosRefund < ApplicationRecord
+  belongs_to :shopify_refund, optional: true
 
-class ShopifyRefund < ApplicationRecord
-  has_many :shopify_refund_orders, dependent: :destroy
-  has_many :shopify_pos_refunds, dependent: :destroy
-
-  def location_cost(location)
-    location_id = ShopifyInventory.locations[location].to_s
-    location_costs.present? ? (location_costs[location_id] || 0) : 0
-  end
-
-  def journal_entry_params
-    {
-      txn_date: date,
-      doc_number: "APP-SR-#{id}"
-    }
-  end
+  enum location_id: {
+    # retail site
+    'San Francisco' => 49481991,
+    'Santa Barbara' => 7_702_609_973,
+    'Venice Beach' => 7_702_577_205
+  }
 
   def journal_line_item_details
     [
@@ -88,9 +73,15 @@ class ShopifyRefund < ApplicationRecord
         posting_type: 'Credit'
       },
       {
-        account_id: Qbo::ACCOUNT_ID_BY_OUTLET['Web'],
+        account_id: Qbo::PETTY_CASH_ID_BY_OUTLET[location_id],
+        amount: cash_payments,
+        description: 'Petty Cash by Location',
+        posting_type: 'Credit'
+      },
+      {
+        account_id: Qbo::ACCOUNT_ID_BY_OUTLET[location_id],
         amount: location_costs.values.reduce(0) { |cost, sum| cost.to_f + sum.to_f },
-        description: 'Web Costs (includes cost of WEB returns from all locations)',
+        description: 'Costs for Location (POS)',
         posting_type: 'Debit'
       }
     ]
@@ -101,17 +92,8 @@ class ShopifyRefund < ApplicationRecord
     shipping > -0.01 && shipping.negative? ? 0 : shipping
   end
 
-  def post_to_qbo
-    return unless shopify_refund_orders.present?
-
-    qbo = Qbo.create_journal_entry(journal_entry)
-    update_attribute(:qbo_id, qbo.id) unless qbo.blank?
-  end
-
-  def journal_entry
-    journal_entry = Qbo.journal_entry(journal_entry_params)
-
-    journal_line_item_details.each do |details|
+  def journal_entry_line_items
+    journal_line_item_details.map do |details|
       line_item_params = {
         amount: details[:amount],
         description: details[:description]
@@ -119,36 +101,25 @@ class ShopifyRefund < ApplicationRecord
 
       journal_entry_line_detail = {
         account_ref: Qbo.base_ref(details[:account_id]),
-        class_ref: Qbo.base_ref(Qbo::CLASS_ID_BY_OUTLET['Web']),
+        class_ref: Qbo.base_ref(Qbo::CLASS_ID_BY_OUTLET[location_id]),
         posting_type: details[:posting_type]
       }
 
-      line_item = Qbo.journal_entry_line_item(line_item_params, journal_entry_line_detail)
-
-      journal_entry.line_items << line_item
+      Qbo.journal_entry_line_item(line_item_params, journal_entry_line_detail)
     end
-
-    shopify_pos_refunds.each do |pos_refund|
-      pos_refund.journal_entry_line_items.each do |line_item|
-        journal_entry.line_items << line_item
-      end
-    end
-
-    journal_entry
   end
 end
 
 # == Schema Information
 #
-# Table name: shopify_refunds
+# Table name: shopify_pos_refunds
 #
 #  id                 :bigint(8)        not null, primary key
 #  arbitrary_discount :float            default(0.0)
+#  cash_payments      :float            default(0.0)
 #  cost               :float            default(0.0)
-#  date               :datetime
 #  discount           :float            default(0.0)
 #  gift_card_payments :float            default(0.0)
-#  location_costs     :json
 #  paypal_payments    :float            default(0.0)
 #  product_sales      :float            default(0.0)
 #  refunded_shipping  :float            default(0.0)
@@ -158,5 +129,6 @@ end
 #  total_payments     :float            default(0.0)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
-#  qbo_id             :bigint(8)
+#  location_id        :bigint(8)
+#  shopify_refund_id  :integer
 #

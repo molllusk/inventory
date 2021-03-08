@@ -64,11 +64,11 @@ class DailyShopifyPosSale < ApplicationRecord
   end
 
   def post_to_qbo
-    if shopify_pos_sales_receipt_sales.present?
-      sales_receipts.each do |receipt_pair|
-        qbo = Qbo.create_sales_receipt(receipt_pair.last)
-        receipt_pair.first.update_attribute(:qbo_id, qbo.id) unless qbo.blank?
-      end
+    return unless shopify_pos_sales_receipt_sales.present?
+
+    sales_receipts.each do |receipt_pair|
+      qbo = Qbo.create_sales_receipt(receipt_pair.last)
+      receipt_pair.first.update_attribute(:qbo_id, qbo.id) unless qbo.blank?
     end
   end
 

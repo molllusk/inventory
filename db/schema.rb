@@ -12,7 +12,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20_210_302_012_440) do
+ActiveRecord::Schema.define(version: 20_210_304_070_832) do
   # These are extensions that must be enabled in order to support this database
   enable_extension 'plpgsql'
 
@@ -185,6 +185,25 @@ ActiveRecord::Schema.define(version: 20_210_302_012_440) do
     t.datetime 'updated_at', null: false
   end
 
+  create_table 'shopify_pos_refunds', force: :cascade do |t|
+    t.float 'arbitrary_discount', default: 0.0
+    t.float 'cost', default: 0.0
+    t.float 'discount', default: 0.0
+    t.float 'gift_card_payments', default: 0.0
+    t.float 'paypal_payments', default: 0.0
+    t.float 'product_sales', default: 0.0
+    t.float 'refunded_shipping', default: 0.0
+    t.float 'sales_tax', default: 0.0
+    t.float 'shipping', default: 0.0
+    t.float 'shopify_payments', default: 0.0
+    t.float 'total_payments', default: 0.0
+    t.float 'cash_payments', default: 0.0
+    t.integer 'shopify_refund_id'
+    t.bigint 'location_id'
+    t.datetime 'created_at', null: false
+    t.datetime 'updated_at', null: false
+  end
+
   create_table 'shopify_pos_sales_cost_orders', force: :cascade do |t|
     t.datetime 'sale_at'
     t.float 'cost', default: 0.0
@@ -265,6 +284,8 @@ ActiveRecord::Schema.define(version: 20_210_302_012_440) do
     t.float 'total_payments', default: 0.0
     t.datetime 'updated_at', null: false
     t.float 'arbitrary_discount', default: 0.0
+    t.float 'cash_payments', default: 0.0
+    t.bigint 'pos_location_id'
   end
 
   create_table 'shopify_refunds', force: :cascade do |t|

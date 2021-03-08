@@ -1,44 +1,40 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  id: 1
-  name: MyString
-  created_at: 2019-06-19 21:02:13
-  shopify_refund_id: 1
+  arbitrary_discount: 1.5
   cost: 1.5
   discount: 1.5
   gift_card_payments: 1.5
-  shopify_payments: 1.5
-  paypal_payments: 1.5
-  location_costs: 
   paypal_payments: 1.5
   product_sales: 1.5
   refunded_shipping: 1.5
   sales_tax: 1.5
   shipping: 1.5
+  shopify_payments: 1.5
   total_payments: 1.5
+  cash_payments: 1.5
+  shopify_refund_id: 1
+  location_id: 
 
 two:
-  id: 1
-  name: MyString
-  created_at: 2019-06-19 21:02:13
-  shopify_refund_id: 1
+  arbitrary_discount: 1.5
   cost: 1.5
   discount: 1.5
   gift_card_payments: 1.5
-  shopify_payments: 1.5
-  paypal_payments: 1.5
-  location_costs: 
   paypal_payments: 1.5
   product_sales: 1.5
   refunded_shipping: 1.5
   sales_tax: 1.5
   shipping: 1.5
+  shopify_payments: 1.5
   total_payments: 1.5
+  cash_payments: 1.5
+  shopify_refund_id: 1
+  location_id:
 
 # == Schema Information
 #
-# Table name: shopify_refund_orders
+# Table name: shopify_pos_refunds
 #
 #  id                 :bigint(8)        not null, primary key
 #  arbitrary_discount :float            default(0.0)
@@ -46,8 +42,6 @@ two:
 #  cost               :float            default(0.0)
 #  discount           :float            default(0.0)
 #  gift_card_payments :float            default(0.0)
-#  location_costs     :json
-#  name               :string
 #  paypal_payments    :float            default(0.0)
 #  product_sales      :float            default(0.0)
 #  refunded_shipping  :float            default(0.0)
@@ -57,7 +51,6 @@ two:
 #  total_payments     :float            default(0.0)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
-#  order_id           :bigint(8)
-#  pos_location_id    :bigint(8)
+#  location_id        :bigint(8)
 #  shopify_refund_id  :integer
 #

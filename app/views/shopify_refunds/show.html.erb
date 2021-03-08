@@ -5,6 +5,7 @@
 <table class="products full_width">
   <tr>
     <th>Date</th>
+    <th>Shop</th>
     <th>Product Sales</th>
     <th>Discounts</th>
     <th>Arbitrary Discounts</th>
@@ -14,11 +15,13 @@
     <th>Shopify Payments</th>
     <th>Paypal Payments</th>
     <th>Gift Card Payments</th>
+    <th>Cash Payments</th>
     <th>Costs</th>
     <th>Costs by Location</th>
   </tr>
   <tr>
     <td><%= @shopify_refund.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y")  %></td>
+    <td>Web</td>
     <td><%= number_to_currency(@shopify_refund.product_sales, unit: '$', separator: '.', delimiter: ',') %></td>
     <td><%= number_to_currency(@shopify_refund.discount, unit: '$', separator: '.', delimiter: ',') %></td>
     <td><%= number_to_currency(@shopify_refund.arbitrary_discount, unit: '$', separator: '.', delimiter: ',') %></td>
@@ -28,11 +31,30 @@
     <td><%= number_to_currency(@shopify_refund.shopify_payments, unit: '$', separator: '.', delimiter: ',') %></td>
     <td><%= number_to_currency(@shopify_refund.paypal_payments, unit: '$', separator: '.', delimiter: ',') %></td>
     <td><%= number_to_currency(@shopify_refund.gift_card_payments, unit: '$', separator: '.', delimiter: ',') %></td>
+    <td>N/A</td>
     <td><%= number_to_currency(@shopify_refund.cost, unit: '$', separator: '.', delimiter: ',') %></td>
     <td>
       <%= render partial: '/daily_reports/shopify_costs_by_location', locals: { location_costs: @shopify_refund.location_costs } %>
     </td>
   </tr>
+    <% @shopify_refund.shopify_pos_refunds.each do |pos_refund| %>
+      <tr>
+        <td><a href='<%= shopify_refund_path(refund) %>' target='_blank'><%= refund.date.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y") %> <i class='fa fa-external-link-alt'></i></a></td>
+        <td><%= pos_refund.location_id %></td>
+        <td><%= number_to_currency(pos_refund.product_sales, unit: '$', separator: '.', delimiter: ',') %></td>
+        <td><%= number_to_currency(pos_refund.discount, unit: '$', separator: '.', delimiter: ',') %></td>
+        <td><%= number_to_currency(pos_refund.arbitrary_discount, unit: '$', separator: '.', delimiter: ',') %></td>
+        <td><%= number_to_currency(pos_refund.sales_tax, unit: '$', separator: '.', delimiter: ',') %></td>
+        <td><%= number_to_currency(pos_refund.refunded_shipping, unit: '$', separator: '.', delimiter: ',') %></td>
+        <td><%= number_to_currency(pos_refund.shipping, unit: '$', separator: '.', delimiter: ',') %></td>
+        <td><%= number_to_currency(pos_refund.shopify_payments, unit: '$', separator: '.', delimiter: ',') %></td>
+        <td><%= number_to_currency(pos_refund.paypal_payments, unit: '$', separator: '.', delimiter: ',') %></td>
+        <td><%= number_to_currency(pos_refund.gift_card_payments, unit: '$', separator: '.', delimiter: ',') %></td>
+        <td><%= number_to_currency(pos_refund.cash_payments, unit: '$', separator: '.', delimiter: ',') %></td>
+        <td><%= number_to_currency(pos_refund.cost, unit: '$', separator: '.', delimiter: ',') %></td>
+        <td>N/A</td>
+      </tr>
+    <% end %>
 </table>
 
 <div class='center'>
@@ -43,6 +65,7 @@
   <tr>
     <th>Created At</th>
     <th>Order Name</th>
+    <th>Shop</th>
     <th>Product Sales</th>
     <th>Discounts</th>
     <th>Arbitrary Discounts</th>
@@ -52,6 +75,7 @@
     <th>Shopify Payments</th>
     <th>Paypal Payments</th>
     <th>Gift Card Payments</th>
+    <th>Cash Payments</th>
     <th>Costs</th>
     <th>Costs by Location</th>
   </tr>
@@ -59,6 +83,7 @@
     <tr>
       <td><%= order.created_at.in_time_zone("Pacific Time (US & Canada)").strftime("%m/%d/%y") %></td>
       <td><a href='https://mollusksurf.myshopify.com/admin/orders/<%= order.order_id %>' target='_blank'><%= order.name %> <i class='fa fa-external-link-alt'></i></a></td>
+      <td><%= order.pos_location_id.present? ? order.pos_location_id : 'Web' %></td>
       <td><%= number_to_currency(order.product_sales, unit: '$', separator: '.', delimiter: ',') %></td>
       <td><%= number_to_currency(order.discount, unit: '$', separator: '.', delimiter: ',') %></td>
       <td><%= number_to_currency(order.arbitrary_discount, unit: '$', separator: '.', delimiter: ',') %></td>
@@ -68,6 +93,7 @@
       <td><%= number_to_currency(order.shopify_payments, unit: '$', separator: '.', delimiter: ',') %></td>
       <td><%= number_to_currency(order.paypal_payments, unit: '$', separator: '.', delimiter: ',') %></td>
       <td><%= number_to_currency(order.gift_card_payments, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(pos_refund.cash_payments, unit: '$', separator: '.', delimiter: ',') %></td>
       <td><%= number_to_currency(order.cost, unit: '$', separator: '.', delimiter: ',') %></td>
       <td>
         <%= render partial: '/daily_reports/shopify_costs_by_location', locals: { location_costs: order.location_costs } %>

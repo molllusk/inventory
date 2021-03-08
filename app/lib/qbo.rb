@@ -1,15 +1,22 @@
 # frozen_string_literal: true
 
 module Qbo
-  # Vend
   ACCOUNT_ID_BY_OUTLET = {
+    'Web' => '3652', # 11137 Finished Goods - Shopify,
     'San Francisco' => '3617', # 11001 Inventory Asset - San Francisco
     'Santa Barbara' => '3677', # 11005 Inventory Account - Santa Barbara
     'Silver Lake' => '3618', # 11002 Inventory Asset - Silver Lake
     'Venice Beach' => '3626' # 11003 Inventory Asset - Venice Beach
   }.freeze
 
+  PETTY_CASH_ID_BY_OUTLET = {
+    'San Francisco' => '3558', # Petty Cash - San Francisco
+    'Santa Barbara' => '3682', # Petty Cash - Santa Barbara
+    'Venice Beach' => '3628' # Petty Cash - Venice Beach
+  }.freeze
+
   CLASS_ID_BY_OUTLET = {
+    'Web' => 300_000_000_000_824_363,
     'San Francisco' => 300_000_000_000_824_364,
     'Santa Barbara' => 300_000_000_000_880_547,
     'Silver Lake' => 300_000_000_000_824_366,
