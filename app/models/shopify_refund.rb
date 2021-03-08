@@ -90,7 +90,7 @@ class ShopifyRefund < ApplicationRecord
       {
         account_id: Qbo::ACCOUNT_ID_BY_OUTLET['Web'],
         amount: location_costs.values.reduce(0) { |cost, sum| cost.to_f + sum.to_f },
-        description: 'Costs by SF Location (includes cost of returns from all locations)',
+        description: 'Web Costs (includes cost of WEB returns from all locations)',
         posting_type: 'Debit'
       }
     ]
