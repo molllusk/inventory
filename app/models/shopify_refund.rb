@@ -1,59 +1,13 @@
 # frozen_string_literal: true
 
-  # '3481', # 40003 Sales:Taxable Sales
-  # '3549', # 25500 *Sales Tax Payable
-  # '3557', # 40100 Freight Income
-  # '3454', # 43000 Sales Discounts
-  # '3483', # 10010 Mollusk West Checking 5421 (credit cards)
-  # '3487', # 10025 PayPal
-  # '3504', # 22050 Gift Certificates Outstanding
-  # '3476', # 50000 Cost of Goods Sold
-  # '3558', # 10045 Petty Cash - San Francisco
-  # '3682', # 10048 Petty Cash - Santa Barbara
-  # '3628', # 10047 Petty Cash - Venice Beach
-
-  # ACCOUNT_ID_BY_OUTLET = {
-  #   'Web' => '3652', # 11137 Finished Goods - Shopify,
-  #   'San Francisco' => '3617', # 11001 Inventory Asset - San Francisco
-  #   'Santa Barbara' => '3677', # 11005 Inventory Account - Santa Barbara
-  #   'Silver Lake' => '3618', # 11002 Inventory Asset - Silver Lake
-  #   'Venice Beach' => '3626' # 11003 Inventory Asset - Venice Beach
-  # }.freeze
-
-  # San Fran below needs to now be mollusk west, what will this affect beyond refunds
-  # "Mollusk West 300000000000824363"
-  # "San Fran 300000000000824364"
-  # "Santa Barbara 300000000000880547"
-  # "Silver Lake 300000000000824366"
-  # "Venice Beach 300000000000824365"
-
-  # CLASS_ID_BY_OUTLET = {
-  #   'San Francisco' => 300_000_000_000_824_364,
-  #   'Santa Barbara' => 300_000_000_000_880_547,
-  #   'Silver Lake' => 300_000_000_000_824_366,
-  #   'Venice Beach' => 300_000_000_000_824_365
-  # }.freeze
-
-  # CUSTOMER_ID_BY_OUTLET = {
-  #   'San Francisco' => 24913,
-  #   'Santa Barbara' => 26373,
-  #   'Silver Lake' => 24914,
-  #   'Venice Beach' => 24918
-  # }.freeze
-
-  # TAX_ITEM_ID_BY_OUTLET = {
-  #   'San Francisco' => '172116',
-  #   'Santa Barbara' => '182878',
-  #   'Silver Lake' => '174884',
-  #   'Venice Beach' => '181525'
-  # }.freeze
-
-  # CREDIT_CARD_PAYMENT_ID_BY_OUTLET = {
-  #   'San Francisco' => '181526',
-  #   'Santa Barbara' => '182879',
-  #   'Silver Lake' => '181528',
-  #   'Venice Beach' => '181529'
-  # }.freeze
+# '3481', # 40003 Sales:Taxable Sales
+# '3549', # 25500 *Sales Tax Payable
+# '3557', # 40100 Freight Income
+# '3454', # 43000 Sales Discounts
+# '3483', # 10010 Mollusk West Checking 5421 (credit cards)
+# '3487', # 10025 PayPal
+# '3504', # 22050 Gift Certificates Outstanding
+# '3476', # 50000 Cost of Goods Sold
 
 class ShopifyRefund < ApplicationRecord
   has_many :shopify_refund_orders, dependent: :destroy
@@ -165,13 +119,19 @@ class ShopifyRefund < ApplicationRecord
 
       journal_entry_line_detail = {
         account_ref: Qbo.base_ref(details[:account_id]),
-        class_ref: Qbo.base_ref(Qbo::MOLLUSK_WEST_CLASS),
+        class_ref: Qbo.base_ref(Qbo::CLASS_ID_BY_OUTLET['Web']),
         posting_type: details[:posting_type]
       }
 
       line_item = Qbo.journal_entry_line_item(line_item_params, journal_entry_line_detail)
 
       journal_entry.line_items << line_item
+    end
+
+    shopify_pos_refunds.each do |pos_refund|
+      pos_refund.journal_entry_line_items.each do |line_item|
+        journal_entry.line_items << line_item
+      end
     end
 
     journal_entry

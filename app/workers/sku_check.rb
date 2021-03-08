@@ -9,6 +9,7 @@ class SkuCheck
     Product.find_each do |product|
       vend_sku = product.vend_datum&.sku
       next if vend_sku.blank?
+
       bad_products << product if product.shopify_datum.present? && product.shopify_datum.barcode != vend_sku
     end
 

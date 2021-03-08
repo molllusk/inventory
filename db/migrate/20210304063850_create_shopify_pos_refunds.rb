@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateShopifyPosRefunds < ActiveRecord::Migration[5.2]
   def change
     create_table :shopify_pos_refunds do |t|

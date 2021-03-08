@@ -299,14 +299,14 @@ class DailySalesReceipts
         end
       end
 
-      if refund_line_items.blank?
-        refund_totals_by_order[order_name][:arbitrary_discount] += (refund_totals_by_order[order_name][:total_payments] - refunded_shipping - arbitrary_discount_from_order_adjustments)
+      next unless refund_line_items.blank?
 
-        if is_pos_refund
-          refund_totals_by_pos_location[location_id][:arbitrary_discount] += (refund_totals_by_pos_location[order_name][:total_payments] - refunded_shipping - arbitrary_discount_from_order_adjustments)
-        else
-          refunded_amounts[:arbitrary_discount] += (refund_totals_by_order[order_name][:total_payments] - refunded_shipping - arbitrary_discount_from_order_adjustments)
-        end
+      refund_totals_by_order[order_name][:arbitrary_discount] += (refund_totals_by_order[order_name][:total_payments] - refunded_shipping - arbitrary_discount_from_order_adjustments)
+
+      if is_pos_refund
+        refund_totals_by_pos_location[location_id][:arbitrary_discount] += (refund_totals_by_pos_location[order_name][:total_payments] - refunded_shipping - arbitrary_discount_from_order_adjustments)
+      else
+        refunded_amounts[:arbitrary_discount] += (refund_totals_by_order[order_name][:total_payments] - refunded_shipping - arbitrary_discount_from_order_adjustments)
       end
     end
 

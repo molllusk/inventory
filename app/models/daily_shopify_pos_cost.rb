@@ -34,10 +34,10 @@ class DailyShopifyPosCost < ApplicationRecord
   end
 
   def post_to_qbo
-    if shopify_pos_sales_cost_orders.present?
-      qbo = Qbo.create_journal_entry(journal_entry)
-      update_attribute(:qbo_id, qbo.id) unless qbo.blank?
-    end
+    return unless shopify_pos_sales_cost_orders.present?
+
+    qbo = Qbo.create_journal_entry(journal_entry)
+    update_attribute(:qbo_id, qbo.id) unless qbo.blank?
   end
 
   def journal_entry

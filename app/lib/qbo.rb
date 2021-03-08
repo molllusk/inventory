@@ -1,16 +1,6 @@
 # frozen_string_literal: true
 
 module Qbo
-
-  # '3481', # 40003 Sales:Taxable Sales
-  # '3549', # 25500 *Sales Tax Payable
-  # '3557', # 40100 Freight Income
-  # '3454', # 43000 Sales Discounts
-  # '3483', # 10010 Mollusk West Checking 5421 (credit cards)
-  # '3487', # 10025 PayPal
-  # '3504', # 22050 Gift Certificates Outstanding
-  # '3476', # 50000 Cost of Goods Sold
-
   ACCOUNT_ID_BY_OUTLET = {
     'Web' => '3652', # 11137 Finished Goods - Shopify,
     'San Francisco' => '3617', # 11001 Inventory Asset - San Francisco
@@ -23,16 +13,10 @@ module Qbo
     'San Francisco' => '3558', # Petty Cash - San Francisco
     'Santa Barbara' => '3682', # Petty Cash - Santa Barbara
     'Venice Beach' => '3628' # Petty Cash - Venice Beach
-  }
-
-# San Fran below needs to now be mollusk west, what will this affect beyond refunds
-# "Mollusk West 300000000000824363"
-# "San Fran 300000000000824364"
-# "Santa Barbara 300000000000880547"
-# "Silver Lake 300000000000824366"
-# "Venice Beach 300000000000824365"
+  }.freeze
 
   CLASS_ID_BY_OUTLET = {
+    'Web' => 300_000_000_000_824_363,
     'San Francisco' => 300_000_000_000_824_364,
     'Santa Barbara' => 300_000_000_000_880_547,
     'Silver Lake' => 300_000_000_000_824_366,

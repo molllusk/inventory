@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ShopifyPosRefund < ApplicationRecord
   belongs_to :shopify_refund, optional: true
 
@@ -90,10 +92,8 @@ class ShopifyPosRefund < ApplicationRecord
     shipping > -0.01 && shipping.negative? ? 0 : shipping
   end
 
-  def journal_entry
-    journal_entry = Qbo.journal_entry(journal_entry_params)
-
-    journal_line_item_details.each do |details|
+  def journal_entry_line_items
+    journal_line_item_details.map do |details|
       line_item_params = {
         amount: details[:amount],
         description: details[:description]
@@ -101,16 +101,12 @@ class ShopifyPosRefund < ApplicationRecord
 
       journal_entry_line_detail = {
         account_ref: Qbo.base_ref(details[:account_id]),
-        class_ref: Qbo.base_ref(Qbo::MOLLUSK_WEST_CLASS),
+        class_ref: Qbo.base_ref(Qbo::CLASS_ID_BY_OUTLET[location_id]),
         posting_type: details[:posting_type]
       }
 
-      line_item = Qbo.journal_entry_line_item(line_item_params, journal_entry_line_detail)
-
-      journal_entry.line_items << line_item
+      Qbo.journal_entry_line_item(line_item_params, journal_entry_line_detail)
     end
-
-    journal_entry
   end
 end
 
