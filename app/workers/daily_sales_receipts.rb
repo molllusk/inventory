@@ -518,7 +518,7 @@ class DailySalesReceipts
 
     shopify_refund = ShopifyRefund.create!(refunded_amounts)
 
-    refund_totals_by_pos_location do |location_id, values|
+    refund_totals_by_pos_location.each do |location_id, values|
       values[:location_id] = location_id
       values[:shipping] = values[:product_sales] + values[:sales_tax] + values[:refunded_shipping] + values[:arbitrary_discount] - values[:discount] - values[:total_payments]
       shopify_refund.shopify_pos_refunds << ShopifyPosRefund.create!(values)
