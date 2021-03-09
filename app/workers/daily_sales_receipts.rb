@@ -256,6 +256,7 @@ class DailySalesReceipts
 
       refund['transactions'].each do |transaction|
         next unless transaction['kind'] == 'refund' && transaction['status'] == 'success'
+        location_id = transaction['location_id']
 
         case transaction['gateway']
         when 'gift_card'
