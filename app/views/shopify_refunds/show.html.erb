@@ -93,7 +93,7 @@
       <td><%= number_to_currency(order.shopify_payments, unit: '$', separator: '.', delimiter: ',') %></td>
       <td><%= number_to_currency(order.paypal_payments, unit: '$', separator: '.', delimiter: ',') %></td>
       <td><%= number_to_currency(order.gift_card_payments, unit: '$', separator: '.', delimiter: ',') %></td>
-      <td><%= number_to_currency(pos_refund.cash_payments, unit: '$', separator: '.', delimiter: ',') %></td>
+      <td><%= number_to_currency(order.cash_payments, unit: '$', separator: '.', delimiter: ',') %></td>
       <td><%= number_to_currency(order.cost, unit: '$', separator: '.', delimiter: ',') %></td>
       <td>
         <%= render partial: '/daily_reports/shopify_costs_by_location', locals: { location_costs: order.location_costs } %>
