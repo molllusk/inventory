@@ -204,7 +204,7 @@ class DailySalesReceipts
         end
 
         costs_by_location[location_id] += refund_cost
-        refund_costs_by_location[location_id] += refund_cost
+        refund_costs_by_location[location_id] += refund_cost if !is_pos_refund
 
         purchased_quantity = line_item['line_item']['quantity'].to_f
         returned_quantity = line_item['quantity'].to_f
