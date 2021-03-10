@@ -80,7 +80,7 @@ class ShopifyPosRefund < ApplicationRecord
       },
       {
         account_id: Qbo::ACCOUNT_ID_BY_OUTLET[location_id],
-        amount: location_costs.values.reduce(0) { |cost, sum| cost.to_f + sum.to_f },
+        amount: cost,
         description: 'Costs for Location (POS)',
         posting_type: 'Debit'
       }
