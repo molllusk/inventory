@@ -168,6 +168,7 @@ class DailySalesReceipts
       order_name = order_names_by_id[refund['order_id']]
       fulfillments = ShopifyClient.fulfillments(refund['order_id'])
       is_pos_refund = refund['source_name'] == 'pos'
+      location_id = nil
 
       costs_by_location = Hash.new(0)
 
@@ -177,8 +178,8 @@ class DailySalesReceipts
         variant_id = line_item['line_item']['variant_id']
 
         if is_pos_refund
-          location_id = line_item['location_id']
-          refund_totals_by_order[order_name][:pos_location_id] += location_id
+          location_id ||= line_item['location_id']
+          refund_totals_by_order[order_name][:pos_location_id] ||= location_id
         else
           fulfillment = fulfillments.find { |fulfillment_candidate| fulfillment_candidate['line_items'].find { |fulfillment_line_item| fulfillment_line_item['variant_id'] == variant_id } }
           location_id = fulfillment.present? && fulfillment['location_id'].present? ? fulfillment['location_id'] : 'no_location'
@@ -197,7 +198,7 @@ class DailySalesReceipts
         refund_totals_by_order[order_name][:cost] += refund_cost
 
         if is_pos_refund
-          refund_totals_by_pos_location[location_id][:cost] += refunded_cost
+          refund_totals_by_pos_location[location_id][:cost] += refund_cost
         else
           refunded_amounts[:cost] += refund_cost
         end
@@ -243,8 +244,8 @@ class DailySalesReceipts
       refund_totals_by_order[order_name][:arbitrary_discount] = arbitrary_discount_from_order_adjustments
 
       if is_pos_refund
-        refund_totals_by_pos_location[location_id][:refunded_shipping] = refunded_shipping
-        refund_totals_by_pos_location[location_id][:arbitrary_discount] = arbitrary_discount_from_order_adjustments
+        refund_totals_by_pos_location[location_id][:refunded_shipping] += refunded_shipping
+        refund_totals_by_pos_location[location_id][:arbitrary_discount] += arbitrary_discount_from_order_adjustments
       else
         refunded_amounts[:refunded_shipping] += refunded_shipping
         refunded_amounts[:arbitrary_discount] += arbitrary_discount_from_order_adjustments
@@ -256,7 +257,6 @@ class DailySalesReceipts
 
       refund['transactions'].each do |transaction|
         next unless transaction['kind'] == 'refund' && transaction['status'] == 'success'
-        location_id = transaction['location_id']
 
         case transaction['gateway']
         when 'gift_card'
