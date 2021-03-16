@@ -21,3 +21,7 @@
     cron: '0 10 * * 1-5'
     class: 'DailyOrdering'
     description: 'Daily Orders for shops (restocks from warehouse)'
+  barcode_issues_check:
+    cron: '0 18 * * 1-5'
+    class: 'BarcodeIssuesCheck'
+    description: 'Check for duplicated and deleted shopify products'

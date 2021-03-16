@@ -17,11 +17,6 @@ class ApplicationMailer < ActionMailer::Base
     mail to: 'john@mollusksurfshop.com', cc: 'joseph@mollusksurfshop.com, arvelhernandez@gmail.com', subject: subject, body: body
   end
 
-  def sku_report(bad_products)
-    body = "One or more mismatched skus were detected between previously matched Vend and Shopify products:#{"<br /><br /><b>Product Mismatches:</b><br /><ul>#{bad_products.map { |prod| "<li><a href='https://mollusk.herokuapp.com/products/#{prod.id}'>#{prod.vend_datum.variant_name}</a></li>" }.join}</ul>" if bad_products.present?}"
-    mail to: 'joseph@mollusksurfshop.com, arvelhernandez@gmail.com', subject: 'Mismatched SKU Report', content_type: 'text/html', body: body
-  end
-
   def po(daily_inventory_transfer)
     daily_inventory_transfer.daily_orders.each do |daily_order|
       unless daily_order.orders.blank?
