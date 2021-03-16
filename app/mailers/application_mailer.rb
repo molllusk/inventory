@@ -33,4 +33,11 @@ class ApplicationMailer < ActionMailer::Base
 
     mail to: 'joseph@mollusksurfshop.com, john@mollusksurfshop.com, johanna@mollusksurfshop.com, sfmanager@mollusksurfshop.com, daveo@mollusksurfshop.com, maddie@mollusksurfshop.com, beau@mollusksurfshop.com', cc: 'arvelhernandez@gmail.com', subject: "Mollusk Order #{daily_inventory_transfer.po_id}"
   end
+
+  def barcode_issues(duplicates, deletions)
+    @shopify_duplicates = duplicates
+    @shopify_deletions = deletions
+
+    mail to: 'joseph@mollusksurfshop.com, arvelhernandez@gmail.com', subject: "Shopify Product Issues #{Time.now.strftime("%F")}"
+  end
 end
