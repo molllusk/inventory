@@ -1,4 +1,4 @@
-For the most up-to-date list please see the <a href='<%= shopify_issues_products_path %>'>Product Issues Page</a>
+For the most up-to-date list please see the <a href='http://mollusk.herokuapp.com/products/shopify_issues'>Product Issues Page</a>
 <br />
 <br />
 <% if @shopify_duplicates.present? %>
@@ -14,15 +14,12 @@ For the most up-to-date list please see the <a href='<%= shopify_issues_products
     <% @shopify_duplicates.each do |duplicate| %>
       <tr>
         <td><%= duplicate.updated_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
-        <td><a href='<%= product_path(duplicate.product) %>'><%= duplicate.product.title %></td>
+        <td><a href='https://mollusk.herokuapp.com/products/<%= duplicate.product.id %>'><%= duplicate.product.title %></td>
         <td><a href='<%= duplicate.original_shopify_link %>'>Original Variant <i class='fa fa-external-link-alt'></i></a></td>
         <td><a href='<%= duplicate.duplicate_shopify_link %>'>Duplicate Variant <i class='fa fa-external-link-alt'></i></a></td>
       </tr>
     <% end %>
   <table>
-  <div class='center'>
-    <%= will_paginate @shopify_duplicates, param_name: 'shopify_duplicates_page' %>
-  </div>
 <% end %>
 
 <% if @shopify_deletions.present? %>
@@ -39,15 +36,12 @@ For the most up-to-date list please see the <a href='<%= shopify_issues_products
     <% @shopify_deletions.each do |deletion| %>
       <tr>
         <td><%= deletion.created_at.in_time_zone("Pacific Time (US & Canada)").to_s(:humanized_ago) %></td>
-        <td><a href='<%= product_path(deletion.product) %>'><%= deletion.product.title %></td>
+        <td><a href='https://mollusk.herokuapp.com/products/<%= deletion.product.id %>'><%= deletion.product.title %></td>
         <td><a href='<%= deletion.deleted_shopify_link %>'>Deleted Variant <i class='fa fa-external-link-alt'></i></a></td>
         <td><a href='<%= deletion.new_shopify_link %>'>New Variant <i class='fa fa-external-link-alt'></i></a></td>
       </tr>
     <% end %>
   <table>
-  <div class='center'>
-    <%= will_paginate @shopify_deletions, param_name: 'shopify_deletions_page' %>
-  </div>
 <% end %>
 
 Thanks!
