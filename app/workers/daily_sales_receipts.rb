@@ -40,6 +40,7 @@ class DailySalesReceipts
       if is_refund
         ShopifyClient.refunds(order['id']).each do |refund|
           next if Time.parse(refund['created_at']) < min_date || Time.parse(refund['created_at']) > max_date
+
           refund['location_id'] = order['location_id']
           refund['is_pos'] = is_pos
           refunds << refund
@@ -180,7 +181,7 @@ class DailySalesReceipts
       refund_line_items.each do |line_item|
         variant_id = line_item['line_item']['variant_id']
 
-        if !is_pos_refund
+        unless is_pos_refund
           fulfillment = fulfillments.find { |fulfillment_candidate| fulfillment_candidate['line_items'].find { |fulfillment_line_item| fulfillment_line_item['variant_id'] == variant_id } }
           location_id = fulfillment.present? && fulfillment['location_id'].present? ? fulfillment['location_id'] : 'no_location'
         end
@@ -204,7 +205,7 @@ class DailySalesReceipts
         end
 
         costs_by_location[location_id] += refund_cost
-        refund_costs_by_location[location_id] += refund_cost if !is_pos_refund
+        refund_costs_by_location[location_id] += refund_cost unless is_pos_refund
 
         purchased_quantity = line_item['line_item']['quantity'].to_f
         returned_quantity = line_item['quantity'].to_f

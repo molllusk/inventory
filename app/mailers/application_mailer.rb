@@ -33,6 +33,6 @@ class ApplicationMailer < ActionMailer::Base
     @shopify_duplicates = duplicates
     @shopify_deletions = deletions
 
-    mail to: 'joseph@mollusksurfshop.com, arvelhernandez@gmail.com', subject: "Shopify Product Issues #{Time.now.strftime("%F")}"
+    mail to: 'joseph@mollusksurfshop.com, arvelhernandez@gmail.com', subject: "Shopify Product Issues #{Time.now.strftime('%F')}"
   end
 end

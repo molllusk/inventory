@@ -161,7 +161,7 @@ class Product < ApplicationRecord
     data = {
       id: id,
       product: shopify_datum&.title,
-      variant: (shopify_datum&.variant_title).to_s.gsub(/Default(\s+Title)?/i, ''),
+      variant: shopify_datum&.variant_title.to_s.gsub(/Default(\s+Title)?/i, ''),
       type: shopify_datum&.product_type,
       size: shopify_datum&.option1.to_s.strip.downcase,
       sku: shopify_datum&.sku,
