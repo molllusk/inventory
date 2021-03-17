@@ -222,23 +222,6 @@ class VendClient
     paginator('inventory')
   end
 
-  def self.update_inventories
-    all_inventory_levels = get_inventory
-
-    all_inventory_levels.each do |inventory_level|
-      vd = VendDatum.find_by(vend_id: inventory_level['product_id'])
-
-      next unless vd.present?
-
-      existing_inventory_item = vd.vend_inventories.find_by(outlet_id: inventory_level['outlet_id'])
-      if existing_inventory_item.present?
-        existing_inventory_item.update_attribute(:inventory, inventory_level['inventory_level']) unless existing_inventory_item.inventory == inventory_level['inventory_level']
-      else
-        vd.vend_inventories << VendInventory.create(outlet_id: inventory_level['outlet_id'], inventory: inventory_level['inventory_level'])
-      end
-    end
-  end
-
   def self.product_attributes(product)
     cleaned = {
       vend_id: product['id'],
