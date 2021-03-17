@@ -152,15 +152,15 @@ class Product < ApplicationRecord
 
   def self.inventory_csv
     CSV.generate(headers: inventory_csv_headers, write_headers: true) do |new_csv|
-      find_each do |product|
+      with_shopify.find_each do |product|
         new_csv << product.inventory_csv_row
       end
     end
   end
 
   def self.inventory_csv_headers
-    stem = %i[id product variant type size sku handle shopify_tags vend shopify app supplier_name supply_price]
-    stem + ShopifyInventory.active_locations + VendInventory.active_locations + [:total_inventory] + ShopifyInventory.active_locations.map { |loc| "Inventory Value (#{loc})" }
+    stem = %i[id product variant type size sku handle shopify_tags shopify app supplier_name supply_price]
+    stem + ShopifyInventory.active_locations + [:total_inventory] + ShopifyInventory.active_locations.map { |loc| "Inventory Value (#{loc})" }
   end
 
   def update_inventory(orders, outlet)
@@ -191,15 +191,14 @@ class Product < ApplicationRecord
   def inventory_csv_row_data
     data = {
       id: id,
-      product: vend_datum&.name || shopify_datum&.title,
-      variant: (shopify_datum&.variant_title || vend_datum&.variant_name).to_s.gsub(/Default(\s+Title)?/i, ''),
-      type: vend_datum&.vend_type&.[]('name') || shopify_datum&.product_type,
+      product: shopify_datum&.title,
+      variant: (shopify_datum&.variant_title).to_s.gsub(/Default(\s+Title)?/i, ''),
+      type: shopify_datum&.product_type,
       size: shopify_datum&.option1.to_s.strip.downcase,
-      sku: vend_datum&.sku || shopify_datum&.barcode,
+      sku: shopify_datum&.barcode,
       product_sku: shopify_datum&.sku,
       handle: shopify_datum&.handle,
       shopify_tags: shopify_datum&.tags&.join(', '),
-      vend: vend_datum&.link,
       shopify: shopify_datum&.link,
       app: "https://mollusk.herokuapp.com/products/#{id}",
       supplier_name: shopify_datum&.vendor,
@@ -212,13 +211,6 @@ class Product < ApplicationRecord
         data[inventory.location] = inventory.inventory
         data["Inventory Value (#{inventory.location})"] = shopify_datum&.vendor == 'Consignee' ? 0 : inventory.inventory * shopify_datum.cost.to_f
         data[:total_inventory] += inventory.inventory if ['Shopify Fulfillment Network', 'Mollusk SF'].include?(inventory.location)
-      end
-    end
-
-    if vend_datum.present?
-      vend_datum.vend_inventories.exclude_dead_locations.each do |inventory|
-        data[inventory.location] = inventory.inventory
-        data[:total_inventory] += inventory.inventory
       end
     end
 
