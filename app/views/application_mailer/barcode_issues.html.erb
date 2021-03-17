@@ -1,6 +1,5 @@
 For the most up-to-date list please see the <a href='http://mollusk.herokuapp.com/products/shopify_issues'>Product Issues Page</a>
 <br />
-<br />
 <% if @shopify_duplicates.present? %>
   <h2 class='center'>Shopify products with duplicate barcodes:</h2>
   <table class='full_width'>
@@ -23,7 +22,7 @@ For the most up-to-date list please see the <a href='http://mollusk.herokuapp.co
 <% end %>
 
 <% if @shopify_deletions.present? %>
-  <hr/>
+  <br />
   <h2 class='center'>Recently deleted shopify products:</h2>
   <table class='full_width'>
     <tr>
@@ -43,5 +42,5 @@ For the most up-to-date list please see the <a href='http://mollusk.herokuapp.co
     <% end %>
   <table>
 <% end %>
-
+<br />
 Thanks!
