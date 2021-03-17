@@ -248,29 +248,6 @@ class DailyOrder < ApplicationRecord
     Airbrake.notify("Could not create Inventory Planner Purchase order for Daily Order: #{id}")
   end
 
-  def create_consignment
-    consignment = VendClient.create_consignment(self)
-    update_attribute(:vend_consignment_id, consignment['id'])
-    add_products_to_consignment
-    send_consignment
-  rescue StandardError
-    Airbrake.notify("Could not create Consignment for Daily Order: #{id}")
-  end
-
-  def add_products_to_consignment
-    orders.each do |order|
-      VendClient.add_consignment_product(order)
-    rescue StandardError
-      Airbrake.notify("Could not add product to Consignment for Daily Order: #{id} / Product: #{order.product_id}")
-    end
-  end
-
-  def send_consignment
-    VendClient.update_consignment_status(vend_consignment_id, 'SENT')
-  rescue StandardError
-    Airbrake.notify("Could not SEND Consignment (#{vend_consignment_id}) for Daily Order: #{id}")
-  end
-
   def cancel_consignment
     VendClient.update_consignment_status(vend_consignment_id, 'CANCELLED')
   rescue StandardError
