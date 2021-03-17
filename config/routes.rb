@@ -63,8 +63,6 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :inventory_updates
-
   resources :products do
     collection do
       get :shopify_issues

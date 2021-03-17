@@ -3,7 +3,6 @@
 class Product < ApplicationRecord
   has_one :vend_datum, dependent: :destroy
   has_one :shopify_datum, dependent: :destroy
-  has_many :inventory_updates, dependent: :destroy
   has_many :orders, dependent: :destroy
   has_many :shopify_duplicates, dependent: :destroy
   has_many :shopify_deletions, dependent: :destroy

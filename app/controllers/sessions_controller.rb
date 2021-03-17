@@ -2,7 +2,7 @@
 
 class SessionsController < ApplicationController
   def new
-    redirect_to inventory_updates_path if logged_in?
+    redirect_to products_path if logged_in?
   end
 
   def create
@@ -10,7 +10,7 @@ class SessionsController < ApplicationController
     if user&.authenticate(params[:session][:password])
       log_in user
       params[:session][:remember_me] == '1' ? remember(user) : forget(user)
-      redirect_back_or inventory_updates_path
+      redirect_back_or products_path
     else
       flash.now[:danger] = 'Invalid email/password combination'
       render 'new'
