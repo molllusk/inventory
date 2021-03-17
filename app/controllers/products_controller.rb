@@ -36,7 +36,7 @@ class ProductsController < ApplicationController
 
   private
 
-  def load_project
+  def load_product
     @product = Product.find(params[:id])
   end
 end
