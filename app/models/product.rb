@@ -84,27 +84,6 @@ class Product < ApplicationRecord
     end
   }
 
-  def self.run_inventory_updates
-    orders = ShopifyClient.web_order_quantities_by_variant
-    update_inventories(orders)
-  end
-
-  def self.update_inventories(orders)
-    # We'll make this store.where(sync_inventory: true) make it a scope then
-    # %i[sf vb sb]
-    %i[].each do |outlet|
-      # do not update inventory if any order exists for that variant in any location
-      update_entire_store_inventory(orders, outlet)
-    end
-  end
-
-  def self.update_entire_store_inventory(orders, outlet = :sf)
-    with_shopify.find_each do |product|
-      # do not update inventory if any order exists for that variant in any location
-      product.update_inventory(orders, outlet) if product.vend_datum&.inventory_at_location(LOCATION_NAMES_BY_CODE[outlet]).present?
-    end
-  end
-
   def self.daily_order_inventory_levels
     @daily_order_inventory_levels ||= get_daily_order_inventory_levels
   end
@@ -159,33 +138,24 @@ class Product < ApplicationRecord
   end
 
   def self.inventory_csv_headers
-    stem = %i[id product variant type size sku handle shopify_tags shopify app supplier_name supply_price]
+    stem = %i[id product variant type size sku barcode handle shopify_tags shopify app supplier_name supply_price]
     stem + ShopifyInventory.active_locations + [:total_inventory] + ShopifyInventory.active_locations.map { |loc| "Inventory Value (#{loc})" }
-  end
-
-  def update_inventory(orders, outlet)
-    connect_inventory_location(outlet) if missing_inventory_location?(outlet)
-    adjust_inventory(outlet) if update_shopify_inventory?(outlet) && !orders_present?(orders)
   end
 
   def orders_present?(orders)
     orders[shopify_datum&.variant_id].positive?
   end
 
-  def adjust_inventory(outlet)
-    adjust_inventory_vend(outlet, inventory_adjustment(outlet))
-  end
-
   def title
-    shopify_datum&.full_title || vend_datum&.variant_name
+    shopify_datum&.full_title
   end
 
   def barcode
-    shopify_datum&.barcode || vend_datum&.sku
+    shopify_datum&.barcode
   end
 
   def sort_key
-    shopify_datum&.sort_key || vend_datum&.sort_key
+    shopify_datum&.sort_key
   end
 
   def inventory_csv_row_data
@@ -195,8 +165,8 @@ class Product < ApplicationRecord
       variant: (shopify_datum&.variant_title).to_s.gsub(/Default(\s+Title)?/i, ''),
       type: shopify_datum&.product_type,
       size: shopify_datum&.option1.to_s.strip.downcase,
-      sku: shopify_datum&.barcode,
-      product_sku: shopify_datum&.sku,
+      sku: shopify_datum&.sku,
+      barcode: shopify_datum&.barcode,
       handle: shopify_datum&.handle,
       shopify_tags: shopify_datum&.tags&.join(', '),
       shopify: shopify_datum&.link,
@@ -222,40 +192,6 @@ class Product < ApplicationRecord
     Product.inventory_csv_headers.map { |header| data[header] }
   end
 
-  def adjust_inventory_vend(outlet, quantity)
-    location_name = "Mollusk #{outlet.to_s.upcase}"
-    location_id = ShopifyInventory.locations[location_name]
-
-    begin
-      response = ShopifyClient.adjust_inventory(shopify_datum.inventory_item_id, location_id, quantity)
-
-      if ShopifyClient.inventory_item_updated?(response)
-        save_inventory_adjustment_vend(response, quantity, outlet)
-      else
-        Airbrake.notify("Could not UPDATE #{location_name}:#{location_id} inventory for Product: #{id}, Adjustment: #{quantity} | #{response}")
-      end
-    rescue StandardError => e
-      Airbrake.notify("There was an error UPDATING #{location_name}:#{location_id} inventory for Product: #{id}, Adjustment: #{quantity} | #{e}")
-    end
-  end
-
-  def save_inventory_adjustment_vend(response, quantity, outlet)
-    location_id = response['inventory_level']['location_id']
-    shopify_inventory = shopify_datum.inventory_at_location(location_id)
-    new_inventory = response['inventory_level']['available']
-
-    InventoryUpdate.create(
-      vend_qty: vend_inventory(outlet),
-      prior_qty: shopify_inventory.inventory,
-      adjustment: quantity,
-      product_id: id,
-      new_qty: new_inventory,
-      location: location_id
-    )
-
-    shopify_inventory.update_attribute(:inventory, new_inventory)
-  end
-
   def connect_inventory_location(outlet = :sf)
     location = ShopifyInventory.locations["Mollusk #{outlet.to_s.upcase}"]
 
@@ -273,20 +209,6 @@ class Product < ApplicationRecord
 
   def shopify_inventory(outlet)
     inventory_location(outlet)&.inventory.to_i
-  end
-
-  def vend_inventory(outlet)
-    outlet = LOCATION_NAMES_BY_CODE[outlet]
-    inventory = vend_datum.vend_inventories.find_by(outlet_id: VendClient::OUTLET_NAMES_BY_ID.key(outlet))&.inventory.to_i
-    inventory.negative? ? 0 : inventory
-  end
-
-  def update_shopify_inventory?(outlet)
-    shopify_inventory(outlet) != vend_inventory(outlet)
-  end
-
-  def inventory_adjustment(outlet)
-    vend_inventory(outlet) - shopify_inventory(outlet)
   end
 
   def missing_inventory_location?(outlet)
