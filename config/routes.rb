@@ -84,10 +84,4 @@ Rails.application.routes.draw do
   resources :shopify_sales_costs
   resources :shopify_sales_receipts
   resources :users
-
-  resources :wholesale_orders do
-    collection do
-      get :post_to_sos
-    end
-  end
 end
