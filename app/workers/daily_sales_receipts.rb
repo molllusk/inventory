@@ -236,6 +236,15 @@ class DailySalesReceipts
       refund['order_adjustments'].each do |adjustment|
         if adjustment['kind'] == 'shipping_refund'
           refunded_shipping -= adjustment['amount'].to_f
+          # refunded sales tax charged on shipping
+          if adjustment['tax_amount'].present?
+            refund_totals_by_order[order_name][:sales_tax] -= adjustment['tax_amount'].to_f
+            if is_pos_refund
+              refund_totals_by_pos_location[location_id][:sales_tax] -= adjustment['tax_amount'].to_f
+            else
+              refunded_amounts[:sales_tax] -= adjustment['tax_amount'].to_f
+            end
+          end
         elsif adjustment['amount'].to_f.negative?
           arbitrary_discount_from_order_adjustments -= adjustment['amount'].to_f
         end
