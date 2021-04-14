@@ -17,6 +17,8 @@ class ShopifyInventory < ApplicationRecord
     'Shopify Fulfillment Network' => 36_225_056_853
   }
 
+  REQUIRED_LOCATIONS = ['Mollusk SF', 'Mollusk SB', 'Mollusk VB']
+
   DEAD_LOCATIONS = ['Jam Warehouse Retail', 'Postworks'].freeze
 
   # This is transitional and won't be needed once vend is fully deprecated

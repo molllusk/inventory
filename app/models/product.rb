@@ -191,17 +191,6 @@ class Product < ApplicationRecord
     Product.inventory_csv_headers.map { |header| data[header] }
   end
 
-  def connect_inventory_location(outlet = :sf)
-    location = ShopifyInventory.locations["Mollusk #{outlet.to_s.upcase}"]
-
-    response = ShopifyClient.connect_inventory_location(shopify_datum.inventory_item_id, location)
-    shopify_datum.shopify_inventories << ShopifyInventory.new(location: location, inventory: 0)
-
-    Airbrake.notify("Could not CONNECT #{outlet.to_s.upcase} inventory location for Product: #{id}") unless ShopifyClient.inventory_item_updated?(response)
-  rescue StandardError
-    Airbrake.notify("There was an error CONNECTING #{outlet.to_s.upcase} inventory location for Product: #{id}")
-  end
-
   def daily_order_inventory_thresholds
     @daily_order_inventory_thresholds ||= Product.daily_order_inventory_levels[shopify_datum.product_type.to_s.strip.downcase]&.[](shopify_datum.option1.to_s.strip.downcase)
   end

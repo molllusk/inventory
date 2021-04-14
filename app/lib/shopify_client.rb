@@ -148,27 +148,6 @@ module ShopifyClient
     inventory_item['cost'].to_f
   end
 
-  def self.update_inventories
-    inventory_item_ids = ShopifyDatum.pluck(:inventory_item_id)
-
-    while inventory_item_ids.present?
-      id_batch = inventory_item_ids.shift(50)
-      all_inventory_levels = get_inventory_levels_all_locations(id_batch)
-
-      all_inventory_levels.each do |inventory_level|
-        sd = ShopifyDatum.find_by(inventory_item_id: inventory_level['inventory_item_id'])
-        existing_inventory_item = sd.shopify_inventories.find_by(location: inventory_level['location_id'])
-        if inventory_level['available'].present?
-          if existing_inventory_item.present?
-            existing_inventory_item.update_attribute(:inventory, inventory_level['available']) if existing_inventory_item.inventory != inventory_level['available']
-          else
-            sd.shopify_inventories << ShopifyInventory.create(location: inventory_level['location_id'], inventory: inventory_level['available'])
-          end
-        end
-      end
-    end
-  end
-
   def self.adjust_inventory(inventory_item_id, location_id, adjustment)
     body = {
       location_id: location_id,

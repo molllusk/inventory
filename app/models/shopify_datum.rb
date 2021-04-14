@@ -8,6 +8,48 @@ class ShopifyDatum < ApplicationRecord
 
   scope :with_warehouse, -> { joins(:shopify_inventories).merge(ShopifyInventory.with_warehouse) }
 
+  def self.connect_required_inventory_locations
+    find_each do |shopify_datum|
+      missing_locations = ShopifyInventory::REQUIRED_LOCATIONS - shopify_datum.shopify_inventories.pluck(:location)
+      missing_locations.each do |location|
+        shopify_datum.connect_inventory_location(location)
+      end
+    end
+  end
+
+  def self.update_inventories
+    inventory_item_ids = pluck(:inventory_item_id)
+
+    while inventory_item_ids.present?
+      id_batch = inventory_item_ids.shift(50)
+      all_inventory_levels = ShopifyClient.get_inventory_levels_all_locations(id_batch)
+
+      all_inventory_levels.each do |inventory_level|
+        if inventory_level['available'].present?
+          sd = find_by(inventory_item_id: inventory_level['inventory_item_id'])
+          existing_inventory_item = sd.shopify_inventories.find_by(location: inventory_level['location_id'])
+
+          if existing_inventory_item.present?
+            existing_inventory_item.update_attribute(:inventory, inventory_level['available']) if existing_inventory_item.inventory != inventory_level['available']
+          else
+            sd.shopify_inventories.create(location: inventory_level['location_id'], inventory: inventory_level['available'])
+          end
+        end
+      end
+    end
+  end
+
+  def connect_inventory_location(outlet)
+    location = ShopifyInventory.locations[outlet]
+
+    response = ShopifyClient.connect_inventory_location(inventory_item_id, location)
+    shopify_inventories << ShopifyInventory.new(location: location, inventory: 0)
+
+    Airbrake.notify("Could not CONNECT #{outlet.to_s.upcase} inventory location for Product: #{product_id}") unless ShopifyClient.inventory_item_updated?(response)
+  rescue StandardError
+    Airbrake.notify("There was an error CONNECTING #{outlet.to_s.upcase} inventory location for Product: #{product_id}")
+  end
+
   def inventory_at_location(location = 'Mollusk SF')
     shopify_inventories.find_by(location: location)
   end
