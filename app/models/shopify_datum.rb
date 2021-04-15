@@ -12,7 +12,19 @@ class ShopifyDatum < ApplicationRecord
     find_each do |shopify_datum|
       missing_locations = ShopifyInventory::REQUIRED_LOCATIONS - shopify_datum.shopify_inventories.pluck(:location)
       missing_locations.each do |location|
-        shopify_datum.connect_inventory_location(location)
+        response = shopify_datum.connect_inventory_location(location)
+        if ShopifyClient.inventory_item_updated?(response)
+          shopify_datum.shopify_inventories.create(location: location, inventory: 0)
+        else
+          shopify_variant = ShopifyClient.get_variant(shopify_datum.variant_id)
+          if shopify_variant.blank?
+            Airbrake.notify("Could not CONNECT #{location.to_s} inventory location for DELETED Shopify Product: #{shopify_datum.product_id}. Deleting from app")
+            shopify_datum.product.destroy
+            break
+          else
+            Airbrake.notify("Could not CONNECT #{location.to_s} inventory location for EXISTING Shopify Product: #{shopify_datum.product_id}")
+          end
+        end
       end
     end
   end
@@ -42,19 +54,7 @@ class ShopifyDatum < ApplicationRecord
   def connect_inventory_location(outlet)
     location = ShopifyInventory.locations[outlet]
 
-    response = ShopifyClient.connect_inventory_location(inventory_item_id, location)
-
-    if ShopifyClient.inventory_item_updated?(response)
-      shopify_inventories << ShopifyInventory.new(location: location, inventory: 0)
-    else
-      shopify_variant = ShopifyClient.get_variant(variant_id)
-      if shopify_variant.blank?
-        Airbrake.notify("Could not CONNECT #{outlet.to_s.upcase} inventory location for DELETED Shopify Product: #{product_id}. Deleting from app")
-        self.class.destroy(id)
-      else
-        Airbrake.notify("Could not CONNECT #{outlet.to_s.upcase} inventory location for EXISTING Shopify Product: #{product_id}")
-      end
-    end
+    ShopifyClient.connect_inventory_location(inventory_item_id, location)
   rescue StandardError
     Airbrake.notify("There was an error CONNECTING #{outlet.to_s.upcase} inventory location for Product: #{product_id}")
   end
