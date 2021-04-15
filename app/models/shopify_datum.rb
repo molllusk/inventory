@@ -43,9 +43,10 @@ class ShopifyDatum < ApplicationRecord
     location = ShopifyInventory.locations[outlet]
 
     response = ShopifyClient.connect_inventory_location(inventory_item_id, location)
-    shopify_inventories << ShopifyInventory.new(location: location, inventory: 0)
 
-    if !ShopifyClient.inventory_item_updated?(response)
+    if ShopifyClient.inventory_item_updated?(response)
+      shopify_inventories << ShopifyInventory.new(location: location, inventory: 0)
+    else
       shopify_variant = ShopifyClient.get_variant(variant_id)
       if shopify_variant.blank?
         Airbrake.notify("Could not CONNECT #{outlet.to_s.upcase} inventory location for DELETED Shopify Product: #{product_id}. Deleting from app")
