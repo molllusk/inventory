@@ -53,6 +53,7 @@ class ShopifyDatum < ApplicationRecord
       else
         Airbrake.notify("Could not CONNECT #{outlet.to_s.upcase} inventory location for EXISTING Shopify Product: #{product_id}")
       end
+    end
   rescue StandardError
     Airbrake.notify("There was an error CONNECTING #{outlet.to_s.upcase} inventory location for Product: #{product_id}")
   end
