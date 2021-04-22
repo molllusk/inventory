@@ -95,15 +95,6 @@ class Product < ApplicationRecord
     @release_schedule ||= get_release_schedule
   end
 
-  def self.get_inventory_levels(fill_key = 'WH Fill')
-    levels = GoogleClient.sheet_values(GoogleClient::FILL_LEVEL).sort_by { |row| row['Category'] }
-    levels_by_type_and_size = Hash.new { |hash, key| hash[key] = {} }
-    levels.each do |level|
-      levels_by_type_and_size[level['Category'].to_s.strip.downcase][level['Size'].to_s.strip.downcase] = level[fill_key].to_i
-    end
-    levels_by_type_and_size
-  end
-
   def self.get_daily_order_inventory_levels
     levels = GoogleClient.sheet_values(GoogleClient::FILL_LEVEL).sort_by { |row| row['Category'] }
     levels_by_type_and_size = Hash.new { |types, type_key| types[type_key] = Hash.new { |sizes, size_key| sizes[size_key] = {} } }
